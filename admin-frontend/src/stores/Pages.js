@@ -1,0 +1,16 @@
+import { action, computed, observable } from 'mobx';
+import localforage from 'localforage';
+import ItemsStore from './ItemsStore';
+import * as api from '../api';
+
+class Pages extends ItemsStore {
+
+  @action
+  async loadPage(pageIndex) {
+    await this._loadPage(pageIndex, 'Pages', api.loadContentPages);
+  }
+}
+
+const pagesStore = new Pages();
+
+export default pagesStore;

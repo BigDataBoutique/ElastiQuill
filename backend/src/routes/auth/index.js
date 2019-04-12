@@ -1,0 +1,118 @@
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import passport from 'passport';
+
+import * as logging from '../../services/logging';
+import { frontendAddress, config } from '../../app';
+
+import initJwt from './jwt';
+import initGoogle from './google';
+import initGithub from './github';
+import { AdminEmails } from './util';
+
+const router = express.Router();
+const socialAuthSources = [];
+
+const ADMIN_ROUTE = config.blog['admin-route'];
+const ADMIN_EMAILS = new AdminEmails(config.blog['admin-emails']);
+
+if (ADMIN_EMAILS.isEmpty()) {
+  throw new Error('blog.admin-emails configuration variable is not set')
+}
+
+router.get('/whoami', passport.authenticate('jwt', { session: false }), function (req, res) {
+  res.json(req.user);
+});
+
+router.get('/social-auth-sources', function (req, res) {
+  res.json(socialAuthSources);
+});
+
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((serialized, done) => done(null, serialized));
+
+initJwt(passport);
+
+try {
+  initGoogle(passport, router, handleRequest);
+  socialAuthSources.push('google');
+} catch (e) {
+  console.error('Failed to init Google auth:', e.message);
+}
+
+try {
+  initGithub(passport, router, handleRequest);
+  socialAuthSources.push('github');
+} catch (e) {
+  console.error('Failed to init Github auth:', e.message);
+}
+
+async function handleRequest(req, res) {
+  if (! req.user) {
+    const profileEmails = JSON.stringify(res.locals.profileEmails) || '';
+    const authEmailBase64 = Buffer.from(profileEmails).toString('base64');
+    res.redirect(frontendAddress() + ADMIN_ROUTE + '#/login/error/' + authEmailBase64);
+
+    logging.logAuthAttempt({
+      email: res.locals.profileEmails,
+      success: false
+    }, req, res);
+    return;
+  }
+
+  updateJwtToken(req, res);
+  res.redirect(frontendAddress() + ADMIN_ROUTE);
+
+  logging.logAuthAttempt({
+    email: req.user.email,
+    success: true
+  }, req, res);
+}
+
+export function getJwtToken(req) {
+  return jwt.sign({
+    user: req.user
+  }, config.blog['jwt-secret']);  
+}
+
+export function updateJwtToken(req, res) {
+  res.cookie('jwt-token', getJwtToken(req), {
+    maxAge: 10 * 1000,
+    sameSite: 'Lax'
+  });
+}
+
+export const passportDefaultCallback = (err, req, res, profile, next) => {
+  if (err) {
+    return next(err);
+  }
+
+  let user = null;
+  const profileEmails = profile.emails.map(em => em.value);
+  for (const email of profileEmails) {
+    if (ADMIN_EMAILS.match(email)) {
+      user = {
+        name: profile.displayName ? profile.displayName : profile.username,
+        email
+      };
+      break;
+    }
+  }
+
+  if (! user) {
+    res.locals.profileEmails = profileEmails;
+    res.status(401);
+    next(null, false);
+    return;
+  }
+
+  req.logIn(user, function (err) {
+    if (err) {
+      return next(err);
+    }
+
+    return next();
+  });
+};
+
+export default router;

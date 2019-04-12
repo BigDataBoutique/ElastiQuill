@@ -1,0 +1,23 @@
+<li class="comment" data-id="{{id}}" data-index={{index}} id="{{comment_id}}">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <img src="https://www.gravatar.com/avatar.php?gravatar_id={{emailMD5}}&amp;size=100&amp;default=identicon" alt="{{author.name}}" style="width: 100px; height: 100px;" class="imageborder alignleft">
+            {{{content}}}
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <i class="fa fa-user"> </i> <a href="{{author.website}}" rel="nofollow">{{author.name}}</a> <i class="fa fa-clock-o"></i> <time datetime="{{published_at}}">{{published_at_str}}</time>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4" style="text-align: right">
+                    <button class="btn btn-primary btn-add-comment" onclick="onClickReply(this)">Reply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul class="list-unstyled" style="padding-left: 30px;">
+    {{#each replies}}
+        {{> comment this index=@index }}
+    {{/each}}
+    </ul>
+</li>

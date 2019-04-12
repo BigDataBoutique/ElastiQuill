@@ -1,0 +1,76 @@
+{
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "allow_comments": {
+          "type": "boolean"
+        },
+        "medium_crosspost_url": {
+          "type": "keyword"
+        },
+        "author": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "email": {
+              "type": "keyword"
+            },
+            "website": {
+              "type": "keyword"
+            }
+          }
+        },
+        "content": {
+          "type": "text"
+        },
+        "description": {
+          "type": "text"
+        },
+        "metadata": {
+          "type": "object",
+          "enabled": false
+        },
+        "last_edited_at": {
+          "type": "date"
+        },
+        "private_viewing_key": {
+          "type": "object",
+          "enabled": false
+        },
+        "published_at": {
+          "type": "date"
+        },
+        "slug": {
+          "type": "keyword"
+        },
+        "type": {
+          "type": "keyword",
+          "doc_values": false
+        },
+        "tags": {
+          "type": "keyword",
+          "normalizer": "keyword_lowercase"
+        },
+        "title": {
+          "type": "text"
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1
+    },
+    "analysis": {
+      "normalizer": {
+        "keyword_lowercase": {
+          "type": "custom",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
+  }
+}

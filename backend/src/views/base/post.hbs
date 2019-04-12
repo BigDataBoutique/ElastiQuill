@@ -1,0 +1,37 @@
+<article>
+    <h1>{{post.title}}</h1>
+    <div class="meta">
+        <span class="date">
+          <time datetime="{{post.published_at}}">{{post.published_at_str}}</time>
+        </span>
+        {{> tags tags=post.tags}}
+        <p class="comments">
+          <a href="{{post.url}}#comments">Comments ({{ post.comments_count }})</a>
+        </p>
+    </div>
+    {{{post.content}}}
+</article>
+<hr />
+<section>
+    <a name="comments"></a>
+    <h2>Comments</h2>
+    <ul class="list-unstyled" id="comments-container">
+    {{#each post.comments}}
+        {{> comment this index=@index }}
+    {{/each}}
+    {{# if post.allow_comments}}
+        {{> comment-form}}
+        <button id='btn-add-comment' class="btn btn-primary btn-add-comment" style="margin-top: 20px" type="button" onclick="onClickReply()">Add comment</button>
+    {{else}}
+        <h2>Comments are now closed</h2>
+    {{/if}}
+    </ul>
+</section>
+<script>
+$(function() {
+  $('article img').each(function() {
+    var href = $(this).attr('src');
+    $(this).replaceWith($('<a data-fancybox="gallery" href="' + href + '"><img src="' + href + '"></a>'));
+  });
+});
+</script>

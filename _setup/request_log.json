@@ -1,0 +1,17 @@
+{
+  "description" : "Add geoip and user_agent_parsed",
+  "processors" : [
+    {
+      "geoip" : {
+        "field" : "source.ip",
+        "target_field" : "source.geo"
+      }
+    },
+    {
+      "user_agent" : { 
+        "field" : "http.request.user_agent",
+        "target_field" : "http.request.user_agent_parsed"
+      }
+    }
+  ]
+}

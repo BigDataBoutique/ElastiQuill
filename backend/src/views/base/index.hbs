@@ -1,0 +1,14 @@
+{{#if posts.length}}
+  {{#each posts}}
+    {{> post this}}
+  {{/each}}
+  <p class="blog-pagination">
+    Showing {{posts.length}} posts out of {{total}} total, page {{pageNum}}
+  </p>
+  <p class="blog-pagination">
+    {{#if prevPage}}<a href="/blog/page/{{prevPage}}">Previous page</a>{{/if}}
+    {{#if nextPage}}<a href="/blog/page/{{nextPage}}">Next page</a>{{/if}}
+  </p>
+{{else}}
+  {{> no-content}}
+{{/if}}

@@ -1,0 +1,44 @@
+{
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "author": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "email": {
+              "type": "keyword"
+            },
+            "website": {
+              "type": "keyword"
+            }
+          }
+        },
+        "content": {
+          "type": "text"
+        },
+        "comment_id": {
+          "type": "keyword"
+        },
+        "post_id": {
+          "type": "keyword"
+        },
+        "published_at": {
+          "type": "date"
+        },
+        "user_agent": {
+          "type": "text"
+        },
+        "user_host_address": {
+          "type": "text"
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1
+    }
+  }
+}

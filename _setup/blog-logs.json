@@ -1,0 +1,207 @@
+{
+  "index_patterns": "blog-logs*",
+  "settings": {
+    "number_of_shards": 1,
+    "analysis": {
+      "normalizer": {
+        "keyword_lowercase": {
+          "type": "custom",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "list_items": {
+          "properties": {
+            "search_query": {
+              "type": "text"
+            },
+            "tag": {
+              "type": "keyword"
+            },
+            "page_index": {
+              "type": "long"
+            },
+            "page_size": {
+              "type": "long"
+            }
+          }
+        },
+        "read_item": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "slug": {
+              "type": "keyword"
+            }
+          }
+        },
+        "ecs" : {
+          "properties" : {
+            "version" : {
+              "type" : "keyword"
+            }
+          }
+        },        
+        "log" : {
+          "properties" : {
+            "level" : {
+              "type" : "keyword"
+            }
+          }
+        },        
+        "error" : {
+          "properties" : {
+            "message" : {
+              "type" : "text"
+            }
+          }
+        },        
+        "http": {
+          "properties": {
+            "request": {
+              "properties": {
+                "method": {
+                  "type": "keyword"
+                },
+                "referrer": {
+                  "type" : "text"
+                },
+                "referrer_parsed" : {
+                  "properties" : {
+                    "domain" : {
+                      "type" : "keyword"
+                    },
+                    "full" : {
+                      "type" : "keyword"
+                    },
+                    "original" : {
+                      "type" : "keyword"
+                    },
+                    "path" : {
+                      "type" : "keyword"
+                    },
+                    "query" : {
+                      "type" : "keyword"
+                    },
+                    "scheme" : {
+                      "type" : "keyword"
+                    },
+                    "type" : {
+                      "type" : "keyword"
+                    }
+                  }
+                },
+                "user_agent" : {
+                  "type" : "text"
+                },
+                "user_agent_parsed" : {
+                  "properties" : {
+                    "device" : {
+                      "type" : "keyword"
+                    },
+                    "major" : {
+                      "type" : "keyword"
+                    },
+                    "minor" : {
+                      "type" : "keyword"
+                    },
+                    "name" : {
+                      "type" : "keyword"
+                    },
+                    "os" : {
+                      "type" : "keyword"
+                    },
+                    "os_name" : {
+                      "type" : "keyword"
+                    },
+                    "patch" : {
+                      "type" : "keyword"
+                    }
+                  }
+                }
+              }
+            },
+            "response": {
+              "properties": {
+                "status_code": {
+                  "type": "keyword"
+                }
+              }
+            }            
+          }
+        },        
+        "source": {
+          "properties": {
+            "address": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "keyword"
+            },
+            "geo": {
+              "properties": {
+                "city_name": {
+                  "type": "keyword"
+                },
+                "continent_name": {
+                  "type": "keyword"
+                },
+                "country_iso_code": {
+                  "type": "keyword"
+                },
+                "location": {
+                  "type": "geo_point"
+                },
+                "region_iso_code": {
+                  "type": "keyword"
+                },
+                "region_name": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "url" : {
+          "properties" : {
+            "domain" : {
+              "type" : "keyword"
+            },
+            "full" : {
+              "type" : "keyword"
+            },
+            "original" : {
+              "type" : "keyword"
+            },
+            "path" : {
+              "type" : "keyword"
+            },
+            "query" : {
+              "type" : "keyword"
+            },
+            "scheme" : {
+              "type" : "keyword"
+            }
+          }
+        },
+        "tags": {
+          "type": "keyword",
+          "normalizer": "keyword_lowercase"
+        },
+        "@timestamp": {
+          "type": "date"
+        },
+        "took": {
+          "type": "long"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+<h1>Search for "{{searchQuery}}"</h1>
+
+{{#each posts}}
+{{> search-result this}}
+{{/each}}
+
+<p style="text-align: center">
+  Showing {{posts.length}} posts out of {{total}} total, page {{pageNum}}
+</p>
+<p style="text-align: center">
+  {{#if prevPage}}<a href="/blog/search/page/{{prevPage}}?q={{searchQuery}}">Previous page</a>{{/if}}
+  {{#if nextPage}}<a href="/blog/search/page/{{nextPage}}?q={{searchQuery}}">Next page</a>{{/if}}
+</p>

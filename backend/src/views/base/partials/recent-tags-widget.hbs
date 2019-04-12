@@ -1,0 +1,32 @@
+<section class="block">
+    <ul class="nav nav-tabs" id="myTab2">
+        <li class="active"><a href="#archive" data-toggle="tab"><i class="fa fa-clock-o"></i></a></li>
+        <!--<li><a href="#categories" data-toggle="tab"><i class="fa fa-folder-open"></i></a></li>-->
+        <li class=""><a href="#tags" data-toggle="tab"><i class="fa fa-tags"></i></a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="archive">
+            <h3>Recent Posts</h3>
+            <ul class="media-list">
+                {{#each sidebarWidgetData.recentPosts}}
+                <li class="media">
+                    <div class="media-body">
+                        <p class="media-heading">
+                            <a href="{{this.url}}">{{this.title}}</a>
+                        </p>
+                        <small><time datetime="{{this.published_at}}">{{this.published_at_str}}</time></small>
+                    </div>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+        <div class="tab-pane" id="tags">
+            <h3>Tags</h3>
+            <div class="tags-cloud">
+                {{#each sidebarWidgetData.allTags}}
+                <a href="/blog/tagged/{{this.key}}" class="tag">{{this.key}} ({{this.doc_count}})</a>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</section>
