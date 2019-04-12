@@ -8,6 +8,7 @@ import * as blogPosts from '../services/blogPosts';
 import * as comments from '../services/comments';
 import * as emails from '../services/emails';
 import * as akismet from '../services/akismet';
+import { cachePageHandler, cacheAndReturn, clearPageCache } from '../services/cache';
 import { preparePost, preparePostJson, blogpostUrl } from './util';
 import { config } from '../app';
 
@@ -24,16 +25,22 @@ const rss = new RSS({
 
 const PAGE_SIZE = 10;
 
-router.get('/', asyncHandler(handlePostsRequest('index')));
+router.get('/', cachePageHandler(asyncHandler(handlePostsRequest('index'))));
 router.get('/page/:pageNum', asyncHandler(handlePostsRequest('index')));
 router.get('/tagged/:tag', asyncHandler(handlePostsRequest('tagged')));
 router.get('/tagged/:tag/page/:pageNum', asyncHandler(handlePostsRequest('tagged')));
 router.get('/search', asyncHandler(handlePostsRequest('search')))
 router.get('/search/page/:pageNum', asyncHandler(handlePostsRequest('search')))
 
-router.get('/rss', (req, res) => {
+router.get('/rss', asyncHandler(async (req, res) => {
+  const { items } = await cacheAndReturn('recent-items', async () => {
+    return blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 })
+  });
+
+  const recentPosts = items.map(preparePost);
+
   res.type('application/rss+xml');
-  res.locals.recentPosts.forEach(post => rss.item({
+  recentPosts.forEach(post => rss.item({
     title: post.title,
     description: post.description,
     url: config.blog.url + post.url,
@@ -41,7 +48,7 @@ router.get('/rss', (req, res) => {
     date: new Date(post.published_at)
   }));
   res.send(rss.xml());
-});
+}));
 
 const BLOGPOST_ROUTE = '/:year(\\d+)/:month(\\d+)/:id-:slug';
 
@@ -59,7 +66,7 @@ router.use(BLOGPOST_ROUTE, (req, res, next) => {
   next();
 });
 
-router.get(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
+router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
   const { slug, isJson } = parseSlug(req.params.slug);
 
   let post = await blogPosts.getItemById(blogPosts.BLOGPOST_ID_PREFIX + req.params.id, true);
@@ -99,9 +106,9 @@ router.get(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     recaptchaClientKey: RECAPTCHA_KEY,
     title: post.title,
     description: post.description,
-    post: preparedPost,
+    post: preparedPost
   });
-}));
+})));
 
 router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
   let commentError = null;
@@ -199,6 +206,8 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
       emails.sendNewCommentNotification(opAndComment);
     }
   }
+
+  clearPageCache(req.originalUrl);
 
   res.render('post', {
     sidebarWidgetData: res.locals.sidebarWidgetData,

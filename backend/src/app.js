@@ -185,6 +185,7 @@ function initConfig() {
     ['blog.description', 'BLOG_DESCRIPTION', 'Sample description'],
     ['blog.url', 'BLOG_URL', 'http://localhost:5000'],
     ['blog.compression', 'BLOG_COMPRESSION', false],
+    ['blog.cache-ttl', 'BLOG_CACHE_TTL', 60],
     ['blog.port', 'PORT', '5000'],
     ['blog.admin-emails', 'BLOG_ADMIN_EMAILS'],
     ['blog.contact-email', 'CONTACT_FORM_SEND_TO'],
@@ -217,11 +218,11 @@ function initConfig() {
 
   envOverrides.forEach(override => {
     const [configPath, env, defaultValue] = override;
-    if (env && _.get(process.env, env)) {
+    if (env && !_.isUndefined(_.get(process.env, env))) {
       config = _.set(config, configPath, _.get(process.env, env));
     }
 
-    if (defaultValue && ! _.get(config, configPath)) {
+    if (defaultValue && _.isUndefined(_.get(config, configPath))) {
       config = _.set(config, configPath, defaultValue);
     }
   });

@@ -3,12 +3,13 @@ import express from 'express';
 import asyncHandler from 'express-async-handler';
 import MarkdownIt from 'markdown-it';
 import * as blogPosts from '../services/blogPosts';
+import { cachePageHandler } from '../services/cache';
 import { preparePage } from './util';
 
 const router = express.Router();
 const md = new MarkdownIt();
 
-router.get('/:slug', asyncHandler(async (req, res, next) => {
+router.get('/:slug', cachePageHandler(asyncHandler(async (req, res, next) => {
   let page;
   try {
     page = await blogPosts.getItemById(req.params.slug);
@@ -45,6 +46,6 @@ router.get('/:slug', asyncHandler(async (req, res, next) => {
     description: page.description,
     page: preparePage(page)
   });
-}));
+})));
 
 export default router;

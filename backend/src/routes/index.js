@@ -11,6 +11,7 @@ import apiRouter from './api';
 import contactRouter from './contact';
 import * as blogPosts from '../services/blogPosts';
 import * as logging from '../services/logging';
+import * as cache from '../services/cache';
 import { preparePost } from './util';
 import { config } from '../app';
 
@@ -51,6 +52,7 @@ router.use((req, res, next) => {
   });
 });
 
+// log visits
 router.use(asyncHandler(async (req, res, next) => {
   const startTime = new Date().getTime();
   res.on('finish', () => {
@@ -59,13 +61,14 @@ router.use(asyncHandler(async (req, res, next) => {
 
   res.locals.gaTrackingId = _.get(config, 'credentials.google.analytics-code', null);
   res.locals.adminRoute = config.blog['admin-route'];
+  res.locals.sidebarWidgetData = await cache.cacheAndReturn('sidebar-widget-data', async () => {
+    const { items, allTags } = await blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 });
+    return {
+      recentPosts: items.map(preparePost),
+      allTags
+    };
+  });
 
-  const { items, allTags } = await blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 });
-  res.locals.recentPosts = items.map(preparePost);
-  res.locals.sidebarWidgetData = {
-    recentPosts: res.locals.recentPosts,
-    allTags
-  };
   next();
 }));
 
