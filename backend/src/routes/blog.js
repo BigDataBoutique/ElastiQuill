@@ -4,16 +4,14 @@ import path from 'path';
 import express from 'express';
 import request from 'request-promise-native';
 import asyncHandler from 'express-async-handler';
+import * as recaptcha from '../services/recaptcha';
 import * as blogPosts from '../services/blogPosts';
 import * as comments from '../services/comments';
-import * as emails from '../services/emails';
 import * as akismet from '../services/akismet';
+import * as emails from '../services/emails';
 import { cachePageHandler, cacheAndReturn, clearPageCache } from '../services/cache';
 import { preparePost, preparePostJson, blogpostUrl } from './util';
 import { config } from '../app';
-
-const RECAPTCHA_KEY = _.get(config, 'credentials.google.recaptcha-v2-key', null);
-const RECAPTCHA_SECRET = _.get(config, 'credentials.google.recaptcha-v2-secret', null);
 
 const router = express.Router();
 const rss = new RSS({
@@ -103,7 +101,7 @@ router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
     canonicalUrl,
     sidebarWidgetData: res.locals.sidebarWidgetData,
     headerImageUrl: post.metadata.header_image_url,
-    recaptchaClientKey: RECAPTCHA_KEY,
+    recaptchaClientKey: recaptcha.clientKey(),
     title: post.title,
     description: post.description,
     post: preparedPost
@@ -117,14 +115,9 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
   let isSpam = false;
 
   try {
-    if (RECAPTCHA_KEY && RECAPTCHA_SECRET) {
-      const recaptchaResp = JSON.parse(await request.post('https://www.google.com/recaptcha/api/siteverify', {
-        form: {
-          secret: RECAPTCHA_SECRET,
-          response: req.body['g-recaptcha-response']
-        }
-      }));
-      if (! recaptchaResp.success) {
+    if (recaptcha.isAvailable()) {
+      const success = await recaptcha.verify(req.body['g-recaptcha-response']);
+      if (! success) {
         const captchaErr = new Error();
         captchaErr.isRecaptcha = true;
         throw captchaErr;
@@ -216,7 +209,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
       error: commentError,
       values: commentError ? req.body : null
     },
-    recaptchaClientKey: RECAPTCHA_KEY,
+    recaptchaClientKey: recaptcha.clientKey(),
     post: preparePost(post)
   });
 }));
