@@ -54,6 +54,8 @@ class ContentEditor extends Component {
       this.container.current.innerHTML = converter.makeHtml(this.props.value);
     }
 
+    this._convertImagesToEmbeds(this.container.current);
+
     const turndown = new TurndownServiceProxy();
     this.editor.subscribe('editableInput', (event, editable) => {
       if (this.props.contentType === 'html') {
@@ -91,6 +93,27 @@ class ContentEditor extends Component {
     return (
       <div style={{ minHeight: '300px' }} ref={this.container} />
     )
+  }
+
+  _convertImagesToEmbeds(el) {
+    $(el).find('img').each(function() {
+      var found = $(this).closest('.medium-insert-embeds');
+      if (found.length) {
+        return;
+      }
+
+      $(this).replaceWith($(`
+        <div class="medium-insert-embeds" contenteditable="false">
+          <figure>
+            <div class="medium-insert-embed">
+              ${$(this)[0].outerHTML}
+            </div>
+          </figure>
+          <div class="medium-insert-embeds-overlay"></div>
+        </div>
+      `));
+    });
+
   }
 }
 
