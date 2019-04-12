@@ -14,6 +14,7 @@ Features:
 * Cross-posting between other blogs and Medium
 * Social posting integration (Twitter, LinkedIn, Reddit)
 * Built-in backup and full database dump
+* Content caching
 
 Demo: https://elastiquill.bigdataboutique.com
 
@@ -87,31 +88,32 @@ Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add 
 All values in `config.yml` file can be overrided by ENV variables when they are set.  
 See [config.yml](config.yml) for a sample configuration file.
 
-| Variable | Description | ENV variable | Default value | Is required |
-| ------ | ------ | ------ | ------ | ------ |
-| blog.title | Blog title. Used in `/blog/rss` xml | `BLOG_TITLE` | `Sample blog` | Optional
-| blog.description | Blog description. Used in `/blog/rss` xml | `BLOG_DESCRIPTION` | `Sample description` | Optional
-| blog.url | Blog URL | `BLOG_URL` | `http://localhost:5000` | Optional
-| blog.compression | Whether to compress HTTP responses | `BLOG_COMPRESSION` |  `false` | Optional
-| blog.port | Port to run on | `PORT` | `5000` | Optional
-| blog.jwt-secret | JWT secret | `BLOG_JWT_SECRET` | | Required
-| blog.comments-noreply-email | When set, blogpost authors and commenters will receive email notifications about on new discussion from this email. Should be a single email string e.g. `noreply@blog.com` | `BLOG_COMMENTS_NOREPLY_EMAIL` | | Optional
-| blog.contact-email | Email to send contacts form submits to | `CONTACT_FORM_SEND_TO` | | Optional
-| blog.admin-emails | Comma-separated list of admin emails, domains or `_all`. Emails will be checked to match with Google/Github account email when using SSO on `/admin` | `BLOG_ADMIN_EMAILS` | | Required
-| blog.theme-path | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base` | `BLOG_THEME_PATH` | | Optional
-| blog.blog-route-prefix | Url prefix for all blog posts urls. Does not apply to content page urls | `BLOG_ROUTE_PREFIX` | `/blog` | Optional
-| blog.admin-route | Url under which admin dashboard can be accessed | `ADMIN_ROUTE` | `/admin` | Optional
-| elasticsearch.hosts | Comma-separated list of Elasticsearch hosts | `ELASTICSEARCH_HOSTS` | `http://localhost:9200` | Optional
-| elasticsearch.blog-index-name | Elasticsearch index name to store blog posts | `BLOG_POSTS_INDEX` | `blog-posts` | Optional
-| elasticsearch.blog-comments-index-name | Elasticsearch index name to store blog comments | `BLOG_COMMENTS_INDEX` | `blog-comments` | Optional
-| elasticsearch.blog-logs-index-name | Elasticsearch index name to store error logs and metrics | `BLOG_LOGS_INDEX` | `blog-logs` | Optional
-| credentials.sendgrid | Sendgrid API key | `SENDGRID_API_KEY` | | Optional
-| credentials.google.analytics-code | GA tracking ID | `GOOGLE_ANALYTICS_CODE` | | Optional
-| credentials.google.oauth-client-id | Google OAuth 2 client ID | `GOOGLE_OAUTH_CLIENT_ID` | | Optional
-| credentials.google.oauth-client-secret | Google OAuth 2 client secret | `GOOGLE_OAUTH_CLIENT_SECRET` | | Optional
-| credentials.github.oauth-client-id | Github OAuth client ID | `GITHUB_CLIENT_ID` | | Optional
-| credentials.github.oauth-client-secret | Github OAuth client secret | `GITHUB_CLIENT_SECRET` | | Optional
-| credentials.google.recaptcha-v2-key | Google Recaptcha v2 client key | `GOOGLE_RECAPTCHA_V2_CLIENT_KEY` | | Optional
-| credentials.google.recaptcha-v2-secret | Google Recaptcha v2 client secret | `GOOGLE_RECAPTCHA_V2_SECRET_KEY` | | Optional
-| credentials.akismet.api-key | Akismet API key | `AKISMET_APIKEY` | | Optional
-| credentials.akismet.domain | Akismet domain | `AKISMET_DOMAIN` | | Optional
+| Variable | Description | ENV variable | Default value |
+| ------ | ------ | ------ | ------ |
+| blog.admin-emails | Comma-separated list of admin emails, domains or `_all_`. Emails will be checked to match with Google/Github account email when using SSO on `/admin` | `BLOG_ADMIN_EMAILS` | None. Required.
+| blog.jwt-secret | A unique string used for encrypting authentication data. | `BLOG_JWT_SECRET` | None. Required.
+| blog.title | Blog title. Used in `/blog/rss` xml | `BLOG_TITLE` | `Sample blog` |
+| blog.description | Blog description. Used in `/blog/rss` xml | `BLOG_DESCRIPTION` | `Sample description` |
+| blog.url | Blog URL | `BLOG_URL` | `http://localhost:5000` |
+| blog.cache-ttl | Page cache TTL in seconds. If `0` will disable caching. | `BLOG_CACHE_TTL` |  `60` |
+| blog.compression | Whether to compress HTTP responses | `BLOG_COMPRESSION` |  `false` |
+| blog.port | Port to run on | `PORT` | `5000` |
+| blog.comments-noreply-email | When set, blogpost authors and commenters will receive email notifications about on new discussion from this email. Should be a single email string e.g. `noreply@blog.com` | `BLOG_COMMENTS_NOREPLY_EMAIL` | |
+| blog.contact-email | Email to send contacts form submits to | `CONTACT_FORM_SEND_TO` | |
+| blog.theme-path | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base` | `BLOG_THEME_PATH` | |
+| blog.blog-route-prefix | Url prefix for all blog posts urls. Does not apply to content page urls | `BLOG_ROUTE_PREFIX` | `/blog` |
+| blog.admin-route | Url under which admin dashboard can be accessed | `ADMIN_ROUTE` | `/admin` |
+| elasticsearch.hosts | Comma-separated list of Elasticsearch hosts | `ELASTICSEARCH_HOSTS` | `http://localhost:9200` |
+| elasticsearch.blog-index-name | Elasticsearch index name to store blog posts | `BLOG_POSTS_INDEX` | `blog-posts` |
+| elasticsearch.blog-comments-index-name | Elasticsearch index name to store blog comments | `BLOG_COMMENTS_INDEX` | `blog-comments` |
+| elasticsearch.blog-logs-index-name | Elasticsearch index name to store error logs and metrics | `BLOG_LOGS_INDEX` | `blog-logs` |
+| credentials.sendgrid | Sendgrid API key | `SENDGRID_API_KEY` |
+| credentials.google.analytics-code | GA tracking ID | `GOOGLE_ANALYTICS_CODE` |
+| credentials.google.oauth-client-id | Google OAuth 2 client ID | `GOOGLE_OAUTH_CLIENT_ID` |
+| credentials.google.oauth-client-secret | Google OAuth 2 client secret | `GOOGLE_OAUTH_CLIENT_SECRET` |
+| credentials.github.oauth-client-id | Github OAuth client ID | `GITHUB_CLIENT_ID` |
+| credentials.github.oauth-client-secret | Github OAuth client secret | `GITHUB_CLIENT_SECRET` |
+| credentials.google.recaptcha-v2-key | Google Recaptcha v2 client key | `GOOGLE_RECAPTCHA_V2_CLIENT_KEY` |
+| credentials.google.recaptcha-v2-secret | Google Recaptcha v2 client secret | `GOOGLE_RECAPTCHA_V2_SECRET_KEY` |
+| credentials.akismet.api-key | Akismet API key | `AKISMET_APIKEY` |
+| credentials.akismet.domain | Akismet domain | `AKISMET_DOMAIN` |
