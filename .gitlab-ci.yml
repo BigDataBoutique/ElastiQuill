@@ -44,7 +44,7 @@ dockerhub:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
     - docker login -u $DOCKERHUB_USER -p "$DOCKERHUB_PASSWORD" docker.io
   script:
-    - IMAGE_NAME=bigdataboutique/elastiquill:v${CI_COMMIT_TAG}
+    - IMAGE_NAME=bigdataboutique/elastiquill:${CI_COMMIT_TAG}
     - docker pull $CONTAINER_TEST_IMAGE
     - docker tag $CONTAINER_TEST_IMAGE $IMAGE_NAME
     - docker push $IMAGE_NAME
