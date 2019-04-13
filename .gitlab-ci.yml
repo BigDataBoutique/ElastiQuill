@@ -46,7 +46,7 @@ dockerhub:
   script:
     - IMAGE_NAME=bigdataboutique/elastiquill:v${CI_COMMIT_TAG}
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $IMAGE_NAME    - 
+    - docker tag $CONTAINER_TEST_IMAGE $IMAGE_NAME
     - docker push $IMAGE_NAME
     - docker tag $CONTAINER_TEST_IMAGE bigdataboutique/elastiquill:latest
     - docker push bigdataboutique/elastiquill:latest
