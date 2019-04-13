@@ -20,26 +20,41 @@ Demo: https://elastiquill.bigdataboutique.com
 
 ## Deploying
 
-The easiest way to deploy ElastiQuill is to use the official Docker container:
+The easiest way to deploy ElastiQuill is to use the [official Docker image](https://hub.docker.com/r/bigdataboutique/elastiquill):
 
 ```bash
 docker pull bigdataboutique/elastiquill
 ```
 
-Docker Hub: https://hub.docker.com/r/bigdataboutique/elastiquill
+Instructions for running on Kubernetes are available under `_k8s/`. 
 
-Kubernetes bits
+### Configure Elasticsearch
+
+To setup the required indexes on Elasticsearch, run `_setup/setup.py` script and pass path to the `config.yml` file.
+```
+./setup.py --config /path/to/config.yml
+```
+Script will create indices for posts and comments and an index template for logs, based on ENV variables and values in config file.
 
 ## Running locally
 
-To run the blog engine in Docker, build the image and run it on port 5000.
+The easiest way is to run via docker-compose:
+
+```
+docker-compose up
+```
+
+You might need to run the following on your machine if Elasticsearch refuses to run: `sysctl -w vm.max_map_count=262144`.
+
+To build and run the blog engine in Docker:
+
 ```
 docker build . -t elastic-blog-engine
-docker run -p 5000:5000 -v /path/to/config.yml:/etc/elastiquill/config.yml elastic-blog-engine
+docker run -p 5000:5000 -v /path/to/config.yml:/etc/elastiquill/config.yml elastiquill
 ```
 Configuration file will be looked up at `/etc/elastiquill/config.yml` unless you set the `CONFIG_PATH` environment variable.  
-Blog themes are located under `/app/views` directory. You can define your own theme by mounting a folder in that directory and setting `blog.theme-path` configuration to `/app/views/yourtheme`.  
 
+Blog themes are located under `/app/views` directory. You can define your own theme by mounting a folder in that directory and setting `blog.theme-path` configuration to `/app/views/yourtheme`.  
 
 Alternatively, you can run the engine without Docker. Build the admin panel frontend
 ```
@@ -52,13 +67,6 @@ cd backend
 npm install
 npm run production
 ```
-
-## Configure Elasticsearch
-To configure Elasticsearch, run `_setup/setup.py` script and pass path to the `config.yml` file.
-```
-./setup.py --config /path/to/config.yml
-```
-Script will create indices for posts and comments and an index template for logs, based on ENV variables and values in config file.
 
 ## Set up admin login
 

@@ -1,0 +1,19 @@
+# full config documentation in the README file in the repo root
+blog:
+  title: ElastiQuill - Modern blog engine based on Elasticsearch
+  description: ElastiQuill blog engine demo
+  url: https://elastiquill.bigdataboutique.com
+  port: 5000
+  compression: true
+  jwt-secret: bdbq-elastiquill-some-random-string
+  admin-emails: _all_
+  contact-email: info@bigdataboutique.com
+  comments-noreply-email: noreply@bigdataboutique.com
+elasticsearch:
+  hosts: http://localhost:9200
+  blog-index-name: blog-posts
+  blog-comments-index-name: blog-comments
+  blog-logs-index-name: blog-logs
+# see instructions in README on how to set up
+credentials:
+  sendgrid: SG.apikey

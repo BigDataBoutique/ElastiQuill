@@ -1,0 +1,41 @@
+version: '3.3'
+
+services:
+  blog_es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    container_name: blog_es
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 127.0.0.1:9200:9200
+
+  blog_kibana:
+    image: docker.elastic.co/kibana/kibana:6.7.1
+    container_name: blog_kibana
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601"]
+    environment:
+      ELASTICSEARCH_URL: http://blog_es:9200
+      ELASTICSEARCH_HOSTS: http://blog_es:9200
+    ports:
+      - 127.0.0.1:5601:5601
+
+  blog:
+    image: bigdataboutique/elastiquill
+    container_name: blog
+    environment:
+      ELASTICSEARCH_HOSTS: http://blog_es:9200
+      BLOG_ADMIN_EMAILS: _all_
+    depends_on:
+      - blog_es
+    ports:
+      - 127.0.0.1:5000:5000
+    volumes:
+      - ${PWD}/_k8s:/etc/elastiquill
+
+networks:
+    default:
+        external:
+            name: blog
