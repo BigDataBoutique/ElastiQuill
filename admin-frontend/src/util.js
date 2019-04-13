@@ -5,6 +5,12 @@ import cookie from 'cookie';
 
 const JWT_TOKEN_KEY = 'jwt-token';
 
+let unathorizedHandler = null;
+
+export function setUnauthorizedHandler(handler) {
+  unathorizedHandler = handler;
+}
+
 export const jsonFetch = async (url, opts = {}) => {
   if (!opts.headers) {
     opts.headers = {};
@@ -25,7 +31,12 @@ export const authFetch = async (url, opts = {}) => {
     opts.headers['Authorization'] = 'Bearer ' + getJwtToken();
   }
 
-  return await fetch(url, opts);
+  const resp = await fetch(url, opts);
+  if (resp.status === 401 && unathorizedHandler) {
+    unathorizedHandler(resp);
+  }
+  
+  return resp;
 };
 
 export function getJwtToken() {

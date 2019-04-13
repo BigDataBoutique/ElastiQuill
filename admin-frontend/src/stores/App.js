@@ -4,7 +4,7 @@ import localforage from 'localforage';
 import {jsonFetch} from '../util';
 import BaseStore from "./BaseStore";
 
-import { cleanJwtToken } from '../util';
+import { cleanJwtToken, setUnauthorizedHandler } from '../util';
 
 class App extends BaseStore {
 
@@ -26,6 +26,7 @@ class App extends BaseStore {
         this.setUser(null);
       } else {
         this.setUser(await resp.json());
+        setUnauthorizedHandler(() => this.setUser(null));
       }
     } catch (err) {
       console.log(err);
