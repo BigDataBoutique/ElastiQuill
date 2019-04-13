@@ -129,7 +129,7 @@ class LoggedInLayout extends Component {
             <div className="row">
               <div className="col-sm-8">
                 Designed by Colorlib <br/>
-                Copyright &copy; 2019 <a href="https://bigdataboutique.com" target="_blank">BigData Boutique</a>
+                <a href="https://github.com/BigDataBoutique/ElastiQuill">ElastiQuill</a> Copyright &copy; 2019 <a href="https://bigdataboutique.com" target="_blank">BigData Boutique</a>
               </div>
               <div className="col-sm-4 text-right">
                 <a href="#">Back to top</a>
