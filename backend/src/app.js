@@ -79,6 +79,8 @@ app.use(function(req, res, next) {
   res.header("X-Frame-Options", "DENY");
   // Block pages from loading when they detect reflected XSS attacks
   res.header("X-XSS-Protection", "1; mode=block");
+  // load scripts and stylesheets only if server indicates the correct MIME type
+  res.header("X-Content-Type-Options", "nosniff");
   next();
 });
 
