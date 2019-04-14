@@ -81,6 +81,8 @@ app.use(function(req, res, next) {
   res.header("X-XSS-Protection", "1; mode=block");
   // load scripts and stylesheets only if server indicates the correct MIME type
   res.header("X-Content-Type-Options", "nosniff");
+  // notifies user agents to only connect to the site over HTTPS
+  res.header("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   next();
 });
 
