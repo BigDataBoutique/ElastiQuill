@@ -241,6 +241,9 @@ export async function getItems({ type, tag, search, pageIndex, pageSize, include
         }
       },
       highlight: {
+        pre_tags: ["<em class='search-highlight'>"],
+        post_tags: ["</em>"],
+
         fields: {
           title: {},
           description: {},

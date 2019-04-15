@@ -52,7 +52,11 @@ export function preparePost(p) {
     else {
       highlight[key] = highlight[key].join('<br/>');
     }
-    highlight[key] = sanitizeHtml(highlight[key]);
+    highlight[key] = sanitizeHtml(highlight[key], {
+      allowedClasses: {
+        em: ['search-highlight']
+      }
+    });
   }
 
   return {
