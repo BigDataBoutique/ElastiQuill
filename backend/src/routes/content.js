@@ -1,7 +1,6 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as cache from '../services/cache';
 import * as blogPosts from '../services/blogPosts';
 import { blogpostUrl, pageUrl } from './util';
 
@@ -67,10 +66,6 @@ router.post('/:type(post|page)', asyncHandler(async (req, res) => {
       res.status(500).json({ error: 'Server error' });
     }
   }
-
-  if (req.params.type === 'post') {
-    await cache.clearIndexPageCache();
-  }
 }));
 
 router.delete('/:type(post|page)/:id', asyncHandler(async (req, res) => {
@@ -82,10 +77,6 @@ router.delete('/:type(post|page)/:id', asyncHandler(async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
-
-  if (req.params.type === 'post') {
-    await cache.clearIndexPageCache();
-  }  
 }));
 
 router.post('/:type(post|page)/:id', asyncHandler(async (req, res) => {
@@ -104,10 +95,6 @@ router.post('/:type(post|page)/:id', asyncHandler(async (req, res) => {
       res.status(500).json({ error: 'Server error' });
     }
   }
-
-  if (req.params.type === 'post') {
-    await cache.clearIndexPageCache();
-  }  
 }));
 
 export default router;

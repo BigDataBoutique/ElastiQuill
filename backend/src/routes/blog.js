@@ -9,6 +9,7 @@ import * as blogPosts from '../services/blogPosts';
 import * as comments from '../services/comments';
 import * as akismet from '../services/akismet';
 import * as emails from '../services/emails';
+import * as events from '../services/events';
 import { cachePageHandler, cacheAndReturn, clearPageCache } from '../services/cache';
 import { preparePost, preparePostJson, blogpostUrl } from './util';
 import { config } from '../app';
@@ -23,7 +24,9 @@ const rss = new RSS({
 
 const PAGE_SIZE = 10;
 
+events.onChange('post', () => clearPageCache(config.blog['blog-route-prefix']));
 router.get('/', cachePageHandler(asyncHandler(handlePostsRequest('index'))));
+
 router.get('/page/:pageNum', asyncHandler(handlePostsRequest('index')));
 router.get('/tagged/:tag', asyncHandler(handlePostsRequest('tagged')));
 router.get('/tagged/:tag/page/:pageNum', asyncHandler(handlePostsRequest('tagged')));
@@ -64,6 +67,7 @@ router.use(BLOGPOST_ROUTE, (req, res, next) => {
   next();
 });
 
+events.onChange('post', post => clearPageCache(blogpostUrl(post)));
 router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
   const { slug, isJson } = parseSlug(req.params.slug);
 
@@ -200,7 +204,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     }
   }
 
-  clearPageCache(req.originalUrl);
+  events.emitChange('post', post);
 
   res.render('post', {
     sidebarWidgetData: res.locals.sidebarWidgetData,
