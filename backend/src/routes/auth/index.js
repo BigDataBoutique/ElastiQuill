@@ -8,6 +8,7 @@ import { frontendAddress, config } from '../../app';
 import initJwt from './jwt';
 import initGoogle from './google';
 import initGithub from './github';
+import initAnonymous from './anonymous';
 import { AdminEmails } from './util';
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router.get('/whoami', passport.authenticate('jwt', { session: false }), function
   res.json(req.user);
 });
 
-router.get('/social-auth-sources', function (req, res) {
+router.get('/auth-sources', function (req, res) {
   res.json(socialAuthSources);
 });
 
@@ -45,6 +46,11 @@ try {
   socialAuthSources.push('github');
 } catch (e) {
   console.error('Failed to init Github auth:', e.message);
+}
+
+if (isAnonymousAuthAllowed()) {
+  initAnonymous(passport, router, handleRequest);
+  socialAuthSources.push('anonymous');  
 }
 
 async function handleRequest(req, res) {
@@ -114,5 +120,9 @@ export const passportDefaultCallback = (err, req, res, profile, next) => {
     return next();
   });
 };
+
+function isAnonymousAuthAllowed() {
+  return socialAuthSources.length === 0 && ADMIN_EMAILS.isMatchAll();  
+}
 
 export default router;
