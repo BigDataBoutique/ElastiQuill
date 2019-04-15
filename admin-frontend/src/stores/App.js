@@ -33,7 +33,7 @@ class App extends BaseStore {
     }
 
     try {
-      const resp = await jsonFetch('/api/auth/social-auth-sources');
+      const resp = await jsonFetch('/api/auth/auth-sources');
       this.setSocialAuthSources(await resp.json());
     } catch (err) {
       console.log(err);

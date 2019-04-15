@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {inject, observer} from "mobx-react";
 import {Layout} from "../components/Layout";
 import {Redirect, withRouter} from "react-router-dom";
-import {SocialAuthButtons} from "../components/SocialAuthButtons";
+import AuthButtons from "../components/AuthButtons";
 import urls from "../config/urls";
 import logo from '../assets/img/logo.png';
 
@@ -43,7 +43,7 @@ class Login extends Component {
                 <p style={{ textAlign: 'center' }}><img src={logo} /></p>
                 {this._renderError()}
               </div>
-              <SocialAuthButtons sources={this.props.appStore.socialAuthSources}/>
+              <AuthButtons sources={this.props.appStore.socialAuthSources}/>
             </div>
           </div>
         </div>

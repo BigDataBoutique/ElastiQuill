@@ -15,6 +15,13 @@ export class AdminEmails {
     return this.rules.length === 0;
   }
 
+  isMatchAll() {
+    for (const rule of this.rules) {
+      if (rule === '_all_') return true;
+    }
+    return false;
+  }
+
   match(email) {
     if (! email) {
       return false;
