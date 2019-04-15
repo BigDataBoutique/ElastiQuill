@@ -141,7 +141,7 @@ article.post {
   background-position: center;
 }
 
-em {
+em.search-highlight {
   font-style: normal;
   font-weight: bold;
   background-color: yellow;
