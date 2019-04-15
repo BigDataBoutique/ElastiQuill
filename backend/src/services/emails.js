@@ -67,15 +67,17 @@ export function sendNewCommentNotification(args) {
     from: config.blog['comments-noreply-email'],
     subject,
     html: `
-    <div>
-      <h3>New reply to your comment on <a href="${args.opUrl}">blogpost</a>:</h3>
-      ${args.opComment ? renderComment(args.opComment) : (
+    <div>      
+      ${args.opComment ? (
+        `<h3>New reply to your comment on <a href="${args.opUrl}">blogpost</a>:</h3>` + renderComment(args.opComment)
+      ) : (
         `<h3>New replies under your blogpost <a href="${args.opUrl}">${args.opTitle}</a></h3>`
       )}
       ${renderComment(args.comment)}
     </div>
     `
   };
+
   sgMail.send(msg);
 }
 
@@ -86,7 +88,7 @@ function renderComment(comment) {
       <div style="display: flex;">
         <img
           style="border: 1px solid #eee; width: 100px; height:100px;"
-          src="https://www.gravatar.com/avatar.php?gravatar_id=${md5(comment.email)}">
+          src="https://www.gravatar.com/avatar.php?gravatar_id=${md5(comment.email)}&amp;size=100&amp;default=identicon">
         <p style="margin-left: 10px;">
           ${markdown.render(comment.content)}
         </p>
