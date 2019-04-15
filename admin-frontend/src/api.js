@@ -109,6 +109,10 @@ export function downloadLogsUrl() {
   return '/api/dump/logs';
 }
 
+export function uploadImageUrl() {
+  return '/api/uploads/image';
+}
+
 async function createItem(url, values) {
   const resp = await authFetch(url, {
     method: 'POST',

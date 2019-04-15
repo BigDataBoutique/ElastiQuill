@@ -1,10 +1,14 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import { toast } from 'react-toastify';
 import React, {Component} from 'react';
 
 import Showdown from 'showdown';
 import TurndownService from 'turndown';
 import MediumEditor from 'medium-editor';
+
+import * as api from '../../api';
+import { getJwtToken } from '../../util';
 
 import './add-hr-plugin';
 import './embeds-patched-plugin';
@@ -21,7 +25,7 @@ class TurndownServiceProxy extends TurndownService {
     var cleanedHtml = content.html();
     var mediumEmbedHtmls = {};
 
-    content.find('.medium-insert-embeds').toArray().forEach((el, i) => {
+    content.find('.medium-insert-embeds,.medium-insert-images').toArray().forEach((el, i) => {
       var key = 'MEDIUM-EMBED-' + i;
       mediumEmbedHtmls[key] = el.outerHTML;
       cleanedHtml = cleanedHtml.replace(el.outerHTML, key);
@@ -69,7 +73,20 @@ class ContentEditor extends Component {
     $(this.container.current).mediumInsert({
       editor: this.editor,
       addons: {
-        images: false,
+        images: {
+          deleteScript: false,
+          fileUploadOptions: {
+            url: api.uploadImageUrl(),
+            headers: {
+              'Authorization': 'Bearer ' + getJwtToken()
+            },
+            fail: e => {
+              toast.error('Failed to upload image. Have you configured the storage backend?')
+            }
+          },
+          captions: false,
+          preview: true
+        },
         embeds: false,
         embedsPatched: {
           styles: false,
@@ -113,7 +130,6 @@ class ContentEditor extends Component {
         </div>
       `));
     });
-
   }
 }
 

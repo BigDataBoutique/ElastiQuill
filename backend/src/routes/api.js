@@ -5,6 +5,7 @@ import content from './content';
 import social from './social';
 import stats from './stats';
 import connect from './connect';
+import uploads from './uploads';
 import dump from './dump';
 import auth from './auth';
 
@@ -22,5 +23,6 @@ router.use('/content', content);
 router.use('/social', social);
 router.use('/stats', stats);
 router.use('/dump', dump);
+router.use('/uploads', uploads);
 
 export default router;
