@@ -111,6 +111,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | blog.theme-path | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base` | `BLOG_THEME_PATH` | |
 | blog.blog-route-prefix | Url prefix for all blog posts urls. Does not apply to content page urls | `BLOG_ROUTE_PREFIX` | `/blog` |
 | blog.admin-route | Url under which admin dashboard can be accessed | `ADMIN_ROUTE` | `/admin` |
+| blog.uploads-bucket-prefix | Bucket prefix used for uploads | `UPLOADS_BUCKET_PREFIX` | |
 | elasticsearch.hosts | Comma-separated list of Elasticsearch hosts | `ELASTICSEARCH_HOSTS` | `http://localhost:9200` |
 | elasticsearch.blog-index-name | Elasticsearch index name to store blog posts | `BLOG_POSTS_INDEX` | `blog-posts` |
 | elasticsearch.blog-comments-index-name | Elasticsearch index name to store blog comments | `BLOG_COMMENTS_INDEX` | `blog-comments` |
@@ -125,3 +126,9 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.google.recaptcha-v2-secret | Google Recaptcha v2 client secret | `GOOGLE_RECAPTCHA_V2_SECRET_KEY` |
 | credentials.akismet.api-key | Akismet API key | `AKISMET_APIKEY` |
 | credentials.akismet.domain | Akismet domain | `AKISMET_DOMAIN` |
+| credentials.google.gcs-bucket | GCS bucket | `GOOGLE_GCS_BUCKET` |
+| credentials.google.gcloud-project-id | Google Cloud project ID for GCS | `GOOGLE_GCLOUD_PROJECT_ID` |
+| credentials.google.gcs-keyfile | Path to the credentials file | `GOOGLE_GCS_KEYFILE` |
+| credentials.aws.s3-bucket | S3 bucket | `AWS_S3_BUCKET` |
+| credentials.aws.access-key-id | AWS access key ID | `AWS_ACCESS_KEY_ID` |
+| credentials.aws.secret-access-key | AWS secret access key | `AWS_SECRET_ACCESS_KEY` |
