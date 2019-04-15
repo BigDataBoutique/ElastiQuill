@@ -2,10 +2,12 @@ import Joi from 'joi';
 import uid from 'uid';
 import slugify from 'slugify';
 import { esClient, config } from '../app';
+import * as events from './events';
 import * as commentsService from './comments';
 
-const ES_INDEX = config.elasticsearch['blog-index-name'];
 export const BLOGPOST_ID_PREFIX = 'blogpost-';
+
+const ES_INDEX = config.elasticsearch['blog-index-name'];
 
 const CreatePostArgSchema = Joi.object().keys({
   "title": Joi.string().required(),
@@ -133,20 +135,24 @@ export async function createItem(type, post) {
     }
   };
 
+  let resp = null;
   if (type === 'post') {
-    const resp = await indexWithUniqueId(query);
-    return resp._id;
+    resp = await indexWithUniqueId(query);    
   }
   else {
-    const resp = await esClient.index({
+    resp = await esClient.index({
       ...query,
       id: query.body.slug
     });
-    return resp._id;
   }
+
+  events.emitCreate(type, query.body);
+
+  return resp._id;
 }
 
 export async function deleteItem(id) {
+  const item = await getItemById(id);
   await esClient.delete({
     id,
     index: ES_INDEX,
@@ -154,7 +160,11 @@ export async function deleteItem(id) {
     refresh: 'wait_for'
   });
 
-  await commentsService.deletePostComments(id);
+  if (item.type === 'post') {
+    await commentsService.deletePostComments(id);
+  }
+
+  events.emitChange(item.type, item);
 }
 
 export async function updateItem(id, type, post) {
@@ -172,7 +182,7 @@ export async function updateItem(id, type, post) {
     doc.slug = makeSlug(doc.title);
   }
 
-  return await esClient.update({
+  await esClient.update({
     id,
     index: ES_INDEX,
     type: '_doc',
@@ -181,6 +191,11 @@ export async function updateItem(id, type, post) {
       doc
     }
   });
+  const updatedItem = await getItemById(id);
+
+  events.emitChange(updatedItem.type, updatedItem);
+
+  return updatedItem;
 }
 
 export async function getAllItems({ type }) {

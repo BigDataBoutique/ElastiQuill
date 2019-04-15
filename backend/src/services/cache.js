@@ -65,10 +65,6 @@ export function cacheAndReturn(key, cb) {
   });
 }
 
-export async function clearIndexPageCache() {
-  return await clearPageCache(BLOG_ROUTE_PREFIX);
-}
-
 export function clearPageCache(url) {
   return new Promise((resolve, reject) => {
     pageCache.del(url, (err) => {
