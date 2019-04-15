@@ -52,6 +52,9 @@ router.use((req, res, next) => {
   });
 });
 
+router.use(routingTableRouter);
+router.use('/api', apiRouter);
+
 // log visits
 router.use(asyncHandler(async (req, res, next) => {
   const startTime = new Date().getTime();
@@ -72,8 +75,6 @@ router.use(asyncHandler(async (req, res, next) => {
   next();
 }));
 
-router.use(routingTableRouter);
-router.use('/api', apiRouter);
 router.use('/contact', contactRouter);
 router.use(BLOG_ROUTE_PREFIX, blogRouter);
 router.use(pageRouter);
