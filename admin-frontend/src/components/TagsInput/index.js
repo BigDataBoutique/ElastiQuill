@@ -36,46 +36,15 @@ class TagsInputContainer extends Component {
 
     return (
       <ReactTags
-        renderInput={this._autosuggestRenderInput.bind(this)}
+        addOnBlur
+        allowNew
         tags={tags}
         suggestions={suggestions}
-        allowNew={true}
         minQueryLength={1}
         handleDelete={handleDelete}
         handleAddition={handleAddition}
         value={this.props.value}
         onChange={this.props.onChange} />
-    )
-  }
-
-  _autosuggestRenderInput({addTag, ...props}) {
-    const handleOnChange = (e, {newValue, method}) => {
-      if (method === 'enter') {
-        e.preventDefault()
-      } else {
-        props.onChange(e)
-      }
-    }
-
-    const inputValue = (props.value && props.value.trim().toLowerCase()) || ''
-    const inputLength = inputValue.length
-
-    const suggestions = ['Aaa', 'Aaabbb', 'bbbb', 'asdfawf'];
-
-    return (
-      <Autosuggest
-        ref={props.ref}
-        suggestions={suggestions}
-        shouldRenderSuggestions={(value) => value && value.trim().length > 0}
-        getSuggestionValue={(suggestion) => suggestion}
-        renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-        inputProps={{...props, onChange: handleOnChange}}
-        onSuggestionSelected={(e, {suggestion}) => {
-          addTag(suggestion.name)
-        }}
-        onSuggestionsClearRequested={() => {}}
-        onSuggestionsFetchRequested={() => {}}
-      />
     )
   }
 }

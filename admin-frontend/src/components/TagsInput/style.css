@@ -122,6 +122,7 @@
   text-decoration: underline;
   background: none;
   font-weight: 600;
+  margin-right: -0.2em;
 }
 
 .react-tags__suggestions li:hover {
