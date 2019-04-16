@@ -8,7 +8,9 @@
   "scripts": {
     "start": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml nodemon --exec babel-node ./src/server",
     "production": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml NODE_ENV=production babel-node ./src/server",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -31,8 +33,8 @@
     "express-http-proxy": "^1.5.1",
     "geoip-lite": "^1.3.7",
     "globby": "9.2.0",
-    "handlebars": "^4.1.1",
-    "hbs": "~4.0.3",
+    "handlebars": "^4.1.2",
+    "hbs": "~4.0.4",
     "http-errors": "~1.7.2",
     "inbound": "0.0.6",
     "joi": "^14.3.1",
@@ -67,7 +69,8 @@
     "twitter": "^1.7.1",
     "uid": "0.0.2",
     "uuid": "^3.3.2",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "snyk": "^1.151.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",
@@ -78,5 +81,6 @@
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-node-externals": "^1.7.2"
-  }
+  },
+  "snyk": true
 }
