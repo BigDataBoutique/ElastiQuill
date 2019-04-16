@@ -15,16 +15,19 @@ import PrivateRoute from './components/PrivateRoute';
 import urls from './config/urls';
 import Pages from './pages/Pages';
 import Posts from './pages/Posts';
+import Setup from './pages/Setup';
 import Dashboard from './pages/Dashboard';
 import Backup from './pages/Backup';
 import appStore from './stores/App';
 import statsStore from './stores/Stats';
 import postsStore from './stores/Posts';
 import pagesStore from './stores/Pages';
+import setupStore from './stores/Setup';
 import dashboardStore from './stores/Dashboard';
 
 const stores = {
   appStore,
+  setupStore,
   statsStore,
   postsStore,
   pagesStore,
@@ -60,7 +63,8 @@ class App extends Component {
       { path: urls.pages, component: Pages },
       { path: urls.posts, component: Posts },
       { path: urls.dashboard, component: Dashboard },
-      { path: urls.backup, component: Backup }
+      { path: urls.backup, component: Backup },
+      { path: urls.setup, component: Setup }
     ];
 
     return <Provider {...stores}>

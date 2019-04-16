@@ -4,6 +4,7 @@ import {inject, observer} from 'mobx-react';
 
 import VisitsMap from '../components/VisitsMap';
 import VisitsGraph from '../components/VisitsGraph';
+import SetupWarning from '../components/SetupWarning';
 import CommentsList from '../components/CommentsList';
 import LoggedInLayout from '../components/LoggedInLayout';
 
@@ -27,6 +28,7 @@ class Dashboard extends React.Component {
     return (
       <LoggedInLayout>
         <div className='content'>
+          <SetupWarning />
           <div className='row'>
             <div className='col-12'>
               {this._renderCard('Visits', (

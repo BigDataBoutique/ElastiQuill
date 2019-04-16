@@ -6,8 +6,8 @@
   "license": "Apache-2.0",
   "private": true,
   "scripts": {
-    "start": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml nodemon --exec babel-node ./src/server",
-    "production": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml NODE_ENV=production babel-node ./src/server",
+    "start": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml SETUP_DIR=../_setup nodemon --exec babel-node ./src/server",
+    "production": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml SETUP_DIR=../_setup NODE_ENV=production babel-node ./src/server",
     "build": "webpack --config webpack.config.js",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"

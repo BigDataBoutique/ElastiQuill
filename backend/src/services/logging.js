@@ -5,6 +5,9 @@ import geohash from 'ngeohash';
 
 import { esClient, config } from '../app';
 import * as blogPosts from './blogPosts';
+import * as elasticsearch from './elasticsearch';
+
+let elasticsearchIsReady = false;
 
 export async function getStats({ startDate, endDate, type = null, postId = null }) {
   const filters = [
@@ -192,6 +195,14 @@ export async function logError(errorScope, error, req, res) {
 
 async function log({ req, res, email, took, error = null, tags = [] }) {
   try {
+    if (! elasticsearchIsReady) {
+      elasticsearchIsReady = await elasticsearch.isReady();
+      if (! elasticsearchIsReady) {
+        // skip logs if elasticsearch is not configured
+        return;
+      }
+    }
+
     const body = {
       // ECS base fields
       'ecs.version': '1.0.0',
