@@ -2,12 +2,17 @@
     <h1>{{post.title}}</h1>
     <div class="meta">
         <span class="date">
-          <time datetime="{{post.published_at}}">{{post.published_at_str}}</time>
+            <time datetime="{{post.published_at}}">{{post.published_at_str}}</time>
         </span>
         {{> tags tags=post.tags}}
         <p class="comments">
-          <a href="{{post.url}}#comments">Comments ({{ post.comments_count }})</a>
+            <a href="{{post.url}}#comments">Comments ({{ post.comments_count }})</a>
         </p>
+        {{#if post.reading_time}}
+        <div class="reading-time">
+            {{post.reading_time}}
+        </div>
+        {{/if}}
     </div>
     {{{post.content}}}
 </article>

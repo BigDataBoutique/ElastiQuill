@@ -2,6 +2,7 @@ import _ from 'lodash';
 import md5 from 'md5';
 import moment from 'moment';
 import MarkdownIt from 'markdown-it';
+import readingTime from 'reading-time';
 import sanitizeHtml from 'sanitize-html';
 
 import { config } from '../app';
@@ -59,10 +60,13 @@ export function preparePost(p) {
     });
   }
 
+  const readTime = readingTime(p.content);
+
   return {
     ...p,
     comments,
     highlight,
+    reading_time: readTime.minutes > 1 ? readTime.text : null,
     comments_count: p.comments_count ? p.comments_count : countComments(comments),
     published_at_str: prepareDate(p.published_at),
     content: p.metadata.content_type === 'markdown' ? blogpostMarkdown.render(p.content) : p.content,
