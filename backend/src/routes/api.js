@@ -6,8 +6,11 @@ import social from './social';
 import stats from './stats';
 import connect from './connect';
 import uploads from './uploads';
+import setup from './setup';
 import dump from './dump';
 import auth from './auth';
+
+import * as elasticsearch from '../services/elasticsearch';
 
 const router = express.Router();
 
@@ -18,11 +21,27 @@ router.use((req, res, next) => {
   auth(req, res, next);
 });
 
+router.use('/setup', setup);
+
+let elasticsearchIsReady = false;
+router.use(async (req, res, next) => {
+  if (! elasticsearchIsReady) {
+    elasticsearchIsReady = await elasticsearch.isReady();
+  }
+
+  if (! elasticsearchIsReady) {
+    next(new Error('Elasticsearch is not configured'));    
+    return;
+  }
+  
+  next();
+});
+
+router.use('/uploads', uploads);
 router.use('/connect', connect);
 router.use('/content', content);
 router.use('/social', social);
 router.use('/stats', stats);
 router.use('/dump', dump);
-router.use('/uploads', uploads);
 
 export default router;

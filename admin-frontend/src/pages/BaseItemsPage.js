@@ -1,13 +1,14 @@
 import _ from 'lodash';
 import React, {Component} from 'react';
-import {inject, observer} from "mobx-react";
-import classnames from "classnames";
+import {inject, observer} from 'mobx-react';
+import classnames from 'classnames';
 import ReactModal from 'react-modal';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import { Button, ButtonGroup, ListGroup, ListGroupItem } from 'reactstrap';
 
-import LoggedInLayout from "../components/LoggedInLayout";
-import urls from "../config/urls";
+import LoggedInLayout from '../components/LoggedInLayout';
+import SetupWarning from '../components/SetupWarning';
+import urls from '../config/urls';
 
 class BaseItemsPage extends Component {
 
@@ -17,7 +18,8 @@ class BaseItemsPage extends Component {
 
     return (
       <LoggedInLayout pageTitle={strings.title} toolbar={this._renderNav(strings, store)}>
-        <div className="content">
+        <div className='content'>
+          <SetupWarning />
           {isLoading ? 'Loading...' : this._renderItems(strings, store)}
         </div>
         {this._renderDeleteItemModal(store)}

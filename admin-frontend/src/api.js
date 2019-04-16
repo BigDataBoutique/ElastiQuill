@@ -82,6 +82,23 @@ export async function loadAllTags() {
   return resp.json();
 }
 
+export async function loadAuthSources() {
+  const resp = await authFetch('/api/auth/auth-sources');
+  return resp.json();
+}
+
+export async function loadSetupStatus() {
+  const resp = await authFetch('/api/setup/status');
+  return resp.json();
+}
+
+export async function setupElasticsearch() {
+  const resp = await authFetch('/api/setup', {
+    method: 'POST'
+  });
+  return resp.json();
+}
+
 export async function postItemToSocial(socialKey, itemId, opts) {
   const resp = await authFetch(`/api/social/post/${socialKey}/${itemId}`, {
     method: 'POST',

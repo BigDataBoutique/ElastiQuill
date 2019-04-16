@@ -1,6 +1,7 @@
 import React from 'react';
 
 import LoggedInLayout from '../components/LoggedInLayout';
+import SetupWarning from '../components/SetupWarning';
 import * as api from '../api';
 
 class Backup extends React.Component {
@@ -8,6 +9,7 @@ class Backup extends React.Component {
     return (
       <LoggedInLayout pageTitle={'Backup'}>
         <div className='content'>
+          <SetupWarning />
           <div className='row'>
             <div className='col-12'>
               <div className='card'>

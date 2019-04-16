@@ -1,6 +1,7 @@
 import {action, computed, observable} from 'mobx';
 import md5 from 'md5';
 import localforage from 'localforage';
+import * as api from '../api';
 import {jsonFetch} from '../util';
 import BaseStore from "./BaseStore";
 
@@ -33,8 +34,7 @@ class App extends BaseStore {
     }
 
     try {
-      const resp = await jsonFetch('/api/auth/auth-sources');
-      this.setSocialAuthSources(await resp.json());
+      this.setSocialAuthSources(await api.loadAuthSources());
     } catch (err) {
       console.log(err);
     }

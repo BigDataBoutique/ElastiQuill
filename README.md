@@ -28,14 +28,6 @@ docker pull bigdataboutique/elastiquill
 
 Instructions for running on Kubernetes are available under `_k8s/`. 
 
-### Configure Elasticsearch
-
-To setup the required indexes on Elasticsearch, run `_setup/setup.py` script and pass path to the `config.yml` file.
-```
-./setup.py --config /path/to/config.yml
-```
-Script will create indices for posts and comments and an index template for logs, based on ENV variables and values in config file.
-
 ## Running locally
 
 The easiest way is to run via docker-compose:

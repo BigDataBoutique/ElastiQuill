@@ -8,5 +8,6 @@ export default {
   statsItem: '/stats/:type/:id',
   pages: '/pages',
   posts: '/posts',
-  dashboard: '/dashboard'
+  dashboard: '/dashboard',
+  setup: '/setup'
 };
