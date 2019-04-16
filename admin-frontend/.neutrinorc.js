@@ -21,6 +21,8 @@ module.exports = {
       }
     ],
     neutrino => {
+      neutrino.config.performance.hints(false);
+
       neutrino.config.output
         .publicPath('');
 
