@@ -71,7 +71,7 @@ Once that is done, go to https://console.developers.google.com/apis/credentials,
 * Authorized JavaScript origins to `hostname`
 * Authorized redirect URIs to `https://hostname/api/auth/google/callback`
 
-Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add them to your config.yml file.
+Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add them to your `config.yml` file.
 
 ### Github
 
@@ -81,7 +81,27 @@ Set:
 * Homepage URL to `hostname`
 * Authorization callback URL to `hostname/api/auth/github/callback`
 
-Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add them to your config.yml file.
+Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add them to your `config.yml` file.
+
+## Integration with social networks
+
+You can connect your Linkedin, Twitter and Reddit accounts to Elastiquill to repost your blogposts from the admin panel.
+
+### Linkedin
+* Go to https://www.linkedin.com/developers/apps/new and create an app with default settings
+* Under OAuth 2.0 settings, add a redirect URL `http://localhost:5000/api/connect/linkedin/callback`. Change `http://localhost:5000` to your `blog.url` configuration.
+* In the app page, select the `Auth` tab. Copy the Client ID and Client Secret and add them to your `config.yml` file.
+
+### Twitter
+* Go to https://developer.twitter.com/en/apps/create
+* Set Callback URL to `http://localhost:5000/api/social/twitter/callback`. Change `http://localhost:5000` to your `blog.url` configuration.
+* `Sign in with Twitter` can be left disabled.
+* In the app page, select the `Keys and tokens` tab. Copy Consumer and Access token keys, and add them to your `config.yml` file.
+
+### Reddit
+* Go to https://www.reddit.com/prefs/apps/ and create a `script` app. You can write any value in `redirect uri`.
+* Copy Client ID (code under `personal use script` line) and Client Secret and add them to your `config.yml` file.
+* Add account's username and password to `config.yml` file.
 
 ## Configuration
 
@@ -124,3 +144,13 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.aws.s3-bucket | S3 bucket | `AWS_S3_BUCKET` |
 | credentials.aws.access-key-id | AWS access key ID | `AWS_ACCESS_KEY_ID` |
 | credentials.aws.secret-access-key | AWS secret access key | `AWS_SECRET_ACCESS_KEY` |
+| credentials.linkedin.client-id | Linkedin Client ID | `LINKEDIN_CLIENT_ID` |
+| credentials.linkedin.client-secret | Linkedin Client Secret | `LINKEDIN_CLIENT_SECRET` |
+| credentials.twitter.consumer-key | Twitter Consumer Key | `TWITTER_CONSUMER_KEY` |
+| credentials.twitter.consumer-secret | Twitter Consumer Secret | `TWITTER_CONSUMER_SECRET` |
+| credentials.twitter.access-token-key | Twitter access token key | `TWITTER_ACCESS_TOKEN_KEY` |
+| credentials.twitter.access-token-secret | Twitter access token secret | `TWITTER_ACCESS_TOKEN_SECRET` |
+| credentials.reddit.client-id | Reddit Client ID | `REDDIT_CLIENT_ID` |
+| credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` |
+| credentials.reddit.username | Reddit account username | `REDDIT_USERNAME` |
+| credentials.reddit.password | Reddit account password | `REDDIT_PASSWORD` |
