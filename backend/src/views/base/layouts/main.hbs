@@ -16,7 +16,9 @@
   <link rel="canonical" href="{{canonicalUrl}}" />
   {{/if}}
   
-  <meta http-equiv="Content-Security-Policy" content="default-src https:">
+  {{#unless isLocalhost}}
+  <meta http-equiv="Content-Security-Policy" content="default-src https: 'unsafe-inline'">
+  {{/unless}}
 
   <link rel="shortcut icon" href="/static/base/favicon/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/static/base/favicon/apple-touch-icon.png">

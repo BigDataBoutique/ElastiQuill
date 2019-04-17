@@ -64,13 +64,15 @@ router.use(asyncHandler(async (req, res, next) => {
 
   res.locals.gaTrackingId = _.get(config, 'credentials.google.analytics-code', null);
   res.locals.adminRoute = config.blog['admin-route'];
+  res.locals.isLocalhost = config.blog.url.startsWith('http://localhost');
+
   res.locals.sidebarWidgetData = await cache.cacheAndReturn('sidebar-widget-data', async () => {
     const { items, allTags } = await blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 });
     return {
       recentPosts: items.map(preparePost),
       allTags
     };
-  });
+  });  
 
   next();
 }));
