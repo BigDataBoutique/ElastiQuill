@@ -5,6 +5,7 @@ import { esClient, config } from '../app';
 
 const BLOG_INDEX = _.get(config, 'elasticsearch.blog-index-name');
 const BLOG_COMMENTS_INDEX = _.get(config, 'elasticsearch.blog-comments-index-name');
+const BLOG_LOGS_INDEX_PREFIX = _.get(config, 'elasticsearch.blog-logs-index-name');
 const BLOG_LOGS_INDEX_TEMPLATE_NAME = 'blog-logs';
 const PIPELINE_NAME = 'request_log';
 
@@ -32,9 +33,12 @@ export async function setup() {
   }
 
   if (! status.blogLogsIndexTemplate) {
+    const parsed = JSON.parse(fs.readFileSync(path.join(setupDir, 'blog-logs-index-template.json')).toString('utf-8'));
+    parsed.index_patterns = BLOG_LOGS_INDEX_PREFIX + '*';
+
     await esClient.indices.putTemplate({
       name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-      body: fs.readFileSync(path.join(setupDir, 'blog-logs-index-template.json')).toString('utf-8')
+      body: JSON.stringify(parsed)
     });
   }
 
