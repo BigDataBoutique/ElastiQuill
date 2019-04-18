@@ -5,7 +5,6 @@ import * as logging from './logging';
 import { config } from '../app';
 
 const CACHE_TTL = _.get(config, 'blog.cache-ttl');
-const BLOG_ROUTE_PREFIX = _.get(config, 'blog.blog-route-prefix');
 
 const pageCache = new NodeCache();
 const dataCache = new NodeCache();

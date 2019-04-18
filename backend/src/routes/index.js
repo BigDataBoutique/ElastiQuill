@@ -24,7 +24,7 @@ router.get('/healthz', (req, res) => {
 });
 
 if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== '/') {
-  router.get('/', (req, res) => res.redirect(BLOG_ROUTE_PREFIX));
+  router.get('/', (req, res) => res.redirect(config.blog.url + BLOG_ROUTE_PREFIX));
 }
 
 // lowercase urls

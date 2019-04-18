@@ -112,9 +112,9 @@ See [config.yml](config.yml) for a sample configuration file.
 | ------ | ------ | ------ | ------ |
 | blog.admin-emails | Comma-separated list of admin emails, domains or `_all_`. Emails will be checked to match with Google/Github account email when using SSO on `/admin` | `BLOG_ADMIN_EMAILS` | None. Required.
 | blog.jwt-secret | A unique string used for encrypting authentication data. | `BLOG_JWT_SECRET` | None. Required.
+| blog.url | Blog URL | `BLOG_URL` | `http://localhost:5000` |
 | blog.title | Blog title. Used in `/blog/rss` xml | `BLOG_TITLE` | `Sample blog` |
 | blog.description | Blog description. Used in `/blog/rss` xml | `BLOG_DESCRIPTION` | `Sample description` |
-| blog.url | Blog URL | `BLOG_URL` | `http://localhost:5000` |
 | blog.cache-ttl | Page cache TTL in seconds. If `0` will disable caching. | `BLOG_CACHE_TTL` |  `60` |
 | blog.compression | Whether to compress HTTP responses | `BLOG_COMPRESSION` |  `false` |
 | blog.port | Port to run on | `PORT` | `5000` |
