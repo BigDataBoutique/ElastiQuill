@@ -69,9 +69,9 @@ export function sendNewCommentNotification(args) {
     html: `
     <div>      
       ${args.opComment ? (
-        `<h3>New reply to your comment on <a href="${args.opUrl}">blogpost</a>:</h3>` + renderComment(args.opComment)
+        `<h3>New reply to your comment on <a href="${args.opUrl}">blog post</a>:</h3>` + renderComment(args.opComment)
       ) : (
-        `<h3>New replies under your blogpost <a href="${args.opUrl}">${args.opTitle}</a></h3>`
+        `<h3>New reply to your post <a href="${args.opUrl}">${args.opTitle}</a></h3>`
       )}
       ${renderComment(args.comment)}
     </div>
