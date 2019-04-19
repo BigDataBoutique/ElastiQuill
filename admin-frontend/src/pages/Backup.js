@@ -18,18 +18,18 @@ class Backup extends React.Component {
                     <div style={{ marginBottom: 10 }}>
                       JSON document with all posts and comments.
                     </div>
-                    <a
-                      href={api.downloadBackupUrl()}
-                      className='btn btn-primary'>Download complete backup</a>
+                    <button
+                      onClick={() => window.location.href = api.downloadBackupUrl()}
+                      className='btn btn-primary'>Download complete backup</button>
                   </div>
                   <hr/>
                   <div>
                     <div style={{ marginBottom: 10 }}>
                       Archive of all logs in JSONL format.
                     </div>
-                    <a
-                      href={api.downloadLogsUrl()}
-                      className='btn btn-primary'>Download logs archive</a>
+                    <button
+                      onClick={() => window.location.href = api.downloadLogsUrl()}
+                      className='btn btn-primary'>Download logs archive</button>
                   </div>
                 </div>
               </div>

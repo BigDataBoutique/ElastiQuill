@@ -119,11 +119,11 @@ export function redirectToSocialConnect(socialKey) {
 }
 
 export function downloadBackupUrl() {
-  return '/api/dump/content';
+  return '/api/dump/content?state=' + getJwtToken();
 }
 
 export function downloadLogsUrl() {
-  return '/api/dump/logs';
+  return '/api/dump/logs?state=' + getJwtToken();
 }
 
 export function uploadImageUrl() {
