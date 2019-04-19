@@ -233,7 +233,6 @@ export async function getAllItems({ type }) {
 export async function getItems({ type, tag, search, pageIndex, pageSize, includePrivatePosts }) {
   const query = {
     index: ES_INDEX,
-    type: '_doc',
     from: pageIndex * pageSize,
     size: pageSize,
     ignore_unavailable: true,
@@ -252,7 +251,7 @@ export async function getItems({ type, tag, search, pageIndex, pageSize, include
       ],
       aggs: {
         tags: {
-          terms: { field: 'tags' }
+          terms: { field: 'tags', size: 50 }
         }
       },
       highlight: {
@@ -310,12 +309,11 @@ export async function getItems({ type, tag, search, pageIndex, pageSize, include
 export async function getAllTags() {
   const resp = await esClient.search({
     index: ES_INDEX,
-    type: '_doc',
     ignore_unavailable: true,
     body: {
       aggs: {
         tags: {
-          terms: { field: 'tags' }
+          terms: { field: 'tags', size: 50 }
         }
       }
     }
