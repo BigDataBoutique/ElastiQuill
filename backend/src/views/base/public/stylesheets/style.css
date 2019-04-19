@@ -15,13 +15,13 @@ h3 {
   font-size: 20pt;
 }
 
-article h1 {
+article h1, h1.content-title {
   font-family: 'Zilla Slab', serif;
   font-weight: bold;
   font-size: 36pt;
 }
 
-article h2 {
+article h2, h2.content-title {
   font-family: 'Zilla Slab', serif;
   font-weight: normal;
   font-size: 22pt;
