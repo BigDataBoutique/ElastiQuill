@@ -93,7 +93,7 @@ app.use(function(req, res, next) {
 app.enable('trust proxy');
 
 app.use('/static/base', express.static(path.join(__dirname, 'views/base/public')));
-if (BLOG_THEME_PATH) {
+if (BLOG_THEME_PATH && fs.existsSync(path.join(BLOG_THEME_PATH, 'public'))) {
   app.use('/static/theme', express.static(path.join(BLOG_THEME_PATH, 'public')));
 }
 
