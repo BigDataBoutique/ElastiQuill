@@ -44,4 +44,10 @@ router.use('/social', social);
 router.use('/stats', stats);
 router.use('/dump', dump);
 
+router.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    error: err.message ? err.message : err.toString()
+  });
+});
+
 export default router;

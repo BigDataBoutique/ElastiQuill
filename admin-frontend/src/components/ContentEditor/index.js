@@ -80,8 +80,17 @@ class ContentEditor extends Component {
             headers: {
               'Authorization': 'Bearer ' + getJwtToken()
             },
-            fail: e => {
-              toast.error('Failed to upload image. Have you configured the storage backend?')
+            fail: (ev, data) => {
+              const responseJSON = data.response().jqXHR.responseJSON;
+              toast.error(responseJSON.error);
+
+              // Remove image previews
+              $(this.container.current).find('.medium-insert-images').each(function() {
+                const img = $(this).find('img');
+                if (img.length && img.attr('src').startsWith('blob:')) {
+                  setTimeout(() => $(this).remove(), 500);
+                }
+              });
             }
           },
           captions: false,
