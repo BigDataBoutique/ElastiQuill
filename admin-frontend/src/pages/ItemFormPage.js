@@ -85,15 +85,6 @@ class ItemFormPage extends Component {
         ///private_viewing_key: null // TODO auto generate UUID
       });
 
-      if (resp.error) {
-        let errorMsg = resp.error;
-        if (resp.error === 'Conflict') {
-          errorMsg = 'Page with that name already exists';
-        }
-        toast.error(errorMsg);
-        return;
-      }
-
       if (this._isNew()) {
         this.props.history.replace('/edit/'+this._getType()+'/' + resp.id);
       }
@@ -101,6 +92,12 @@ class ItemFormPage extends Component {
     }
     catch (err) {
       console.log(err);
+      
+      let errorMsg = err.message;
+      if (err.message === 'Conflict') {
+        errorMsg = 'Page with that name already exists';
+      }
+      toast.error(errorMsg);
     }
     finally {
       this._getStore().setFormSaving(false);
