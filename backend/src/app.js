@@ -61,14 +61,15 @@ const hbs = exphbs({
     truncateHtml: require('truncate-html'),
     toLowerCase: s => s.toLowerCase()
   },
-  partialDirs: viewPaths.map(p => path.join(p, 'partials')),
-  layoutDirs: viewPaths.map(p => path.join(p, 'layouts')),
+  partialDirs: viewPaths.map(p => path.join(p, 'partials')).filter(p => fs.existsSync(p)),
+  layoutDirs: viewPaths.map(p => path.join(p, 'layouts')).filter(p => fs.existsSync(p)),
   defaultLayout: 'main',
   ext: '.hbs'
 });
 app.engine('hbs', hbs);
 app.set('view engine', 'hbs');
 app.set('views', viewPaths);
+app.set('view cache', !! config.blog['theme-caching']);
 
 if (config.blog.compression) {
   app.use(compression());
@@ -194,6 +195,7 @@ function initConfig() {
     ['blog.admin-emails', 'BLOG_ADMIN_EMAILS'],
     ['blog.contact-email', 'CONTACT_FORM_SEND_TO'],
     ['blog.theme-path', 'BLOG_THEME_PATH'],
+    ['blog.theme-caching', 'BLOG_THEME_CACHING', true],
     ['blog.routing-table-path', 'BLOG_ROUTING_TABLE_PATH'],
     ['blog.jwt-secret', 'BLOG_JWT_SECRET'],
     ['blog.blog-route-prefix', 'BLOG_ROUTE_PREFIX', '/blog'],

@@ -121,6 +121,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | blog.comments-noreply-email | When set, blogpost authors and commenters will receive email notifications about on new discussion from this email. Should be a single email string e.g. `noreply@blog.com` | `BLOG_COMMENTS_NOREPLY_EMAIL` | |
 | blog.contact-email | Email to send contacts form submits to | `CONTACT_FORM_SEND_TO` | |
 | blog.theme-path | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base` | `BLOG_THEME_PATH` | |
+| blog.theme-caching | View template compilation caching. Set `false` for hot-reloading. | `BLOG_THEME_CACHING` | `true` |
 | blog.blog-route-prefix | Url prefix for all blog posts urls. Does not apply to content page urls | `BLOG_ROUTE_PREFIX` | `/blog` |
 | blog.admin-route | Url under which admin dashboard can be accessed | `ADMIN_ROUTE` | `/admin` |
 | blog.uploads-bucket-prefix | Bucket prefix used for uploads | `UPLOADS_BUCKET_PREFIX` | |
