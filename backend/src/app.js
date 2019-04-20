@@ -11,6 +11,8 @@ import cookieParser from 'cookie-parser';
 import elasticsearch from 'elasticsearch';
 import exphbs from './lib/express-handlebars-multi';
 
+import { EmailString } from './util';
+
 require('dotenv').config();
 
 export const config = initConfig();
@@ -241,6 +243,8 @@ function initConfig() {
       config = _.set(config, configPath, defaultValue);
     }
   });
+
+  config.blog['admin-emails'] = new EmailString(config.blog['admin-emails']);
 
   return config;
 }

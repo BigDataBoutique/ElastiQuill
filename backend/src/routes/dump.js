@@ -5,8 +5,25 @@ import asyncHandler from 'express-async-handler';
 import * as commentsService from '../services/comments';
 import * as blogPostsService from '../services/blogPosts';
 import * as loggingService from '../services/logging';
+import { config } from '../app';
+
 
 const router = express.Router();
+
+router.use((req, res, next) => {
+  if (config.blog['admin-emails'].isMatchAll()) {
+    next(new Error('Logs and backups download is disabled when using anonymous access'));
+    return;
+  }
+
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET,OPTIONS')
+    res.json({ error: null });
+    return;
+  }
+
+  next();
+});
 
 router.get('/content', asyncHandler(async (req, res) => {
   const comments = await commentsService.getAllComments();

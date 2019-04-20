@@ -1,12 +1,12 @@
-export class AdminEmails {
-  constructor(adminEmailsString) {
+export class EmailString {
+  constructor(emailString) {
     this.rules = [];
 
-    if (! adminEmailsString || ! adminEmailsString.length) {
+    if (! emailString || ! emailString.length) {
       return;
     }
 
-    this.rules = adminEmailsString.split(',')
+    this.rules = emailString.split(',')
       .map(s => s.trim())
       .filter(s => s.length > 0);
   }

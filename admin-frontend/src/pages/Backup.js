@@ -1,8 +1,10 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 
 import LoggedInLayout from '../components/LoggedInLayout';
 import SetupWarning from '../components/SetupWarning';
 import * as api from '../api';
+
 
 class Backup extends React.Component {
   render() {
@@ -19,7 +21,7 @@ class Backup extends React.Component {
                       JSON document with all posts and comments.
                     </div>
                     <button
-                      onClick={() => window.location.href = api.downloadBackupUrl()}
+                      onClick={this._onClick.bind(this, api.downloadBackup)}
                       className='btn btn-primary'>Download complete backup</button>
                   </div>
                   <hr/>
@@ -28,7 +30,7 @@ class Backup extends React.Component {
                       Archive of all logs in JSONL format.
                     </div>
                     <button
-                      onClick={() => window.location.href = api.downloadLogsUrl()}
+                      onClick={this._onClick.bind(this, api.downloadLogs)}
                       className='btn btn-primary'>Download logs archive</button>
                   </div>
                 </div>
@@ -38,6 +40,15 @@ class Backup extends React.Component {
         </div>
       </LoggedInLayout>
     );
+  }
+
+  async _onClick(apiCall) {
+    try {
+      await apiCall();
+    }
+    catch (err) {
+      toast.error(err.message);
+    }
   }
 }
 

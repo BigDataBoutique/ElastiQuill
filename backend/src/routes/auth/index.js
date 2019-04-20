@@ -9,13 +9,12 @@ import initJwt from './jwt';
 import initGoogle from './google';
 import initGithub from './github';
 import initAnonymous from './anonymous';
-import { AdminEmails } from './util';
 
 const router = express.Router();
 const socialAuthSources = [];
 
 const ADMIN_ROUTE = config.blog['admin-route'];
-const ADMIN_EMAILS = new AdminEmails(config.blog['admin-emails']);
+const ADMIN_EMAILS = config.blog['admin-emails'];
 
 if (ADMIN_EMAILS.isEmpty()) {
   throw new Error('blog.admin-emails configuration variable is not set')

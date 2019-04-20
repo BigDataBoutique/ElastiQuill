@@ -105,12 +105,24 @@ export function redirectToSocialConnect(socialKey) {
   window.location.href = url;
 }
 
-export function downloadBackupUrl() {
-  return '/api/dump/content?state=' + getJwtToken();
+export async function downloadBackup() {
+  const url = '/api/dump/content';
+  const resp = await authFetch(url, { method: 'OPTIONS' });
+  const data = await resp.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  window.location.href = url + '?state=' + getJwtToken();
 }
 
-export function downloadLogsUrl() {
-  return '/api/dump/logs?state=' + getJwtToken();
+export async function downloadLogs() {
+  const url = '/api/dump/logs';
+  const resp = await authFetch(url, { method: 'OPTIONS' });
+  const data = await resp.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  window.location.href = url + '?state=' + getJwtToken();
 }
 
 export function uploadImageUrl() {
