@@ -169,7 +169,7 @@ class BaseForm extends Component {
     )
   }
 
-  _renderSimpleInput({ prop, placeholder, style, optional, className }) {
+  _renderSimpleInput({ prop, placeholder, style, optional, className, disabled }) {
     const value = this._getValue(prop, '');
     const onChange = ev => this._setValue(prop, ev.target.value);
     const isInvalid = this.state.showErrors && !optional ? value.length === 0 : false;
@@ -183,6 +183,7 @@ class BaseForm extends Component {
               type={'text'}
               placeholder={placeholder}
               className={classnames(className, { 'is-invalid': isInvalid })}
+              disabled={disabled}
               value={value}
               onChange={onChange} />
           </div>

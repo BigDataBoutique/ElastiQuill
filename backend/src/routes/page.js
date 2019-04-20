@@ -1,20 +1,35 @@
 import _ from 'lodash';
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import MarkdownIt from 'markdown-it';
 import * as blogPosts from '../services/blogPosts';
 import { cachePageHandler } from '../services/cache';
 import { preparePage } from './util';
+import { hbs } from '../app';
 
 const router = express.Router();
-const md = new MarkdownIt();
+
+hbs.registerAsyncHelper('embedContentPage', async (id) => {
+  let page;
+  try {
+    page = await blogPosts.getItemById(id);    
+  }
+  catch (err) {
+    return `<div class="alert alert-danger">Invalid embed: ${id}</div>`;
+  }  
+  return preparePage(page).content;
+});
 
 router.get('/:slug', cachePageHandler(asyncHandler(async (req, res, next) => {
   let page;
   try {
-    page = await blogPosts.getItemById(req.params.slug);
+    page = await blogPosts.getItemById(req.params.slug);    
   }
   catch (err) {
+    next();
+    return;
+  }
+
+  if (page.metadata.is_embed) {
     next();
     return;
   }
