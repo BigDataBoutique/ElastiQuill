@@ -70,6 +70,7 @@
     "twitter": "^1.7.1",
     "uid": "0.0.2",
     "uuid": "^3.3.2",
+    "valid-url": "^1.0.9",
     "zlib": "^1.0.5"
   },
   "devDependencies": {

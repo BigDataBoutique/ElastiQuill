@@ -63,7 +63,7 @@ export async function createComment(comment) {
 
     return {
       newComment: body,
-      repliedToComment: resp._source
+      repliedToComment: res
     };
   }
   else {

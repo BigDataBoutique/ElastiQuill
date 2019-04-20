@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import RSS from 'rss';
+import url from 'url';
 import path from 'path';
 import express from 'express';
 import request from 'request-promise-native';
@@ -44,7 +45,7 @@ router.get('/rss', asyncHandler(async (req, res) => {
   recentPosts.forEach(post => rss.item({
     title: post.title,
     description: post.description,
-    url: config.blog.url + post.url,
+    url: url.resolve(config.blog.url, post.url),
     categories: post.tags,
     date: new Date(post.published_at)
   }));
@@ -98,7 +99,7 @@ router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
 
   let canonicalUrl = _.get(post, 'metadata.canonical_url', '');
   if (! canonicalUrl.length) {
-    canonicalUrl = config.blog.url + preparedPost.url;
+    canonicalUrl = url.resolve(config.blog.url, preparedPost.url);
   }
 
   res.render('post', {
@@ -164,7 +165,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     else if (err.isJoi) {
       validity = {};
       err.details.forEach(err => {
-        validity[err.path] = 'has-error';
+        err.path.forEach(key => validity[key] = 'has-error');
       });
       commentError = 'Please fill all required fields';
     }
@@ -179,7 +180,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     const opAndComment = {
       opEmail: post.author.email,
       opTitle: post.title,
-      opUrl: path.join(config.blog.url, blogpostUrl(post)),
+      opUrl: url.resolve(config.blog.url, blogpostUrl(post)),
       comment: {
         email: req.body.email,
         author: req.body.author,
@@ -205,6 +206,11 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
   }
 
   events.emitChange('post', post);
+
+  if (! commentError) {
+    res.redirect(303, req.originalUrl);
+    return;
+  }
 
   res.render('post', {
     sidebarWidgetData: res.locals.sidebarWidgetData,

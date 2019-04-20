@@ -6,21 +6,19 @@ function onClickReply(btn) {
     var parents = $(btn).parentsUntil('#comments-container', '.comment');
     var path = [];
     for (var i = 0; i < parents.length; ++i) {
-        if (i === parents.length - 1) {
-            path.push(parents.eq(i).data('id'));
-        }
-        else {
-            path.push(parents.eq(i).data('index'));
-        }
+      if (i === parents.length - 1) {
+        path.push(parents.eq(i).data('id'));
+      }
+      else {
+        path.push(parents.eq(i).data('index'));
+      }
     }
     path.reverse();
 
-    commentForm.css('padding-left', 20);
     $(btn).closest('.comment').find('.list-unstyled').eq(0).prepend(commentForm);
     $('#recipient-hidden-input').val(JSON.stringify(path));
   }
   else {
-    commentForm.css('padding-left', 0);
     $('#comments-container').after(commentForm);
     $('#recipient-hidden-input').val('');
     $('#btn-add-comment').hide();
