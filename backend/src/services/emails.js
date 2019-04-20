@@ -1,11 +1,14 @@
 import Joi from 'joi';
 import uid from 'uid';
 import md5 from 'md5';
+import validUrl from 'valid-url';
 import ellipsize from 'ellipsize';
+import escapeHtml from 'escape-html';
 import MarkdownIt from 'markdown-it';
 
 import { config } from '../app';
 
+// Markdown converter with disabled HTML tags  
 const markdown = new MarkdownIt();
 
 const sgMail = require('@sendgrid/mail');
@@ -82,7 +85,8 @@ export function sendNewCommentNotification(args) {
 }
 
 function renderComment(comment) {
-  const website = comment.website ? comment.website : '#';
+  const website = validUrl.isUri(comment.website) ? comment.website : '#';
+
   return `
     <div style="border: 1px solid #eee; margin: 10px; padding: 10px;">
       <div style="display: flex;">
@@ -94,7 +98,7 @@ function renderComment(comment) {
         </p>
       </div>
       <br/>
-      By: <a href=${website}>${comment.author}</a>
+      By: <a href="${website}" rel="nofollow">${escapeHtml(comment.author)}</a>
     </div>
   `;
 }
