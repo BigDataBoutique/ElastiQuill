@@ -2,7 +2,9 @@ import _ from 'lodash';
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import classnames from 'classnames';
+import copyToClipboard from 'copy-to-clipboard';
 import ReactModal from 'react-modal';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { Button, ButtonGroup, ListGroup, ListGroupItem } from 'reactstrap';
 
@@ -74,13 +76,25 @@ class BaseItemsPage extends Component {
         </div>
         <div>
           {this._renderLineItemExtra && this._renderLineItemExtra(item)}
-          <a href={url} target='_blank'>
+          {item.metadata.is_embed ? (
             <Button
+              onClick={() => {
+                copyToClipboard(`{{embedContentPage "${item.slug}"}}`);
+                toast.success('Copied embed code into clipboard');
+              }}
               style={{ marginRight: 10 }}
-              color='primary'>Open{!_.isEmpty(item.private_viewing_key) && ' (secret URL)'}
-              <i style={{ marginLeft: 5 }} className='fa fa-external-link' />
+              color='primary'>Copy embed code
+              <i style={{ marginLeft: 5 }} className='fa fa-copy' />
             </Button>
-          </a>
+          ) : (
+            <a href={url} target='_blank'>
+              <Button
+                style={{ marginRight: 10 }}
+                color='primary'>Open{!_.isEmpty(item.private_viewing_key) && ' (secret URL)'}
+                <i style={{ marginLeft: 5 }} className='fa fa-external-link' />
+              </Button>
+            </a>
+          )}
           <Link to={`/edit/${urlPart}/` + item.id}>
             <Button
               style={{ marginRight: 10 }}

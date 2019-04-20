@@ -46,6 +46,7 @@ const CreateContentPageArgSchema = Joi.object().keys({
   "content": Joi.string().allow(''),
   "description": Joi.string().allow(''),
   "metadata": Joi.object().keys({
+    "is_embed": Joi.boolean().optional(),
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
   }).required(),
@@ -61,6 +62,7 @@ const UpdateContentPageArgSchema = Joi.object().keys({
   "content": Joi.string().allow(''),
   "description": Joi.string().allow(''),
   "metadata": Joi.object().keys({
+    "is_embed": Joi.boolean().optional(),
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
   }).required(),

@@ -35,8 +35,6 @@ esClient.ping({
   }
 });
 
-const mainRouter = require('./routes');
-
 const app = express();
 app.disable('x-powered-by');
 
@@ -56,7 +54,7 @@ if (BLOG_THEME_PATH) {
   }
 }
 
-const hbs = exphbs({
+export const hbs = exphbs({
   helpers: {
     truncateHtml: require('truncate-html'),
     toLowerCase: s => s.toLowerCase()
@@ -116,6 +114,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(logger('dev'));
 }
 
+const mainRouter = require('./routes');
 app.use(mainRouter.default);
 
 // catch 404 and forward to error handler

@@ -22,7 +22,14 @@ class ContentPageForm extends BaseForm {
       <div className='row'>
         <div className='col-8'>
           {this._renderTextarea({ placeholder: 'Description', maxLength: 300, prop: 'description', optional: true })}
-          {this._renderSimpleInput({ className: 'form-control', placeholder: 'Header image URL', prop: 'metadata.header_image_url', optional: true })}
+          {this._renderSimpleInput({
+            className: 'form-control',
+            placeholder: 'Header image URL',
+            prop: 'metadata.header_image_url',
+            optional: true,
+            disabled: this.state.formValues.metadata.is_embed
+          })}
+          {this._renderToggle({ label: 'Save as embed', prop: 'metadata.is_embed' })}
         </div>
         <div className='col-4'>
           <Button

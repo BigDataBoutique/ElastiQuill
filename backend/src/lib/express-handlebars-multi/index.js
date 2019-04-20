@@ -14,6 +14,7 @@ const fsp = require('mz/fs')
 const globby = require('globby')
 const handlebars = require('handlebars')
 const mergeArgs = require('merge-args')()
+const uuidv1 = require('uuid/v1');
 
 // default configuration
 const defaultConfig = {
@@ -36,6 +37,8 @@ const defaultConfig = {
     // templates indexed by absolute file name
     templates: {},
 }
+
+const asyncHelpers = {};
 
 /* global singleton data */
 var GLOBAL
@@ -142,14 +145,25 @@ function render (file, options, callback) {
             // render layout
             body = layouts[layout](options, hbsOptions)
         }
-        // if callback is passed then call with result
-        if (callback) {
-            callback(null, body)
-        }
-        // otherwise resolve with result
-        else {
-            return body
-        }
+
+        // async helpers support
+        const helpersPairs = _.toPairs(asyncHelpers).filter(pair => body.indexOf(pair[0]) > -1);
+        return Promise.all(helpersPairs.map(p => p[1])).then(results => {
+            for (let i = 0; i < results.length; ++i) {
+                const key = helpersPairs[i][0];
+                body = body.replace(key, results[i]);
+                delete asyncHelpers[key];
+            }
+
+            // if callback is passed then call with result
+            if (callback) {
+                callback(null, body)
+            }
+            // otherwise resolve with result
+            else {
+                return body
+            }
+        });
     })
 }
 
@@ -291,4 +305,12 @@ function loadTemplatesFiles (dir, files, options, templates) {
         // wait for template to load
         return promise
     })
+}
+
+render.registerAsyncHelper = (helperName, asyncHelper) => {
+    handlebars.registerHelper(helperName, (...args) => {
+        const uuid = 'async_helper_' + uuidv1();
+        asyncHelpers[uuid] = asyncHelper(...args);
+        return uuid;
+    });
 }
