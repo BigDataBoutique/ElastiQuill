@@ -246,11 +246,15 @@ async function log({ req, res, email, took, error = null, tags = [] }) {
 function ecsSource(req, res) {
   if (! req || ! res) return {};
 
-  const ip = req.connection.remoteAddress;
+  const ip = req.headers['x-forwarded-for'] ||
+             req.connection.remoteAddress || 
+             req.socket.remoteAddress ||
+            (req.connection.socket ? req.connection.socket.remoteAddress : null);
+
   return {
     source: {
       address: ip,
-      ip: ip
+      ip
     }
   }
 }
