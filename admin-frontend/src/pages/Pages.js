@@ -39,10 +39,7 @@ class Pages extends BaseItemsPage {
   async _onDeleteItem() {
     try {
       this.props.pagesStore.setItemDeleting(true);
-      const resp = await api.deleteContentPage(this.props.pagesStore.deleteItemId);
-      if (resp.error) {
-        throw new Error(resp.error);
-      }
+      await api.deleteContentPage(this.props.pagesStore.deleteItemId);
       this.props.pagesStore.loadPage(0);
       this.props.pagesStore.setDeleteItemId(null);
     }

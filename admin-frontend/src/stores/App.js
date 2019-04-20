@@ -1,8 +1,8 @@
-import {action, computed, observable} from 'mobx';
+import { action, computed, observable } from 'mobx';
 import md5 from 'md5';
 import localforage from 'localforage';
 import * as api from '../api';
-import {jsonFetch} from '../util';
+import { authFetch } from '../util';
 import BaseStore from "./BaseStore";
 
 import { cleanJwtToken, setUnauthorizedHandler } from '../util';
@@ -22,7 +22,12 @@ class App extends BaseStore {
     this.loading('loadSession');
 
     try {
-      const resp = await jsonFetch('/api/auth/whoami');
+      const resp = await authFetch('/api/auth/whoami', {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      });
+
       if (resp.status == 401) {
         this.setUser(null);
       } else {
@@ -81,9 +86,12 @@ class App extends BaseStore {
     try {
       this.clearLoginErrors();
 
-      const response = await jsonFetch('/api/auth/local', {
+      const response = await authFetch('/api/auth/local', {
         method: 'POST',
-        body: JSON.stringify({username, password})
+        body: JSON.stringify({username, password}),
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
       });
 
       if (response.status === 401) {

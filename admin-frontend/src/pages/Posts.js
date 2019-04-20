@@ -94,10 +94,7 @@ class Posts extends BaseItemsPage {
   async _onDeleteItem() {
     try {
       this.props.postsStore.setItemDeleting(true);
-      const resp = await api.deletePost(this.props.postsStore.deleteItemId);
-      if (resp.error) {
-        throw new Error(resp.error);
-      }
+      await api.deletePost(this.props.postsStore.deleteItemId);
       this.props.postsStore.loadPage(0);
       this.props.postsStore.setDeleteItemId(null);
     }

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { authFetch, getJwtToken } from './util';
+import { authFetchJson, getJwtToken } from './util';
 
 export async function createPost(values) {
   return await createItem('/api/content/post', values);
@@ -21,13 +21,11 @@ export async function updatePost(id, post) {
 }
 
 export async function loadPostById(id) {
-  const resp = await authFetch(`/api/content/post/${id}`);
-  return resp.json();
+  return await authFetchJson(`/api/content/post/${id}`);
 }
 
 export async function loadPosts(pageIndex) {
-  const resp = await authFetch(`/api/content/post?page_index=${pageIndex}`);
-  return resp.json();
+  return await authFetchJson(`/api/content/post?page_index=${pageIndex}`);
 }
 
 export async function createContentPage(values) {
@@ -48,66 +46,55 @@ export async function updateContentPage(id, page) {
 }
 
 export async function loadContentPages(pageIndex) {
-  const resp = await authFetch(`/api/content/page?page_index=${pageIndex}`);
-  return resp.json();
+  return await authFetchJson(`/api/content/page?page_index=${pageIndex}`);
 }
 
 export async function loadContentPageById(id) {
-  const resp = await authFetch(`/api/content/page/${id}`);
-  return resp.json();
+  return await authFetchJson(`/api/content/page/${id}`);
 }
 
 export async function loadVisitsStats() {
-  const resp = await authFetch('/api/stats/visits');
-  return resp.json();
+  return await authFetchJson('/api/stats/visits');
 }
 
 export async function loadCommentsStats(postId = null) {
-  const resp = await authFetch('/api/stats/comments?post_id='+(postId || ''));
-  return resp.json();
+  return await authFetchJson('/api/stats/comments?post_id='+(postId || ''));
 }
 
 export async function loadItemStats(itemType, id) {
-  const resp = await authFetch(`/api/stats/${itemType}/${id}`);
-  return resp.json();
+  return await authFetchJson(`/api/stats/${itemType}/${id}`);
 }
 
 export async function loadSocialAvailability() {
-  const resp = await authFetch('/api/social/availability');
-  return resp.json();
+  return await authFetchJson('/api/social/availability');
 }
 
 export async function loadAllTags() {
-  const resp = await authFetch('/api/content/tags');
-  return resp.json();
+  return await authFetchJson('/api/content/tags');
 }
 
 export async function loadAuthSources() {
-  const resp = await authFetch('/api/auth/auth-sources');
-  return resp.json();
+  return await authFetchJson('/api/auth/auth-sources');
 }
 
 export async function loadSetupStatus() {
-  const resp = await authFetch('/api/setup/status');
-  return resp.json();
+  return await authFetchJson('/api/setup/status');
 }
 
 export async function setupElasticsearch() {
-  const resp = await authFetch('/api/setup', {
+  return await authFetchJson('/api/setup', {
     method: 'POST'
   });
-  return resp.json();
 }
 
 export async function postItemToSocial(socialKey, itemId, opts) {
-  const resp = await authFetch(`/api/social/post/${socialKey}/${itemId}`, {
+  return await authFetchJson(`/api/social/post/${socialKey}/${itemId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(opts)
   });
-  return resp.json();
 }
 
 export function redirectToSocialConnect(socialKey) {
@@ -131,30 +118,27 @@ export function uploadImageUrl() {
 }
 
 async function createItem(url, values) {
-  const resp = await authFetch(url, {
+  return await authFetchJson(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(values)
   });
-  return resp.json();
 }
 
 async function deleteItem(url) {
-  const resp = await authFetch(url, {
+  return await authFetchJson(url, {
     method: 'DELETE'
   });
-  return resp.json();
 }
 
 async function updateItem(url, values) {
-  const resp = await authFetch(url, {
+  return await authFetchJson(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(values)
   });
-  return resp.json();
 }

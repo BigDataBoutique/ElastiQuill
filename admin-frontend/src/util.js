@@ -11,15 +11,6 @@ export function setUnauthorizedHandler(handler) {
   unathorizedHandler = handler;
 }
 
-export const jsonFetch = async (url, opts = {}) => {
-  if (!opts.headers) {
-    opts.headers = {};
-  }
-  opts.headers['Content-Type'] = 'application/json; charset=utf-8';
-
-  return await authFetch(url, opts);
-};
-
 export const authFetch = async (url, opts = {}) => {
   opts.credentials = 'include';
 
@@ -35,8 +26,18 @@ export const authFetch = async (url, opts = {}) => {
   if (resp.status === 401 && unathorizedHandler) {
     unathorizedHandler(resp);
   }
-  
+
   return resp;
+};
+
+export const authFetchJson = async (url, opts = {}) => {
+  const resp = await authFetch(url, opts);
+  const data = await resp.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  
+  return data;
 };
 
 export function getJwtToken() {

@@ -31,24 +31,19 @@ class Posts extends ItemsStore {
   async postItemToSocial(opts = {}) {
     try {
       this.loading('postToSocial');
-      const { url, error } = await api.postItemToSocial(this.socialDialog, this.socialItem.id, opts);
-      if (error) {
-        toast.error(`${_.capitalize(this.socialDialog)} error. ${error}`);
-      }
-      else {
-        toast.success(() => (
-          <div>
-            Posted successfully.
-            {url && <a
-              target='_blank'
-              style={{ color: 'white', fontWeight: 'bold', marginLeft: 5 }}
-              href={url}>Open</a>}
-          </div>
-        ));
-      }
+      const { url } = await api.postItemToSocial(this.socialDialog, this.socialItem.id, opts);
+      toast.success(() => (
+        <div>
+          Posted successfully.
+          {url && <a
+            target='_blank'
+            style={{ color: 'white', fontWeight: 'bold', marginLeft: 5 }}
+            href={url}>Open</a>}
+        </div>
+      ));
     }
     catch (err) {
-      toast.error('Server error.');
+      toast.error(`${_.capitalize(this.socialDialog)} error. ${err.message}`);
     }
     finally {
       this.loaded('postToSocial');
