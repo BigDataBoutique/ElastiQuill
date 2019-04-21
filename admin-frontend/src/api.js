@@ -106,22 +106,14 @@ export function redirectToSocialConnect(socialKey) {
 }
 
 export async function downloadBackup() {
-  const url = '/api/dump/content';
-  const resp = await authFetch(url, { method: 'OPTIONS' });
-  const data = await resp.json();
-  if (data.error) {
-    throw new Error(data.error);
-  }
+  const url = '/api/dump/content';  
+  await authFetchJson(url, { method: 'OPTIONS' });
   window.location.href = url + '?state=' + getJwtToken();
 }
 
 export async function downloadLogs() {
   const url = '/api/dump/logs';
-  const resp = await authFetch(url, { method: 'OPTIONS' });
-  const data = await resp.json();
-  if (data.error) {
-    throw new Error(data.error);
-  }
+  await authFetchJson(url, { method: 'OPTIONS' });
   window.location.href = url + '?state=' + getJwtToken();
 }
 
