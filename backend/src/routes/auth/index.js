@@ -52,11 +52,17 @@ if (isAnonymousAuthAllowed()) {
   socialAuthSources.push('anonymous');  
 }
 
+router.use((err, req, res, next) => {
+  redirectToFrontend(res, {
+    message: err.message
+  });
+});
+
 async function handleRequest(req, res) {
   if (! req.user) {
-    const profileEmails = JSON.stringify(res.locals.profileEmails) || '';
-    const authEmailBase64 = Buffer.from(profileEmails).toString('base64');
-    res.redirect(frontendAddress() + ADMIN_ROUTE + '#/login/error/' + authEmailBase64);
+    redirectToFrontend(res, {
+      emails: res.locals.profileEmails
+    });
 
     logging.logAuthAttempt({
       email: res.locals.profileEmails,
@@ -66,7 +72,7 @@ async function handleRequest(req, res) {
   }
 
   updateJwtToken(req, res);
-  res.redirect(frontendAddress() + ADMIN_ROUTE);
+  redirectToFrontend(res);
 
   logging.logAuthAttempt({
     email: req.user.email,
@@ -122,6 +128,16 @@ export const passportDefaultCallback = (err, req, res, profile, next) => {
 
 function isAnonymousAuthAllowed() {
   return socialAuthSources.length === 0 && ADMIN_EMAILS.isMatchAll();  
+}
+
+function redirectToFrontend(res, loginError) {
+  let url = frontendAddress() + ADMIN_ROUTE;
+  if (loginError) {
+    const errorBase64 = Buffer.from(JSON.stringify(loginError)).toString('base64');
+    url += '#/login/error/' + errorBase64;
+  }
+
+  res.redirect(url);
 }
 
 export default router;

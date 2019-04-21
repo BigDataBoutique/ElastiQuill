@@ -56,12 +56,32 @@ class Login extends Component {
       return false;
     }
 
-    let emails;
+    let errorData;
     try {
-      emails = JSON.parse(atob(this.props.location.pathname.split('error/')[1]));
+      errorData = JSON.parse(atob(this.props.location.pathname.split('error/')[1]));
     }
     catch (err) {
-      emails = null;
+      errorData = null;
+    }
+
+    let errorLabel;
+
+    if (errorData && errorData.message) {
+      errorLabel = <div>{errorData.message}</div>;
+    }
+    else if (errorData && errorData.emails) {
+      errorLabel = (
+        <div>
+          User
+            {errorData.emails.map((email, key) => {
+              return <span> {email} </span>
+            })}
+            is not authorized to access this area. If you believe this is a mistake, contact the blog owners.
+        </div>
+      );
+    }
+    else {
+      errorLabel = <div>Failed to authenticate using emails attached to account</div>;
     }
 
     return (
@@ -69,19 +89,7 @@ class Login extends Component {
         <h4 className="alert-heading mb-0">Authentication error</h4>
         <hr/>
         <p className="mb-0">
-          {emails ? (
-            <div>
-              User
-                {emails.map((email, key) => {
-                  return <span> {email} </span>
-                })}
-                is not authorized to access this area. If you believe this is a mistake, contact the blog owners.
-            </div>
-          ) : (
-            <div>
-              Failed to authenticate using emails attached to account
-            </div>
-          )}
+          {errorLabel}
         </p>
       </div>
     )
