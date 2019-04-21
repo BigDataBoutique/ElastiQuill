@@ -246,10 +246,17 @@ async function log({ req, res, email, took, error = null, tags = [] }) {
 function ecsSource(req, res) {
   if (! req || ! res) return {};
 
-  const ip = req.headers['x-forwarded-for'] ||
-             req.connection.remoteAddress || 
-             req.socket.remoteAddress ||
-            (req.connection.socket ? req.connection.socket.remoteAddress : null);
+  let ip = null;
+
+  if (req.headers['x-forwarded-for']) {
+    ip = req.headers['x-forwarded-for'].split(',').map(s => s.trim())[0];
+  }
+
+  if (! ip || ! ip.length) {
+    ip = req.connection.remoteAddress || 
+         req.socket.remoteAddress ||
+        (req.connection.socket ? req.connection.socket.remoteAddress : null);
+  }
 
   return {
     source: {
