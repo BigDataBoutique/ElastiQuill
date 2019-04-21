@@ -61,7 +61,7 @@ async function getStorage() {
 
     let results = null;
     try {
-      const results = await gcsStorage.bucket(GCS_BUCKET).iam.getPolicy();
+      results = await gcsStorage.bucket(GCS_BUCKET).iam.getPolicy();
     } catch (ignored_ex) {}
     if (results !== null) {
 	  const found = _.find(results[0].bindings, ['role', 'roles/storage.objectViewer']);
