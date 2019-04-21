@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -27,12 +27,42 @@ spec:
                   values:
                   - elastiquill
               topologyKey: kubernetes.io/hostname
+#      initContainers:
+#      - name: git-theme-init-sync
+#        image: k8s.gcr.io/git-sync:v3.1.1
+#        volumeMounts:
+#        - name: theme
+#          mountPath: /etc/elastiquill-theme
+#        env:
+#        - name: GIT_SYNC_REPO
+#          value: <your theme git repo>
+#        - name: GIT_SYNC_BRANCH
+#          value: master
+#        - name: GIT_SYNC_ROOT
+#          value: /etc/elastiquill-theme
+#        - name: GIT_SYNC_DEST
+#          value: theme
+#        - name: GIT_SYNC_PERMISSIONS
+#          value: "0777"
+#        - name: GIT_SYNC_ONE_TIME
+#          value: "true"
+#        - name: GIT_SYNC_SSH
+#          value: "false"
+#        securityContext:
+#          runAsUser: 0
       containers:
-      - image: bigdataboutique/elastiquill
+      - image: bigdataboutique/elastiquill:latest
+        imagePullPolicy: Always
         name: elastiquill
+#        env:
+#        - name: BLOG_THEME_PATH
+#          value: /etc/elastiquill-theme/theme
         volumeMounts:
         - name: elastiquill-config
           mountPath: /etc/elastiquill
+          readOnly: true
+        - name: theme
+          mountPath: /etc/elastiquill-theme
           readOnly: true
         ports:
         - containerPort: 5000
@@ -55,6 +85,8 @@ spec:
             memory: "512Mi"
             cpu: "1000m"
       volumes:
+      - name: theme
+        emptyDir: {}
       - name: elastiquill-config
         secret:
           secretName: elastiquill-demo-config
@@ -72,4 +104,4 @@ spec:
     targetPort: 5000
   selector:
     app: elastiquill
-  type: LoadBalancer
+  type: NodePort

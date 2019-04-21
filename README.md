@@ -2,6 +2,8 @@
 
 #### ElastiQuill is a modern blog engine built on top of Elasticsearch
 
+[![Latest version](https://images.microbadger.com/badges/version/bigdataboutique/elastiquill.svg)](https://hub.docker.com/r/bigdataboutique/elastiquill "Latest version") [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Known Vulnerabilities](https://snyk.io/test/github/BigDataBoutique/ElastiQuill/badge.svg?targetFile=backend/package.json)](https://snyk.io/test/github/BigDataBoutique/ElastiQuill) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+
 Features:
 
 * Fully featured blog engine - posts, comments and replies to comments
@@ -15,6 +17,7 @@ Features:
 * Social posting integration (Twitter, LinkedIn, Reddit)
 * Built-in backup and full database dump
 * Content caching
+* Themes support
 
 Demo: https://elastiquill.bigdataboutique.com
 
@@ -27,38 +30,6 @@ docker pull bigdataboutique/elastiquill
 ```
 
 Instructions for running on Kubernetes are available under `_k8s/`. 
-
-## Running locally
-
-The easiest way is to run via docker-compose:
-
-```
-docker-compose up
-```
-
-You might need to run the following on your machine if Elasticsearch refuses to run: `sysctl -w vm.max_map_count=262144`.
-
-To build and run the blog engine in Docker:
-
-```
-docker build . -t elastic-blog-engine
-docker run -p 5000:5000 -v /path/to/config.yml:/etc/elastiquill/config.yml elastiquill
-```
-Configuration file will be looked up at `/etc/elastiquill/config.yml` unless you set the `CONFIG_PATH` environment variable.  
-
-Blog themes are located under `/app/views` directory. You can define your own theme by mounting a folder in that directory and setting `blog.theme-path` configuration to `/app/views/yourtheme`.  
-
-Alternatively, you can run the engine without Docker. Build the admin panel frontend
-```
-cd admin-frontend
-npm install && npm run build
-```
-And run the backend
-```
-cd backend
-npm install
-npm run production
-```
 
 ## Set up admin login
 
@@ -82,6 +53,28 @@ Set:
 * Authorization callback URL to `hostname/api/auth/github/callback`
 
 Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add them to your `config.yml` file.
+
+## Themes
+
+ElastiQuill supports loading custom themes to override the default provided theme or any part of it.
+
+Themes are using the [Handlebars](https://handlebarsjs.com/) syntax, and all view files are expected to have the .hbs extension.
+
+Theme structure:
+
+```
+theme-root/
+|- layouts/    # contains the layout files, default layout name is "main"
+|- partials/   # partias for the layout and pages, you can override existing or create new
+|- public/     # public assets to serve (CSS, JS, images, etc)
+| contact.hbs  # Handlebars views you can override as needed
+```
+
+You can use the default view as a base (under `backend/src/views/base`) or create your own from scratch. ElastiQuill will expect your theme to be under the path configured as `blog.theme-path` in your config.yml file.
+
+Examples for custom ElastiQuill themes:
+* https://github.com/BigDataBoutique/elastiquill-demo-theme
+* https://github.com/synhershko/elastiquill-code972-theme
 
 ## Integration with social networks
 
@@ -154,3 +147,33 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` |
 | credentials.reddit.username | Reddit account username | `REDDIT_USERNAME` |
 | credentials.reddit.password | Reddit account password | `REDDIT_PASSWORD` |
+
+## Running locally
+
+The easiest way is to run via docker-compose:
+
+```
+docker-compose up
+```
+
+You might need to run the following on your machine if Elasticsearch refuses to run: `sysctl -w vm.max_map_count=262144`.
+
+To build and run the blog engine in Docker:
+
+```
+docker build . -t elastic-blog-engine
+docker run -p 5000:5000 -v /path/to/config.yml:/etc/elastiquill/config.yml elastiquill
+```
+Configuration file will be looked up at `/etc/elastiquill/config.yml` unless you set the `CONFIG_PATH` environment variable.    
+
+Alternatively, you can run the engine without Docker. Build the admin panel frontend
+```
+cd admin-frontend
+npm install && npm run build
+```
+And run the backend
+```
+cd backend
+npm install
+npm run production
+```
