@@ -140,8 +140,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.akismet.api-key | Akismet API key | `AKISMET_APIKEY` |
 | credentials.akismet.domain | Akismet domain | `AKISMET_DOMAIN` |
 | credentials.google.gcs-bucket | GCS bucket | `GOOGLE_GCS_BUCKET` |
-| credentials.google.gcloud-project-id | Google Cloud project ID for GCS | `GOOGLE_GCLOUD_PROJECT_ID` |
-| credentials.google.gcs-keyfile | Path to the credentials file | `GOOGLE_GCS_KEYFILE` |
+| credentials.google.gcs-keyfile | Path to the credentials file | `GOOGLE_APPLICATION_CREDENTIALS` |
 | credentials.aws.s3-bucket | S3 bucket | `AWS_S3_BUCKET` |
 | credentials.aws.access-key-id | AWS access key ID | `AWS_ACCESS_KEY_ID` |
 | credentials.aws.secret-access-key | AWS secret access key | `AWS_SECRET_ACCESS_KEY` |
