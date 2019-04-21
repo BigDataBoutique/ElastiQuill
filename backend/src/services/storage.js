@@ -59,11 +59,16 @@ async function getStorage() {
       keyFilename: GCS_KEYFILE
     });
 
-    const results = await gcsStorage.bucket(GCS_BUCKET).iam.getPolicy();
-    const found = _.find(results[0].bindings, ['role', 'roles/storage.objectViewer']);
-    if (! found || ! found.members.includes('allUsers')) {
-      throw new Error(`Bucket ${GCS_BUCKET} is not configured for public access.`)
-    }
+    let results = null;
+    try {
+      const results = await gcsStorage.bucket(GCS_BUCKET).iam.getPolicy();
+    } catch (ignored_ex) {}
+    if (results !== null) {
+	  const found = _.find(results[0].bindings, ['role', 'roles/storage.objectViewer']);
+	  if (!found || !found.members.includes('allUsers')) {
+	    throw new Error(`Bucket ${GCS_BUCKET} is not configured for public access.`)
+	  }
+	}
 
     return new MulterGcsStorage({
       projectId,
