@@ -1,13 +1,17 @@
 import _ from 'lodash';
 import React, {Component} from 'react';
+import { toast } from 'react-toastify';
 import classnames from 'classnames';
 import ReactModal from 'react-modal';
 import ReactSelect from 'react-select';
-import * as Showdown from "showdown";
 import { Alert } from 'reactstrap';
+import * as Showdown from "showdown";
+import FileUploadProgress from 'react-fileupload-progress';
 
 import ContentEditor from './ContentEditor';
 import TagsInput from './TagsInput';
+import * as api from '../api';
+import { getJwtToken } from '../util';
 
 class BaseForm extends Component {
   constructor(props) {
@@ -105,6 +109,53 @@ class BaseForm extends Component {
               value={value} onChange={onChange} />
           </div>
         </div>
+      </div>
+    )
+  }
+
+  _renderFileInput({ label, prop }) {
+    const formRenderer = (onSubmit) => (
+      <form className="_react_fileupload_form_content" ref="form" method="post" onSubmit={onSubmit}>
+        <div>
+          <input type="file" name="file" onChange={onSubmit} />
+        </div>
+      </form>
+    );
+
+    const beforeSend = xhr => {
+      xhr.setRequestHeader('Authorization', 'Bearer ' + getJwtToken());
+      return xhr;
+    };
+
+    const onLoad = (e, data) => {
+      try {
+        const resp = JSON.parse(data.response);
+        if (resp.error) {
+          toast.error(resp.error);
+          return;
+        }
+
+        console.log(prop, resp.files[0].url);
+        this._setValue(prop, resp.files[0].url);
+      }
+      catch (err) {
+        console.log(err);
+      }
+    };
+
+    const value = this._getValue(prop);
+
+    return (
+      <div style={{ paddingBottom: 10, width: '100%' }}>
+        {this._renderSimpleInput({ prop, placeholder: label, optional: true, className: 'form-control' })}
+        <FileUploadProgress
+          key={value}
+          formRenderer={formRenderer}
+          beforeSend={beforeSend}
+          url={api.uploadImageUrl()}
+          onProgress={(e, request, progress) => {console.log('progress', e, request, progress);}}
+          onLoad={onLoad}
+          onError={() => toast.error(e.message)} />
       </div>
     )
   }
