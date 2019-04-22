@@ -39,6 +39,11 @@ class TurndownServiceProxy extends TurndownService {
 
     return markdown;
   }
+
+  escape(html) {
+    // override escape function with a noop
+    return html;
+  }
 }
 
 const converter = new Showdown.Converter();
@@ -50,7 +55,21 @@ class ContentEditor extends Component {
   }
 
   componentDidMount() {
-    this.editor = new MediumEditor(this.container.current);
+    this.editor = new MediumEditor(this.container.current, {
+      toolbar: {
+        buttons: [
+          'bold', 'italic', 'underline',
+          {
+            name: 'anchor',
+            action: 'createLink',
+            aria: 'link',
+            tagNames: ['a'],
+            contentDefault: '<i class="fa fa-link"></i>'
+          },          
+          'h2', 'h3', 'quote'
+        ]
+      }
+    });
     if (this.props.contentType === 'html') {
       this.container.current.innerHTML = this.props.value;
     }
