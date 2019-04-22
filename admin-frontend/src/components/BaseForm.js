@@ -195,7 +195,7 @@ class BaseForm extends Component {
     )
   }
 
-  _renderTextarea({ prop, maxLength, placeholder, style, optional }) {
+  _renderTextarea({ prop, maxLength, placeholder, style, disabled, optional }) {
     const value = this._getValue(prop, '');
     const onChange = ev => this._setValue(prop, ev.target.value);
     const isInvalid = this.state.showErrors && !optional ? value.length === 0 : false;
@@ -205,6 +205,7 @@ class BaseForm extends Component {
         <div className='col-12'>
           <div style={{ display: 'flex' }}>
             <textarea
+              disabled={disabled}
               style={{ width: '100%', overflow: 'hidden', paddingRight: '70px', ...style }}
               placeholder={placeholder}
               className={classnames('form-control', { 'is-invalid': isInvalid })}
