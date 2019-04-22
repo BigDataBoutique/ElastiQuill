@@ -33,10 +33,16 @@ class ItemFormPage extends Component {
       }
     ];
 
+    let blogpostId = null;
+    if (! this._isNew() && this._getType() === 'post') {
+      blogpostId = this.props.match.params.id;
+    }
+
     return <LoggedInLayout pageTitle={this._renderPageTitle()} breadcrumbs={breadcrumbs}>
       <div className="content">
         {this._getStore().isLoading ? 'Loading...' : (
           <ItemForm
+            blogpostId={blogpostId}
             isNew={this._isNew()}
             isFormSaving={this._getStore().isFormSaving}
             isFormModalOpen={this._getStore().isFormModalOpen}

@@ -46,7 +46,12 @@ class BaseForm extends Component {
             </div>
           </div>
         </div>
-        {this._renderContentEditor({ prop: 'content', contentType: this._getCurrentContentType(this.props.item), optional: true })}
+        {this._renderContentEditor({
+          prop: 'content',
+          contentType: this._getCurrentContentType(this.props.item),
+          optional: true,
+          blogpostId: this.props.blogpostId
+        })}
         <ReactModal
           style={modalStyle}
           isOpen={this.props.isFormModalOpen}
@@ -68,10 +73,11 @@ class BaseForm extends Component {
     return false;
   }
 
-  _renderContentEditor({ prop, contentType }) {
+  _renderContentEditor({ prop, contentType, blogpostId }) {
     return (
       <div style={{ marginBottom: 10 }}>
         <ContentEditor
+          blogpostId={blogpostId}
           contentType={contentType}
           value={this._getValue(prop, '')}
           onChange={val => this._setValue(prop, val)} />
