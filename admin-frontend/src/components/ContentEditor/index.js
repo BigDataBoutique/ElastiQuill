@@ -89,13 +89,18 @@ class ContentEditor extends Component {
       }
     });
 
+    let uploadImageUrl = api.uploadImageUrl();
+    if (this.props.blogpostId) {
+      uploadImageUrl += '?post_id=' + this.props.blogpostId;
+    }
+
     $(this.container.current).mediumInsert({
       editor: this.editor,
       addons: {
         images: {
           deleteScript: false,
           fileUploadOptions: {
-            url: api.uploadImageUrl(),
+            url: uploadImageUrl,
             headers: {
               'Authorization': 'Bearer ' + getJwtToken()
             },

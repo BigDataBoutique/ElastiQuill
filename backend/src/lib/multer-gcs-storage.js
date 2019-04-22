@@ -11,16 +11,30 @@ export default class MulterGcsStorage {
   _handleFile(req, file, cb) {
     this.options.filename(req, file, (err, filename) => {
       if (err) {
-        return cb(err);
+        cb(err);
+        return;
       }
-      
-      file.stream.pipe(this.bucket.file(filename).createWriteStream())
-        .on('error', (err) => cb(err))
-        .on('finish', (file) => cb(null, {
-            path: `https://${this.options.bucket}.storage.googleapis.com/${filename}`,
-            filename: filename
-          })
-        );
+
+      this.options.contentType(req, file, (err, contentType) => {
+        if (err) {
+          cb(err);
+          return;
+        }
+
+        const streamOpts = {
+          metadata: {
+            contentType
+          }
+        };
+        
+        file.stream.pipe(this.bucket.file(filename).createWriteStream(streamOpts))
+          .on('error', (err) => cb(err))
+          .on('finish', (file) => cb(null, {
+              path: `https://${this.options.bucket}.storage.googleapis.com/${filename}`,
+              filename: filename
+            })
+          );
+      });
     });
   }
 
