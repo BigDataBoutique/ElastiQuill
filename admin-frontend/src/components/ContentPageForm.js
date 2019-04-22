@@ -21,7 +21,13 @@ class ContentPageForm extends BaseForm {
     return (
       <div className='row'>
         <div className='col-8'>
-          {this._renderTextarea({ placeholder: 'Description', maxLength: 300, prop: 'description', optional: true })}
+          {this._renderTextarea({
+            placeholder: 'Description',
+            maxLength: 300,
+            prop: 'description',
+            optional: true,
+            disabled: this.state.formValues.metadata.is_embed
+          })}
           {this._renderSimpleInput({
             className: 'form-control',
             placeholder: 'Header image URL',
