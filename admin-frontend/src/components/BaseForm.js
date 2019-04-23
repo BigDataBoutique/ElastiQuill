@@ -113,7 +113,7 @@ class BaseForm extends Component {
     )
   }
 
-  _renderFileInput({ label, prop }) {
+  _renderFileInput({ label, prop, disabled }) {
     const formRenderer = (onSubmit) => (
       <form className="_react_fileupload_form_content" ref="form" method="post" onSubmit={onSubmit}>
         <div>
@@ -147,15 +147,17 @@ class BaseForm extends Component {
 
     return (
       <div style={{ paddingBottom: 10, width: '100%' }}>
-        {this._renderSimpleInput({ prop, placeholder: label, optional: true, className: 'form-control' })}
-        <FileUploadProgress
-          key={value}
-          formRenderer={formRenderer}
-          beforeSend={beforeSend}
-          url={api.uploadImageUrl()}
-          onProgress={(e, request, progress) => {console.log('progress', e, request, progress);}}
-          onLoad={onLoad}
-          onError={() => toast.error(e.message)} />
+        {this._renderSimpleInput({ disabled, prop, placeholder: label, optional: true, className: 'form-control' })}
+        {!disabled && (
+          <FileUploadProgress
+            key={value}
+            disabled={disabled}
+            formRenderer={formRenderer}
+            beforeSend={beforeSend}
+            url={api.uploadImageUrl()}
+            onLoad={onLoad}
+            onError={e => toast.error(e.message)} />
+        )}
       </div>
     )
   }
