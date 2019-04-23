@@ -39,6 +39,13 @@ const SendNewCommentNotificationArgSchema = Joi.object().keys({
   }).required()
 });
 
+export function getStatus() {
+  const backend = config.credentials.sendgrid ? 'sendgrid' : null;
+  return {
+    backend
+  };
+}
+
 export function sendContactMessage(message) {
   const result = Joi.validate(message, ContactMessageArgSchema);
   if (result.error) {

@@ -7,31 +7,11 @@ import { hot } from 'react-hot-loader';
 import { reaction } from "mobx";
 import { Provider } from "mobx-react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import Login from './pages/Login';
-import ItemFormPage from './pages/ItemFormPage';
-import ItemStatsPage from './pages/ItemStatsPage';
 import PrivateRoute from './components/PrivateRoute';
-import urls from './config/urls';
-import Pages from './pages/Pages';
-import Posts from './pages/Posts';
-import Setup from './pages/Setup';
-import Dashboard from './pages/Dashboard';
-import Backup from './pages/Backup';
-import appStore from './stores/App';
-import statsStore from './stores/Stats';
-import postsStore from './stores/Posts';
-import pagesStore from './stores/Pages';
-import setupStore from './stores/Setup';
-import dashboardStore from './stores/Dashboard';
 
-const stores = {
-  appStore,
-  setupStore,
-  statsStore,
-  postsStore,
-  pagesStore,
-  dashboardStore
-};
+import urls from './config/urls';
+import * as pages from './pages';
+import * as stores from './stores';
 
 @hot(module)
 class App extends Component {
@@ -44,8 +24,8 @@ class App extends Component {
 
     reaction(
       () => ({
-        isLoading: appStore.isLoading,
-        isAuthenticated: appStore.isAuthenticated
+        isLoading: stores.appStore.isLoading,
+        isAuthenticated: stores.appStore.isAuthenticated
       }),
       data => {
         this.setState(data)
@@ -56,21 +36,22 @@ class App extends Component {
   render() {
     const privateRoutes = [
       { path: '/', component: () => <Redirect to={urls.defaultUrl}/> },
-      { path: urls.newItem, component: ItemFormPage },
-      { path: urls.editItem, component: ItemFormPage },
-      { path: urls.statsItem, component: ItemStatsPage },
-      { path: urls.pages, component: Pages },
-      { path: urls.posts, component: Posts },
-      { path: urls.dashboard, component: Dashboard },
-      { path: urls.backup, component: Backup },
-      { path: urls.setup, component: Setup }
+      { path: urls.newItem, component: pages.ItemFormPage },
+      { path: urls.editItem, component: pages.ItemFormPage },
+      { path: urls.statsItem, component: pages.ItemStatsPage },
+      { path: urls.pages, component: pages.Pages },
+      { path: urls.posts, component: pages.Posts },
+      { path: urls.dashboard, component: pages.Dashboard },
+      { path: urls.backup, component: pages.Backup },
+      { path: urls.setup, component: pages.Setup },
+      { path: urls.status, component: pages.Status }
     ];
 
     return <Provider {...stores}>
       <HashRouter>
         <div>
           <Switch>
-            <Route path={urls.login} component={Login}/>
+            <Route path={urls.login} component={pages.Login}/>
             {privateRoutes.map(route => {
               return (
                 <PrivateRoute key={route.path}

@@ -9,5 +9,6 @@ export default {
   pages: '/pages',
   posts: '/posts',
   dashboard: '/dashboard',
-  setup: '/setup'
+  setup: '/setup',
+  status: '/status'
 };

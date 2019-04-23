@@ -50,7 +50,7 @@ export async function setup() {
   }
 }
 
-async function getStatus() {
+export async function getStatus() {
   const status = {};
 
   status.blogIndex = await esClient.indices.exists({

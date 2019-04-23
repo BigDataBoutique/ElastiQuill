@@ -117,6 +117,10 @@ export async function downloadLogs() {
   window.location.href = url + '?state=' + getJwtToken();
 }
 
+export async function loadStatus() {
+  return await authFetchJson('/api/status');
+}
+
 export function uploadImageUrl() {
   return '/api/uploads/image';
 }
