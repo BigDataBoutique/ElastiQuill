@@ -6,6 +6,7 @@ import social from './social';
 import stats from './stats';
 import connect from './connect';
 import uploads from './uploads';
+import status from './status';
 import setup from './setup';
 import dump from './dump';
 import auth from './auth';
@@ -22,6 +23,7 @@ router.use((req, res, next) => {
 });
 
 router.use('/setup', setup);
+router.use('/status', status);
 
 let elasticsearchIsReady = false;
 router.use(async (req, res, next) => {

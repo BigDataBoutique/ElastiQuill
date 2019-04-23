@@ -42,6 +42,7 @@ class LoggedInLayout extends Component {
               { label: 'Posts', url: urls.posts, icon: 'pencil' },
               { label: 'Content Pages', url: urls.pages, icon: 'file' },
               { label: 'Backup', url: urls.backup, icon: 'archive' },
+              { label: 'Status', url: urls.status, icon: 'signal' },
             ])}
           </div>
         </nav>

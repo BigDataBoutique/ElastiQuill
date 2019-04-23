@@ -15,6 +15,10 @@ export class EmailString {
     return this.rules.length === 0;
   }
 
+  getRules() {
+    return this.rules;
+  }
+
   isMatchAll() {
     for (const rule of this.rules) {
       if (rule === '_all_') return true;
