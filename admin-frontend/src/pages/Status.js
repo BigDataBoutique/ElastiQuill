@@ -21,7 +21,7 @@ class Status extends React.Component {
 
   render() {
     return (
-      <LoggedInLayout pageTitle='Status page'>
+      <LoggedInLayout pageTitle='Blog Status'>
         <div className='content'>
           <div className='row'>
             <div className='col-12'>
@@ -48,7 +48,22 @@ class Status extends React.Component {
 
     return (
       <div>
+        <div style={{ marginBottom: 10 }}>
+            <h4>Blog</h4>
+        </div>
         {this._renderElasticsearchStatus(elasticsearch)}
+		  <div>
+			  {theme.path ? (
+				  this._renderLabel({
+					  label: 'Theme',
+					  success: ! theme.error,
+					  error: theme.error,
+					  value: theme.path
+				  })
+			  ) : (
+				  <div>Using base theme</div>
+			  )}
+		  </div>
         <div>
           <div style={{ marginBottom: 10 }}>
             <h4>File upload</h4>
@@ -109,18 +124,6 @@ class Status extends React.Component {
           {this._renderLabel({ label: 'Reddit', success: social.reddit !== 'not_configured' })}
           {this._renderLabel({ label: 'LinkedIn', success: social.linkedin !== 'not_configured' })}
           <hr/>
-        </div>        
-        <div>
-          {theme.path ? (
-            this._renderLabel({
-              label: 'Theme',
-              success: ! theme.error,
-              error: theme.error,
-              value: theme.path
-            })
-          ) : (
-            <div>Using base theme</div>
-          )}
         </div>
       </div>
     )
