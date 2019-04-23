@@ -28,12 +28,10 @@ class ContentPageForm extends BaseForm {
             optional: true,
             disabled: this.state.formValues.metadata.is_embed
           })}
-          {this._renderSimpleInput({
-            className: 'form-control',
-            placeholder: 'Header image URL',
-            prop: 'metadata.header_image_url',
-            optional: true,
-            disabled: this.state.formValues.metadata.is_embed
+          {this._renderFileInput({
+            label: 'Header image URL',
+            disabled: this.state.formValues.metadata.is_embed,
+            prop: 'metadata.header_image_url'
           })}
           {this._renderToggle({ label: 'Save as embed', prop: 'metadata.is_embed' })}
         </div>
