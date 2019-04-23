@@ -49,6 +49,7 @@ const BLOG_THEME_PATH = config.blog['theme-path'],
 const viewPaths = [ path.join(__dirname, 'views/base') ];
 if (BLOG_THEME_PATH) {
   if (fs.existsSync(BLOG_THEME_PATH)) {
+    console.log('Theme path configured: ' + BLOG_THEME_PATH);
     viewPaths.unshift(BLOG_THEME_PATH);
   }
   else {
@@ -106,6 +107,7 @@ app.use(passport.initialize());
 
 if (process.env.NODE_ENV === 'production') {
   console.log('Running production code');
+  console.log('Admin path is set to ' + ADMIN_ROUTE);
   const frontendBuildPath = path.join(__dirname, config.blog['admin-frontend-path']);
 
   app.use(ADMIN_ROUTE, express.static(frontendBuildPath, { index: false }));
@@ -258,6 +260,7 @@ function loadRoutingTable(config) {
   }
 
   try {
+    console.log('Loading routing table from ' + routingTablePath);
     return JSON.parse(fs.readFileSync(routingTablePath));
   }
   catch (err) {
