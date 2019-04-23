@@ -55,7 +55,7 @@ router.get('/:slug', cachePageHandler(asyncHandler(async (req, res, next) => {
   }
 
   res.render('page', {
-    sidebarWidgetData: res.locals.sidebarWidgetData,
+    isContentPage: true,
     headerImageUrl: page.metadata.header_image_url,
     title: page.title,
     description: page.description,
