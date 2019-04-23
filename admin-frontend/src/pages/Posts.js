@@ -51,29 +51,46 @@ class Posts extends BaseItemsPage {
 
   _renderLineItemExtra(item) {
     const { socialAvailability } = this.props.postsStore;
-    const renderItem = (title, key) => socialAvailability && (
-      <DropdownItem
-        disabled={socialAvailability[key] === 'not_configured'}
-        onClick={() => {
-          if (socialAvailability[key] === 'ready') {
-            this.props.postsStore.setSocialDialog(key, item);
-          }
-          else {
-            api.redirectToSocialConnect(key);
-          }
-        }}>
-        {title} {socialAvailability[key] === 'not_configured' ? '- not configured' : (
-          socialAvailability[key] === 'not_connected' ? '- not connected' : false
-        )}
-      </DropdownItem>
-    );
+    if (! socialAvailability) {
+      return false;
+    }
+
+    const allNotConfigured = _.every(_.values(socialAvailability), val => val === 'not_configured');
+    if (allNotConfigured) {
+      return false;
+    }
+
+    const renderItem = (title, key) => {
+      if (socialAvailability[key] === 'not_configured') {
+        return false;
+      }
+
+      return (
+        <DropdownItem
+          disabled={socialAvailability[key] === 'not_configured'}
+          onClick={() => {
+            if (socialAvailability[key] === 'ready') {
+              this.props.postsStore.setSocialDialog(key, item);
+            }
+            else {
+              api.redirectToSocialConnect(key);
+            }
+          }}>
+          <i className={`fa fa-${key}`} style={{ marginRight: 10 }} />
+          {title}
+        </DropdownItem>
+      )
+    };
 
     return (
       <UncontrolledButtonDropdown style={{ marginRight: 10 }}>
         <DropdownToggle caret>
           <i style={{ marginLeft: 5 }} className='fa fa-share-alt' />
         </DropdownToggle>
-        <DropdownMenu>
+        <DropdownMenu style={{ marginTop: 0, border: '1px solid #aaa' }}>
+          <div style={{ paddingLeft: 10 }}>
+            Repost on social
+          </div>
           {! socialAvailability && <DropdownItem header>Loading...</DropdownItem>}
           {renderItem('Twitter', 'twitter')}
           {renderItem('Linkedin', 'linkedin')}
