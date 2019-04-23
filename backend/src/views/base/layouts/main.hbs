@@ -48,6 +48,13 @@
     <div id="all-but-footer">
       {{> header}}
       <div class="container">
+        {{#if isContentPage}}
+        <div class="row">
+          <main class="col-md-12">
+            {{{body}}}
+          </main>
+        </div>
+        {{else}}
         <div class="row">
           <main class="col-md-8">
             {{{body}}}
@@ -55,7 +62,8 @@
           <aside class="col-md-4" id="sidebar">
             {{> sidebar}}
           </aside>
-        </div>
+        </div>        
+        {{/if}}
       </div>
     </div>
     {{> footer}}
