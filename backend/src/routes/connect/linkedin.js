@@ -22,6 +22,10 @@ router.get('/', asyncHandler(async (req, res) => {
 
 router.get('/callback', passport.authenticate('jwt', { session: false }), asyncHandler(async (req, res) => {
   if (req.query.error) {
+    if (req.query.error === 'user_cancelled_login' || req.query.error === 'user_cancelled_authorize') {
+      res.redirect(frontendAddress() + config.blog['admin-route']);
+      return;
+    }    
     throw new Error('Linkedin error: ' + req.query.error);
   }
 

@@ -92,9 +92,9 @@ You can connect your Linkedin, Twitter and Reddit accounts to Elastiquill to rep
 * In the app page, select the `Keys and tokens` tab. Copy Consumer and Access token keys, and add them to your `config.yml` file.
 
 ### Reddit
-* Go to https://www.reddit.com/prefs/apps/ and create a `script` app. You can write any value in `redirect uri`.
-* Copy Client ID (code under `personal use script` line) and Client Secret and add them to your `config.yml` file.
-* Add account's username and password to `config.yml` file.
+* Go to https://www.reddit.com/prefs/apps/ and create a `web` app.
+* Set `redirect uri` to `http://localhost:5000/api/connect/reddit/callback`. Change `http://localhost:5000` to your `blog.url` configuration.
+* Copy Client ID (code under `web app` line) and Client Secret and add them to your `config.yml` file.
 
 ## Configuration
 
@@ -145,8 +145,6 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.twitter.access-token-secret | Twitter access token secret | `TWITTER_ACCESS_TOKEN_SECRET` |
 | credentials.reddit.client-id | Reddit Client ID | `REDDIT_CLIENT_ID` |
 | credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` |
-| credentials.reddit.username | Reddit account username | `REDDIT_USERNAME` |
-| credentials.reddit.password | Reddit account password | `REDDIT_PASSWORD` |
 
 ## Running locally
 

@@ -98,11 +98,7 @@ export async function postItemToSocial(socialKey, itemId, opts) {
 }
 
 export function redirectToSocialConnect(socialKey) {
-  let url = '/api/connect/' + socialKey;
-  if (socialKey === 'linkedin') {
-    url += '?state=' + getJwtToken();
-  }
-  window.location.href = url;
+  window.location.href = '/api/connect/' + socialKey + '?state=' + getJwtToken();
 }
 
 export async function downloadBackup() {

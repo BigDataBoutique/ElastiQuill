@@ -34,13 +34,17 @@ router.post('/post/linkedin/:id', asyncHandler(async (req, res) => {
   }
 }));
 
-router.post('/post/reddit/:id', asyncHandler(async (req, res) => {
+router.post('/post/reddit/:id', asyncHandler(async (req, res) => {  
   const { subreddit } = req.body;
+
+  if (! req.user.connected.reddit) {
+    throw new Error('Reddit is not connected');
+  }  
 
   const post = await blogPosts.getItemById(req.params.id);
   const link =  config.blog.url + preparePost(post).url;
   try {
-    const resp = await social.postToReddit(post.title, link, subreddit);
+    const resp = await social.postToReddit(req.user.connected.reddit, post.title, link, subreddit);
     res.json({
       url: resp.url
     });

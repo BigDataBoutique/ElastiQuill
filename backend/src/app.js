@@ -227,9 +227,7 @@ function initConfig() {
     ['credentials.linkedin.client-id', 'LINKEDIN_CLIENT_ID'],
     ['credentials.linkedin.client-secret', 'LINKEDIN_CLIENT_SECRET'],
     ['credentials.reddit.client-id', 'REDDIT_CLIENT_ID'],
-    ['credentials.reddit.client-secret', 'REDDIT_CLIENT_SECRET'],
-    ['credentials.reddit.username', 'REDDIT_USERNAME'],
-    ['credentials.reddit.password', 'REDDIT_PASSWORD']
+    ['credentials.reddit.client-secret', 'REDDIT_CLIENT_SECRET']
   ];
 
   envOverrides.forEach(override => {
