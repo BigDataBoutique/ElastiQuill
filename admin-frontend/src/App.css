@@ -1524,13 +1524,13 @@ header .form-inline .search-form.close {
 
 .user-area .user-menu {
     background: #fff;
-    border: none;
+    border: 1px solid #bbb;
     left: inherit !important;
     right: 0;
     top: 54px !important;
     margin: 0;
     max-width: 150px;
-    padding: 5px 10px;
+    padding: 5px 0px;
     position: absolute;
     width: 100%;
     z-index: 999;
@@ -1544,7 +1544,13 @@ header .form-inline .search-form.close {
     display: block;
     font-size: 13px;
     line-height: 22px;
-    padding: 5px 0;
+    padding: 5px 10px;
+    width: 100%;
+    text-align: left;
+}
+
+.user-area .user-menu .nav-link:hover {
+    background: #eee;
 }
 
 .user-area .user-menu .nav-link > i {
@@ -3661,4 +3667,8 @@ footer.site-footer .footer-inner a {
 
 pre {
   display: inline;
+}
+
+.dropdown-item:hover {
+    background: #eee;
 }
