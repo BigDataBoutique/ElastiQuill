@@ -12,7 +12,7 @@ export function getAvailability(connected = {}) {
 
   for (const key in res ) {
     if (res[key]) {
-      if (connected[key] || key === 'twitter' || key === 'reddit') {
+      if (connected[key] || key === 'twitter') {
         res[key] = 'ready';
       }
       else {
@@ -84,28 +84,18 @@ export function postToTwitter(text) {
   });
 }
 
-export async function postToReddit(title, url, subreddit) {
-  const tokenResp = await request({
-    method: 'POST',
-    url: 'https://www.reddit.com/api/v1/access_token',
-    auth: {
-      user: config.credentials.reddit['client-id'],
-      pass: config.credentials.reddit['client-secret']
-    },
-    form: {
-      grant_type: 'password',
-      username: config.credentials.reddit['username'],
-      password: config.credentials.reddit['password']
-    }
-  });
-
-  const token = JSON.parse(tokenResp).access_token;
+export async function postToReddit(authData, title, url, subreddit) {
+  if (new Date().getTime() > authData.expiresAt - 10000) {
+    authData = await fetchRedditAccessToken({
+      refreshToken: authData.refreshToken
+    });
+  }
 
   const submitResp = await request({
     method: 'POST',
     url: 'https://oauth.reddit.com/api/submit',
     auth: {
-      bearer: token
+      bearer: authData.token
     },
     headers: {
       'User-Agent': 'elastiquill'
@@ -127,4 +117,32 @@ export async function postToReddit(title, url, subreddit) {
   }
 
   throw new Error(parsed.json.errors[0][1]);
+}
+
+export async function fetchRedditAccessToken({ code, callback, refreshToken }) {
+  const form = refreshToken ? ({
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken
+  }) : ({
+    grant_type: 'authorization_code',
+    code: code,
+    redirect_uri: callback
+  });
+
+  const resp = await request({
+    form,
+    method: 'POST',
+    url: 'https://www.reddit.com/api/v1/access_token',
+    auth: {
+      user: config.credentials.reddit['client-id'],
+      pass: config.credentials.reddit['client-secret']
+    }
+  });
+
+  const parsed = JSON.parse(resp);
+  return {
+    expiresAt: new Date().getTime() + parsed.expires_in * 1000,
+    token: parsed.access_token,
+    refreshToken: parsed.refresh_token ? parsed.refresh_token : refreshToken
+  };
 }
