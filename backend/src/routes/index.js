@@ -9,6 +9,7 @@ import blogRouter from './blog';
 import pageRouter from './page';
 import apiRouter from './api';
 import contactRouter from './contact';
+import { authInfoTokenMiddleware } from './auth';
 import * as blogPosts from '../services/blogPosts';
 import * as logging from '../services/logging';
 import * as cache from '../services/cache';
@@ -54,15 +55,20 @@ router.use((req, res, next) => {
 
 router.use(routingTableRouter);
 router.use('/api', apiRouter);
+router.use(authInfoTokenMiddleware);
 
 // log visits
 router.use(asyncHandler(async (req, res, next) => {
   const startTime = new Date().getTime();
-  res.on('finish', () => {
-    logging.logVisit(req, res, new Date().getTime() - startTime);
-  });
 
-  res.locals.gaTrackingId = _.get(config, 'credentials.google.analytics-code', null);
+  if (! req.isAuthorizedAdmin) {
+    res.on('finish', () => {
+      logging.logVisit(req, res, new Date().getTime() - startTime);
+    });
+    
+    res.locals.gaTrackingId = _.get(config, 'credentials.google.analytics-code', null);
+  }
+
   res.locals.adminRoute = config.blog['admin-route'];
   res.locals.isLocalhost = config.blog.url.startsWith('http://localhost');
 

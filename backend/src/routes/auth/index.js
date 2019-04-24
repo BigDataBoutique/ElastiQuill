@@ -15,6 +15,8 @@ const socialAuthSources = [];
 
 const ADMIN_ROUTE = config.blog['admin-route'];
 const ADMIN_EMAILS = config.blog['admin-emails'];
+const JWT_SECRET = config.blog['jwt-secret'];
+const AUTH_INFO_TOKEN_COOKIE = 'auth-info-token';
 
 if (ADMIN_EMAILS.isEmpty()) {
   throw new Error('blog.admin-emails configuration variable is not set')
@@ -26,6 +28,11 @@ router.get('/whoami', passport.authenticate('jwt', { session: false }), function
 
 router.get('/auth-sources', function (req, res) {
   res.json(socialAuthSources);
+});
+
+router.get('/logout', function (req, res) {
+  res.clearCookie(AUTH_INFO_TOKEN_COOKIE);
+  res.redirect(frontendAddress() + '/admin');
 });
 
 passport.serializeUser((user, done) => done(null, user));
@@ -83,7 +90,7 @@ async function handleRequest(req, res) {
 export function getJwtToken(req) {
   return jwt.sign({
     user: req.user
-  }, config.blog['jwt-secret']);  
+  }, JWT_SECRET);  
 }
 
 export function updateJwtToken(req, res) {
@@ -91,6 +98,43 @@ export function updateJwtToken(req, res) {
     maxAge: 10 * 1000,
     sameSite: 'Lax'
   });
+}
+
+export function authInfoTokenMiddleware(req, res, next) {
+  const token = req.cookies[AUTH_INFO_TOKEN_COOKIE];
+  if (! token) {
+    next();
+    return;
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    try {
+      if (decoded.authorizedBy && decoded.authorizedBy !== '_all_') {
+        req.isAuthorizedAdmin = true;
+      }
+    }
+    catch (ignored) {}
+
+    next();
+  });
+}
+
+export function updateAuthInfoToken(req, res) {
+  let token = req.cookies[AUTH_INFO_TOKEN_COOKIE];
+  if (req.user) {
+    token = jwt.sign({
+      authorizedBy: req.user.authorizedBy
+    }, JWT_SECRET);
+  }
+
+  if (! token) {
+    return;
+  }
+
+  res.cookie(AUTH_INFO_TOKEN_COOKIE, token, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    sameSite: 'Lax'
+  });  
 }
 
 export const passportDefaultCallback = (err, req, res, profile, next) => {
@@ -101,9 +145,11 @@ export const passportDefaultCallback = (err, req, res, profile, next) => {
   let user = null;
   const profileEmails = profile.emails.map(em => em.value);
   for (const email of profileEmails) {
-    if (ADMIN_EMAILS.match(email)) {
+    const foundRule = ADMIN_EMAILS.match(email);
+    if (foundRule) {
       user = {
         name: profile.displayName ? profile.displayName : profile.username,
+        authorizedBy: foundRule,
         email
       };
       break;
