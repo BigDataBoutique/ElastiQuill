@@ -1,6 +1,10 @@
 import _ from 'lodash';
 import { authFetchJson, getJwtToken } from './util';
 
+export function logout() {
+  window.location.href = '/api/auth/logout';
+}
+
 export async function createPost(values) {
   return await createItem('/api/content/post', values);
 }

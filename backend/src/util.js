@@ -34,14 +34,14 @@ export class EmailString {
        // first char or none at all
       if (rule.indexOf('@') <= 0) {
         if (rule === '_all_') {
-          return true;
+          return rule;
         }
         else if (email.endsWith(rule)) {
-          return true;
+          return rule;
         }
       }
       else if (rule === email) {
-        return true;
+        return rule;
       }
     }
     return false;

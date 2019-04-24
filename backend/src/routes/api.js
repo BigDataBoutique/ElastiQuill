@@ -9,7 +9,7 @@ import uploads from './uploads';
 import status from './status';
 import setup from './setup';
 import dump from './dump';
-import auth from './auth';
+import auth, { updateAuthInfoToken } from './auth';
 
 import * as elasticsearch from '../services/elasticsearch';
 
@@ -20,6 +20,11 @@ router.use('/auth', auth);
 router.use((req, res, next) => {
   const auth = passport.authenticate('jwt', { session: false });
   auth(req, res, next);
+});
+
+router.use((req, res, next) => {
+  updateAuthInfoToken(req, res);
+  next();
 });
 
 router.use('/setup', setup);

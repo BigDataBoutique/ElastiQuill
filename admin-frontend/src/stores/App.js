@@ -118,8 +118,8 @@ class App extends BaseStore {
   };
 
   logout = async () => {
-    this.setUser(null);
     cleanJwtToken();
+    api.logout();
   };
 }
 

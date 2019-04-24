@@ -8,6 +8,7 @@ export default function (passport, router, handleRequest) {
   router.get('/anonymous', (req, res, next) => {
     passportDefaultCallback(null, req, res, {
       displayName: 'Admin',
+      authorizedBy: '_all_',
       emails: [{
         value: 'admin@elastiquill'
       }]
