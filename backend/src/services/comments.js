@@ -33,6 +33,7 @@ export async function createComment(comment) {
     ...comment,
     comment_id: uid(12),
     approved: ! comment.spam,
+    spam: comment.spam,
     published_at: new Date().toISOString()
   };
 
@@ -91,13 +92,14 @@ export async function getComments(postIds) {
         bool: {
           filter: [
             { terms: { post_id: postIds } },
-            { term: { approved: true } }
+            { term: { approved: true } },
+            { term: { spam: false } },
           ]
         }
       },
       sort: [
         {
-          published_at: { order: 'desc' }
+          published_at: { order: 'asc' }
         }
       ]
     }

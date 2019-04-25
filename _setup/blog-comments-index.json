@@ -32,6 +32,12 @@
         },
         "user_host_address": {
           "type": "text"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "spam": {
+          "type": "boolean"
         }
       }
     }
