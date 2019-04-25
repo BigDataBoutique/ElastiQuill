@@ -19,18 +19,20 @@
 <hr />
 <section>
     <a name="comments"></a>
+    {{#if post.comments}}
     <h2>Comments</h2>
     <ul class="list-unstyled" id="comments-container">
     {{#each post.comments}}
         {{> comment this index=@index }}
     {{/each}}
+    </ul>
+    {{/if}}
     {{# if post.allow_comments}}
         {{> comment-form}}
-        <button id='btn-add-comment' class="btn btn-primary btn-add-comment" style="margin-top: 20px" type="button" onclick="onClickReply()">Add comment</button>
+        <button id="btn-add-comment" class="btn btn-primary btn-add-comment" style="margin-top: 20px" type="button" onclick="onClickReply()">Leave a new comment</button>
     {{else}}
         <h2>Comments are now closed</h2>
     {{/if}}
-    </ul>
 </section>
 <script>
 $(function() {
