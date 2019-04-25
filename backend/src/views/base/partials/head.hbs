@@ -1,0 +1,39 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{{#if title}}{{title}}{{else}}Modern Blog Engine - ElastiQuill{{/if}} - ElastiQuill</title>
+{{#if description}}
+    <meta name="Description" content="{{description}}">
+{{/if}}
+{{#if canonicalUrl}}
+    <link rel="canonical" href="{{canonicalUrl}}" />
+{{/if}}
+{{#unless isLocalhost}}
+    <meta http-equiv="Content-Security-Policy" content="default-src https: 'unsafe-inline'">
+{{/unless}}
+
+<link rel="shortcut icon" href="/static/base/favicon/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/base/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/base/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/base/favicon/favicon-16x16.png">
+<link rel="manifest" href="/static/base/favicon/site.webmanifest">
+<link rel="mask-icon" href="/static/base/favicon/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link id="AtomLink" title="RSS" type="application/rss+xml" rel="alternate" href="/blog/rss">
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+<link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Zilla+Slab" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" rel="stylesheet"/>
+<link href="/static/base/stylesheets/style.css" rel="stylesheet" media="screen">
+
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js" async defer crossorigin="anonymous"></script>
+
+{{> google-analytics}}
