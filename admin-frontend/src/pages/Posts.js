@@ -8,6 +8,7 @@ import { Button, ButtonGroup } from 'reactstrap';
 import { UncontrolledButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import LoggedInLayout from "../components/LoggedInLayout";
+import ImportPostModal from "../components/ImportPostModal";
 import RedditShareDialog from "../components/RedditShareDialog";
 import ConfirmSocialDialog from "../components/ConfirmSocialDialog";
 import BaseItemsPage from "./BaseItemsPage";
@@ -32,6 +33,23 @@ class Posts extends BaseItemsPage {
           urlPart: this._getUrlPart()
         }, this.props.postsStore)}
         {this._renderDialog()}
+        <ImportPostModal
+          key={this.props.postsStore.importModalOpen}
+          isOpen={this.props.postsStore.importModalOpen}
+          isLoading={this.props.postsStore.beingLoaded.includes('importPost')}
+          onRequestImport={(...args) => this.props.postsStore.importPost(...args)}
+          onRequestClose={() => this.props.postsStore.setImportModalOpen(false)} />
+      </div>
+    )
+  }
+
+  _renderNav() {
+    return (
+      <div style={{ display: 'inline-block', marginLeft: 5 }}>
+        <Button
+          onClick={() => this.props.postsStore.setImportModalOpen(true)}>
+          Import post
+        </Button>
       </div>
     )
   }

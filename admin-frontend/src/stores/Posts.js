@@ -17,6 +17,9 @@ class Posts extends ItemsStore {
   @observable
   socialAvailability = null;
 
+  @observable
+  importModalOpen = false;
+
   @action
   async loadSocialAvailability() {
     try {
@@ -57,9 +60,30 @@ class Posts extends ItemsStore {
   }
 
   @action
+  async importPost(url) {
+    try {
+      this.loading('importPost');
+      await api.importPost(url);
+      await this.loadPage(0);
+      this.importModalOpen = false;
+    }
+    catch (err) {
+      toast.error(err.message);
+    }
+    finally {
+      this.loaded('importPost');
+    }
+  }
+
+  @action
   setSocialDialog(key, item) {
     this.socialDialog = key;
     this.socialItem = item;
+  }
+
+  @action
+  setImportModalOpen(open) {
+    this.importModalOpen = open;
   }
 }
 

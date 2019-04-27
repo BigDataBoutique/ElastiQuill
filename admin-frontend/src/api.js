@@ -91,6 +91,18 @@ export async function setupElasticsearch() {
   });
 }
 
+export async function importPost(url) {
+  return await authFetchJson(`/api/import`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url
+    })
+  });
+}
+
 export async function postItemToSocial(socialKey, itemId, opts) {
   return await authFetchJson(`/api/social/post/${socialKey}/${itemId}`, {
     method: 'POST',

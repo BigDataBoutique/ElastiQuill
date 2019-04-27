@@ -6,6 +6,7 @@ import social from './social';
 import stats from './stats';
 import connect from './connect';
 import uploads from './uploads';
+import importRoute from './import';
 import status from './status';
 import setup from './setup';
 import dump from './dump';
@@ -44,6 +45,7 @@ router.use(async (req, res, next) => {
   next();
 });
 
+router.use('/import', importRoute);
 router.use('/uploads', uploads);
 router.use('/connect', connect);
 router.use('/content', content);
