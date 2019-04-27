@@ -18,6 +18,8 @@ export default function (passport, router, handleRequest) {
     return passport.authenticate('github', {
       failureRedirect: '/login#unknown-user'
     }, function (err, user, info) {
+
+      res.locals.authAttemptBackend = 'github';
       return passportDefaultCallback(err, req, res, user, next);
     })(req, res, next);
   }, handleRequest);
