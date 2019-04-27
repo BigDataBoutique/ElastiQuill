@@ -9,6 +9,35 @@ import * as elasticsearch from './elasticsearch';
 
 let elasticsearchIsReady = false;
 
+export async function getStatus() {
+  const resp = await esClient.search({
+    index: config.elasticsearch['blog-logs-index-name'] + '*',
+    body: {
+      aggs: {
+        log_levels: {
+          terms: { field: 'log.level' }
+        }
+      }
+    }
+  });
+
+  let logLevel = null;
+
+  if (resp.aggregations && resp.aggregations.log_levels) {
+    const logLevels = resp.aggregations.log_levels.buckets.map(b => b.key);
+    if (logLevels.includes('error')) {
+      logLevel = 'error';
+    }
+    else if (logLevels.includes('warn')) {
+      logLevel = 'warn';
+    }
+  }
+
+  return { 
+    logLevel
+  }
+}
+
 export async function getStats({ startDate, endDate, type = null, postId = null }) {
   const filters = [
     {

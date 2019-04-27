@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { action, computed, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
-import { Badge } from 'reactstrap';
+import { UncontrolledTooltip, Badge } from 'reactstrap';
 
 import LoggedInLayout from '../components/LoggedInLayout';
 import * as api from '../api';
@@ -49,9 +49,9 @@ class Status extends React.Component {
     return (
       <div>
         <div style={{ marginBottom: 10 }}>
-            <h4>Blog</h4>
+          <h4>Blog</h4>
         </div>
-        {this._renderElasticsearchStatus(elasticsearch)}
+        {this._renderBlogStatus(elasticsearch)}
 		  <div>
 			  {theme.path ? (
 				  this._renderLabel({
@@ -65,19 +65,11 @@ class Status extends React.Component {
 			  )}
 		  </div>
         <div>
-          <div style={{ marginBottom: 10 }}>
-            <h4>File upload</h4>
-          </div>
-
           {this._renderLabel({
-            label: 'Google Cloud Storage',
-            success: upload.backend === 'gcs',
+            label: 'File upload',
+            successTooltip: upload.backend ? upload.backend.toUpperCase() : false,
+            success: upload.backend !== null,
             error: upload.errors['gcs']
-          })}
-          {this._renderLabel({
-            label: 'AWS S3',
-            success: upload.backend === 's3',
-            error: upload.errors['s3']
           })}
           <hr/>
         </div>
@@ -90,7 +82,11 @@ class Status extends React.Component {
           {this._renderLabel({ label: 'Admin login via Github OAuth', success: admin.github })}
           <div>
             Admin login enabled for: {admin.rules.indexOf('_all_') > -1 ? <pre>everyone</pre> : (
-              admin.rules.map((em, i) => <pre key={i}>{em}</pre>)
+              admin.rules.map((em, i) => (
+                <pre key={i}>
+                  {em}{admin.rules.length - 1 === i ? '' : ', '}
+                </pre>
+              ))
             )}
           </div>
           <hr/>
@@ -129,12 +125,31 @@ class Status extends React.Component {
     )
   }
 
-  _renderElasticsearchStatus(elasticsearch) {
-    const allConfigured = _.every(_.values(elasticsearch));
-    const error = 'Errors in setup detected: ' + _.keys(elasticsearch)
-      .filter(k => ! elasticsearch[k])
+  _renderBlogStatus(elasticsearch) {
+    const allConfigured = _.every(_.values(elasticsearch.setup));
+    const error = 'Errors in setup detected: ' + _.keys(elasticsearch.setup)
+      .filter(k => ! elasticsearch.setup[k])
       .map(k => `${k} misconfigured`)
       .join(', ');
+
+    const renderHealth = status => {
+      const mappings = {
+        red: 'danger',
+        error: 'danger',
+        yellow: 'warning',
+        warn: 'warning',
+        green: 'success',
+      };
+
+      return (
+        <div className={`badge-${mappings[status] || 'success'}`} style={{
+          width: 10, height: 10,
+          borderRadius: 20,
+          marginLeft: 5,
+          display: 'inline-block'
+        }} />
+      )
+    };
 
     return (
       <div>
@@ -146,21 +161,34 @@ class Status extends React.Component {
           error
         })}
         {!allConfigured && <div>Go to <a href='#/setup'>/setup</a> page to complete setup.</div>}
+
+        <div>
+          Elasticsearch cluster health {renderHealth(elasticsearch.cluster_health)}
+        </div>
+        <div>
+          Blog operation {renderHealth(elasticsearch.log_level)}
+        </div>
         <hr/>
       </div>      
     )
   }
 
-  _renderLabel({ label, success, error, value = false, successLabel = 'Configured', warningLabel = 'Not configured' }) {
+  _renderLabel({ label, success, error, value = false, successTooltip = false, successLabel = 'Configured', warningLabel = 'Not configured' }) {
+    const tooltipId = label.replace(' ', '');
     return (
       <div>
         <div style={{ display: 'flex', marginBottom: 3 }}>
           <h5>{label}: <pre>{value}</pre> </h5>
-          <div style={{ marginTop: -3, marginLeft: 6 }}>
+          <div style={{ marginTop: -3, marginLeft: 6 }} id={tooltipId}>
             <Badge color={success ? 'success' : (error ? 'danger' : 'warning')}>
-              {success ? successLabel : (error ? error : warningLabel)}
+              <span>
+                {success ? successLabel : (error ? error : warningLabel)}
+              </span>
             </Badge>
           </div>
+          {successTooltip && (
+            <UncontrolledTooltip placement='bottom' target={tooltipId}>{successTooltip}</UncontrolledTooltip>
+          )}
         </div>
       </div>
     );

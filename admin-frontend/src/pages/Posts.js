@@ -76,7 +76,7 @@ class Posts extends BaseItemsPage {
               api.redirectToSocialConnect(key);
             }
           }}>
-          <i className={`fa fa-${key}`} style={{ marginRight: 10 }} />
+          <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
           {title}
         </DropdownItem>
       )
