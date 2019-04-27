@@ -298,7 +298,6 @@ function ecsSource(req, res) {
 
   return {
     source: {
-      address: ip,
       ip
     }
   }
@@ -311,7 +310,6 @@ function ecsHttp(req, res) {
     http: {
       request: {
         method: req.method.toLowerCase(),
-        referrer: req.header('referrer'),
         user_agent: req.get('User-Agent')
       },
       response: {
@@ -321,11 +319,17 @@ function ecsHttp(req, res) {
   };
 
   if (req.referrer) {
-    body.http.request.referrer_parsed = {
-      type: req.referrer.type,
-      ...ecsUrl(req.referrer.from).url
-    };
-  }  
+    const referrerRaw = req.header('referrer') || '';
+    const sameDomain = referrerRaw.startsWith(config.blog.url);
+
+    if (! sameDomain && ! ['direct', 'internal'].includes(req.referrer.type)) {
+      body.http.request.referrer = referrerRaw;
+      body.http.request.referrer_parsed = {
+        type: req.referrer.type,
+        ...ecsUrl(req.referrer.from).url
+      };
+    }
+  }
 
   return body;
 }
@@ -337,12 +341,8 @@ function ecsUrl(urlStr) {
   return {
     url: {
       full: parsed.href,
-      original: parsed.href,
-      domain: parsed.host,
-      fragment: parsed.hash ? parsed.hash.substr(1) : null,
-      path: parsed.path,
-      query: parsed.query,
-      scheme: parsed.protocol ? parsed.protocol.substr(0, parsed.protocol.length - 1) : null          
+      path: parsed.pathname,
+      query: parsed.query
     }
   };
 }
