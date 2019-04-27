@@ -91,14 +91,14 @@ class BaseItemsPage extends Component {
               <Button
                 style={{ marginRight: 10 }}
                 color='primary'>Open{!_.isEmpty(item.private_viewing_key) && ' (secret URL)'}
-                <i style={{ marginLeft: 5 }} className='fa fa-external-link' />
+                <i style={{ marginLeft: 5 }} className='fa fa-external-link-alt' />
               </Button>
             </a>
           )}
           <Link to={`/edit/${urlPart}/` + item.id}>
             <Button
               style={{ marginRight: 10 }}
-              color='primary'>Edit<i style={{ marginLeft: 5 }} className='fa fa-pencil' /></Button>
+              color='primary'>Edit<i style={{ marginLeft: 5 }} className='fa fa-pencil-alt' /></Button>
           </Link>
           <Button
             onClick={() => this._getStore().setDeleteItemId(item.id)}

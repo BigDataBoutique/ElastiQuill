@@ -11,7 +11,7 @@ import $ from 'jquery';
     var pluginName = 'mediumInsert',
         addonName = 'EmbedsPatched', // first char is uppercase
         defaults = {
-            label: '<span class="fa fa-youtube-play"></span>',
+            label: '<span class="fab fa-youtube"></span>',
             placeholder: 'Paste an YouTube, Vimeo, Facebook, Twitter, Instagram or an image URL and press Enter',
             oembedProxy: 'http://medium.iframe.ly/api/oembed?iframe=1',
             captions: true,

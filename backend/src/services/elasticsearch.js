@@ -14,6 +14,11 @@ export async function isReady() {
   return _.every(_.values(status));  
 }
 
+export async function getClusterHealth() {
+  const resp = await esClient.cluster.health();
+  return resp.status;
+}
+
 export async function setup() {
   const status = await getStatus();
   const setupDir = process.env.SETUP_DIR || './_setup';

@@ -38,8 +38,8 @@ class LoggedInLayout extends Component {
         <nav className="w-100 navbar navbar-expand-sm navbar-default">
           <div id="main-menu" className="w-100 main-menu collapse navbar-collapse">
             {this._renderMenuItems([
-              { label: 'Dashboard', url: urls.dashboard, icon: 'dashboard' },
-              { label: 'Posts', url: urls.posts, icon: 'pencil' },
+              { label: 'Dashboard', url: urls.dashboard, icon: 'tachometer-alt' },
+              { label: 'Posts', url: urls.posts, icon: 'pencil-alt' },
               { label: 'Content Pages', url: urls.pages, icon: 'file' },
               { label: 'Backup', url: urls.backup, icon: 'archive' },
               { label: 'Status', url: urls.status, icon: 'notes-medical' },
@@ -51,7 +51,9 @@ class LoggedInLayout extends Component {
         <header id="header" className="header">
           <div className="top-left">
             <div className="navbar-header">
-              <img src={logo} style={{ height: '2rem' }} />
+              <Link to='/dashboard'>
+                <img src={logo} style={{ height: '2rem' }} />
+              </Link>
               <button id="menuToggle" className="btn btn-link menutoggle"
                 onClick={this.handleMenuToggleClick}><FAIcon icon="bars"/></button>
             </div>
@@ -147,7 +149,8 @@ class LoggedInLayout extends Component {
       <ul className="w-100 nav navbar-nav">
         {items.map((item, i) => (
           <NavLiLink key={i} to={item.url}>
-            <FAIcon className="menu-icon" icon={item.icon}/>{item.label}
+            <FAIcon className='menu-icon' icon={item.icon} />
+            {item.label}
           </NavLiLink>
         ))}
       </ul>

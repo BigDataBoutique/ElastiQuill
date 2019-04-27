@@ -7,6 +7,7 @@ import { config } from '../app';
 
 import * as emails from '../services/emails';
 import * as social from '../services/social';
+import * as logging from '../services/logging';
 import * as storage from '../services/storage';
 import * as akismet from '../services/akismet';
 import * as recaptcha from '../services/recaptcha';
@@ -21,7 +22,11 @@ router.get('/', asyncHandler(async (req, res) => {
                      _.get(config, 'credentials.github.oauth-client-secret');
 
   res.json({
-    elasticsearch: await elasticsearch.getStatus(),
+    elasticsearch: {
+      setup: await elasticsearch.getStatus(),
+      cluster_health: await elasticsearch.getClusterHealth(),
+      log_level: (await logging.getStatus()).logLevel
+    },
     upload: await storage.getStatus(),
     admin: {
       rules: config.blog['admin-emails'].getRules(),
