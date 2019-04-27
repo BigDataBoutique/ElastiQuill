@@ -2,7 +2,7 @@
 blog:
   title: ElastiQuill - Modern blog engine based on Elasticsearch
   description: ElastiQuill blog engine demo
-  url: https://elastiquill.bigdataboutique.com
+  url: http://localhost:5000 # https://elastiquill.bigdataboutique.com
   port: 5000
   compression: true
   jwt-secret: bdbq-elastiquill-some-random-string
