@@ -200,7 +200,10 @@ export async function logAuthAttempt(params, req, res) {
   const { email, success } = params;
   await log({
     req, res, email,
-    tags: ['auth', success ? 'auth-success' : 'auth-failure']
+    authMethod: res.locals.authAttemptBackend,
+    status: success ? 'success' : 'failure',
+    excludeUrl: true,
+    tags: ['auth']
   });
 }
 
@@ -222,7 +225,7 @@ export async function logError(errorScope, error, req, res) {
   });
 }
 
-async function log({ req, res, email, took, error = null, tags = [] }) {
+async function log({ req, res, email, status, took, authMethod, excludeUrl = false, error = null, tags = [] }) {
   try {
     if (! elasticsearchIsReady) {
       elasticsearchIsReady = await elasticsearch.isReady();
@@ -233,22 +236,28 @@ async function log({ req, res, email, took, error = null, tags = [] }) {
     }
 
     const body = {
-      // ECS base fields
       'ecs.version': '1.0.0',
       '@timestamp': new Date().toISOString(),
       tags: tags,
       log: {
         level: error ? 'error' : 'info',
       },
-      ...ecsUrl(req.protocol + '://' + req.get('host') + req.originalUrl),
       ...ecsSource(req, res),
       ...ecsHttp(req, res),
 
-      // Custom fields
       took,
       email,
+      status,
+      auth_method: authMethod,
       ...(res ? res.locals.logData : {}),      
     };
+
+    if (! excludeUrl) {
+      const url = ecsUrl(req.protocol + '://' + req.get('host') + req.originalUrl);
+      for (const key in url) {
+        body[key] = url[key];
+      }
+    }
 
     if (error) {
       body.error = {

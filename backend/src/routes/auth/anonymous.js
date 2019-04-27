@@ -6,6 +6,7 @@ import { config } from '../../app';
 
 export default function (passport, router, handleRequest) {
   router.get('/anonymous', (req, res, next) => {
+    res.locals.authAttemptBackend = 'anonymous';
     passportDefaultCallback(null, req, res, {
       displayName: 'Admin',
       authorizedBy: '_all_',
