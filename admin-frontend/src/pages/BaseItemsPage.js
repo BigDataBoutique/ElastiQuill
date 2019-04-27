@@ -18,24 +18,23 @@ class BaseItemsPage extends Component {
     const { isLoading, itemFormOpen, currentItem } = store;
     const isNew = currentItem === null;
 
+    const toolbar = (
+      <div>
+        <Link to={`/new/${strings.urlPart}`}>
+          <Button>{strings.newItem}</Button>
+        </Link>
+        {this._renderNav && this._renderNav()}
+      </div>
+    );
+
     return (
-      <LoggedInLayout pageTitle={strings.title} toolbar={this._renderNav(strings, store)}>
+      <LoggedInLayout pageTitle={strings.title} toolbar={toolbar}>
         <div className='content'>
           <SetupWarning />
           {isLoading ? 'Loading...' : this._renderItems(strings, store)}
         </div>
         {this._renderDeleteItemModal(store)}
       </LoggedInLayout>
-    )
-  }
-
-  _renderNav(strings, store) {
-    return (
-      <div>
-        <Link to={`/new/${strings.urlPart}`}>
-          <Button>{strings.newItem}</Button>
-        </Link>
-      </div>
     )
   }
 

@@ -9,7 +9,7 @@ export const BLOGPOST_ID_PREFIX = 'blogpost-';
 
 const ES_INDEX = config.elasticsearch['blog-index-name'];
 
-const CreatePostArgSchema = Joi.object().keys({
+export const CreatePostArgSchema = Joi.object().keys({
   "title": Joi.string().required(),
   "content": Joi.string().allow(''),
   "description": Joi.string().allow(''),
