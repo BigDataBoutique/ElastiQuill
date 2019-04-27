@@ -112,6 +112,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | blog.compression | Whether to compress HTTP responses | `BLOG_COMPRESSION` |  `false` |
 | blog.port | Port to run on | `PORT` | `5000` |
 | blog.comments-noreply-email | When set, blogpost authors and commenters will receive email notifications about on new discussion from this email. Should be a single email string e.g. `noreply@blog.com` | `BLOG_COMMENTS_NOREPLY_EMAIL` | |
+| blog.comments-post-period | Number of days to keep commenting enabled after publishing the blogpost. Set `-1` to never disable commenting | `BLOG_COMMENTS_POST_PERIOD` | `60` |
 | blog.contact-email | Email to send contacts form submits to | `CONTACT_FORM_SEND_TO` | |
 | blog.theme-path | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base` | `BLOG_THEME_PATH` | |
 | blog.theme-caching | View template compilation caching. Set `false` for hot-reloading. | `BLOG_THEME_CACHING` | `true` |

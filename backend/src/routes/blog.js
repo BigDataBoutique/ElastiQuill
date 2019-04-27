@@ -119,6 +119,14 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
   let repliedToComment = null;
   let isSpam = false;
 
+  const postId = blogPosts.BLOGPOST_ID_PREFIX + req.params.id;
+  const post = preparePost(await blogPosts.getItemById(postId, true));
+
+  if (! post.allow_comments) {
+    res.redirect(req.originalUrl);
+    return;
+  }
+
   try {
     if (recaptcha.isAvailable()) {
       const success = await recaptcha.verify(req.body['g-recaptcha-response']);
@@ -174,8 +182,6 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     }
   }
 
-  const post = await blogPosts.getItemById(blogPosts.BLOGPOST_ID_PREFIX + req.params.id, true);
-
   if (! commentError && config.blog['comments-noreply-email']) {
     const opAndComment = {
       opEmail: post.author.email,
@@ -220,7 +226,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
       values: commentError ? req.body : null
     },
     recaptchaClientKey: recaptcha.clientKey(),
-    post: preparePost(post)
+    post: preparePost(await blogPosts.getItemById(postId, true))
   });
 }));
 

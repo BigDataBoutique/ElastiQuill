@@ -9,9 +9,11 @@
                 <div class="col-lg-10 col-md-9 col-sm-8">
                     <i class="fa fa-user"> </i> <a href="{{author.website}}" rel="nofollow">{{author.name}}</a> <i class="fa fa-clock-o"></i> <time datetime="{{published_at}}">{{published_at_str}}</time>
                 </div>
+            {{#if allow_comments}}
                 <div class="col-lg-2 col-md-3 col-sm-4" style="text-align: right">
                     <button class="btn btn-primary btn-add-comment" onclick="onClickReply(this)">Reply</button>
                 </div>
+            {{/if}}
             </div>
         </div>
     </div>

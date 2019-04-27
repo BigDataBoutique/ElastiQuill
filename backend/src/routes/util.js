@@ -8,6 +8,7 @@ import sanitizeHtml from 'sanitize-html';
 import { config } from '../app';
 
 const BLOG_ROUTE_PREFIX = config.blog['blog-route-prefix'];
+const COMMENTS_POST_PERIOD = config.blog['comments-post-period'];
 
 const blogpostMarkdown = new MarkdownIt({
   html: true
@@ -42,7 +43,6 @@ export function preparePostJson(p) {
 }
 
 export function preparePost(p) {
-  const comments = prepareComments(p.comments || []);
   const highlight = p.highlight;
 
   for (const key in highlight) {
@@ -61,11 +61,20 @@ export function preparePost(p) {
   }
 
   const readTime = readingTime(p.content);
+  const daysPastPublishing = moment().diff(moment(p.published_at), 'days');
+
+  let allowComments = p.allow_comments;
+  if (allowComments && COMMENTS_POST_PERIOD >= 0) {
+    allowComments = daysPastPublishing <= COMMENTS_POST_PERIOD;
+  }
+
+  const comments = prepareComments(p.comments || [], allowComments);
 
   return {
     ...p,
     comments,
     highlight,
+    allow_comments: allowComments,
     reading_time: readTime.minutes > 1 ? readTime.text : null,
     comments_count: p.comments_count ? p.comments_count : countComments(comments),
     published_at_str: prepareDate(p.published_at),
@@ -80,9 +89,10 @@ export function preparePost(p) {
   }
 }
 
-export function prepareComments(comments, parentComment = null) {
+export function prepareComments(comments, allowComments, parentComment = null) {
   return comments.map(prepareComment).map((c, i) => {
-    c.replies = prepareComments(c.replies || [], c);
+    c.allow_comments = allowComments;
+    c.replies = prepareComments(c.replies || [], allowComments, c);
     return c;
   });
 }
