@@ -83,9 +83,10 @@ export async function createComment(comment) {
 }
 
 export async function getComments(postIds) {
-  const resp = await esClient.search({
+  let resp = await esClient.search({
     index: ES_INDEX,
     type: '_doc',
+    scroll: '10s',
     ignore_unavailable: true,
     body: {
       query: {
@@ -105,7 +106,17 @@ export async function getComments(postIds) {
     }
   });
 
-  return filterNotApproved(resp.hits.hits.map(h => ({
+  let allComments = [];
+
+  while (resp.hits.hits.length) {
+    allComments = allComments.concat(resp.hits.hits);
+    resp = await esClient.scroll({
+      scroll: '10s',
+      scrollId: resp._scroll_id
+    });
+  }
+
+  return filterNotApproved(allComments.map(h => ({
     ...h._source,
     id: h._id
   })));
