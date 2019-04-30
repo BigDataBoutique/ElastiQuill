@@ -12,6 +12,7 @@ import setup from './setup';
 import dump from './dump';
 import auth, { updateAuthInfoToken } from './auth';
 
+import * as loggingService from '../services/logging';
 import * as elasticsearch from '../services/elasticsearch';
 
 const router = express.Router();
@@ -57,6 +58,14 @@ router.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     error: err.message ? err.message : err.toString()
   });
+
+  const isDev = req.app.get('env') === 'development';
+  if (isDev) {
+    console.error(err);
+  }
+  else {
+    loggingService.logError('api', err, req, res);
+  }  
 });
 
 export default router;

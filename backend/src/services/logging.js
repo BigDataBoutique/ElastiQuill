@@ -9,9 +9,12 @@ import * as elasticsearch from './elasticsearch';
 
 let elasticsearchIsReady = false;
 
+const LOGS_INDICES_PREFIX = config.elasticsearch['blog-logs-index-name'];
+const LOGS_PERIOD = config.elasticsearch['blog-logs-period'];
+
 export async function getStatus() {
   const resp = await esClient.search({
-    index: config.elasticsearch['blog-logs-index-name'] + '*',
+    index: LOGS_INDICES_PREFIX + '*',
     body: {
       aggs: {
         log_levels: {
@@ -79,7 +82,7 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
   }
 
   const query = {
-    index: config.elasticsearch['blog-logs-index-name'] + '*',
+    index: LOGS_INDICES_PREFIX + '*',
     body: {
       query: {
         bool: {
@@ -167,7 +170,7 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
 
 export async function* allLogsGenerator() {
   let resp = await esClient.search({
-    index: config.elasticsearch['blog-logs-index-name'] + '*',
+    index: LOGS_INDICES_PREFIX + '*',
     type: '_doc',
     scroll: '10s',
     ignore_unavailable: true,
@@ -193,7 +196,19 @@ export async function* allLogsGenerator() {
 }
 
 function logIndexName() {
-  return config.elasticsearch['blog-logs-index-name'] + '-' + moment().format('YYYY.MM.DD');
+  let formatStr = null;
+  switch (LOGS_PERIOD) {
+    case 'daily':
+      formatStr = 'YYYY.MM.DD';
+      break;
+    case 'monthly':
+      formatStr = 'YYYY.MM';
+      break;
+    default:
+      throw new Error('Invalid configuration blog-logs-period: ' + LOGS_PERIOD);
+  }
+
+  return LOGS_INDICES_PREFIX + '-' + moment().format(formatStr);
 }
 
 export async function logAuthAttempt(params, req, res) {
