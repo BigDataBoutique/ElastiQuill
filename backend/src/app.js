@@ -189,6 +189,7 @@ function initConfig() {
     ['elasticsearch.blog-index-name', 'BLOG_POSTS_INDEX', 'blog-posts'],
     ['elasticsearch.blog-comments-index-name', 'BLOG_COMMENTS_INDEX', 'blog-comments'],
     ['elasticsearch.blog-logs-index-name', 'BLOG_LOGS_INDEX', 'blog-logs'],
+    ['elasticsearch.blog-logs-period', 'BLOG_LOGS_PERIOD', 'daily'],
     ['blog.comments-noreply-email', 'BLOG_COMMENTS_NOREPLY_EMAIL'],
     ['blog.comments-post-period', 'BLOG_COMMENTS_POST_PERIOD', 60],
     ['blog.title', 'BLOG_TITLE', 'Sample blog'],

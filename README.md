@@ -123,6 +123,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | elasticsearch.blog-index-name | Elasticsearch index name to store blog posts | `BLOG_POSTS_INDEX` | `blog-posts` |
 | elasticsearch.blog-comments-index-name | Elasticsearch index name to store blog comments | `BLOG_COMMENTS_INDEX` | `blog-comments` |
 | elasticsearch.blog-logs-index-name | Elasticsearch index name to store error logs and metrics | `BLOG_LOGS_INDEX` | `blog-logs` |
+| elasticsearch.blog-logs-period | Set to `monthly` to index logs in separate indices per month instead of per day | `BLOG_LOGS_PERIOD` | `daily` |
 | credentials.sendgrid | Sendgrid API key | `SENDGRID_API_KEY` |
 | credentials.google.analytics-code | GA tracking ID | `GOOGLE_ANALYTICS_CODE` |
 | credentials.google.oauth-client-id | Google OAuth 2 client ID | `GOOGLE_OAUTH_CLIENT_ID` |
