@@ -11,6 +11,7 @@ export const CONTENT_DESCRIPTION_ID_PREFIX = 'content:description:';
 
 const ES_INDEX = config.elasticsearch['blog-index-name'];
 const SERIES_REGEXP_STR = '\{.*\}';
+const SLUG_MAX_LENGTH = 100;
 
 export const CreatePostArgSchema = Joi.object().keys({
   "title": Joi.string().required(),
@@ -404,7 +405,7 @@ function makeSlug(title) {
   return slugify(title, {
     remove: /[*+~.\/,()'"!:@^#?]/g,
     lower: true
-  });
+  }).substring(0, SLUG_MAX_LENGTH);
 }
 
 function prepareHit(hit) {

@@ -115,7 +115,7 @@ export function prepareDate(d) {
 
 export function blogpostUrl(post) {
   const id = post.id.split('-')[1];
-  const url = `/${moment(post.published_at).format('YYYY/MM')}/${id}-${post.slug}`;
+  const url = `/${moment(post.published_at).format('YYYY/MM')}/${post.slug}-${id}`;
 
   if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== '/') {
     return BLOG_ROUTE_PREFIX + url;

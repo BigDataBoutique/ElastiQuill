@@ -54,7 +54,7 @@ router.get('/rss', asyncHandler(async (req, res) => {
   res.send(rss.xml());
 }));
 
-const BLOGPOST_ROUTE = '/:year(\\d+)/:month(\\d+)/:id-:slug';
+const BLOGPOST_ROUTE = '/:year(\\d+)/:month(\\d+)/:slug-:id([^-]+$)';
 
 router.use(BLOGPOST_ROUTE, (req, res, next) => {
   const { slug, isJson } = parseSlug(req.params.slug);
