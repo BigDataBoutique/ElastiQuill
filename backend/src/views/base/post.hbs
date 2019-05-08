@@ -14,6 +14,11 @@
         </div>
         {{/if}}
     </div>
+    {{# if post.series}}
+    <p>
+        This post is part of <a href="{{post.series_url}}">{{post.series}}</a> series.
+    </p>
+    {{/if}}    
     {{{post.content}}}
 </article>
 <hr />

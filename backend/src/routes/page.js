@@ -29,7 +29,7 @@ router.get('/:slug', cachePageHandler(asyncHandler(async (req, res, next) => {
     return;
   }
 
-  if (page.metadata.is_embed) {
+  if (page.metadata.is_embed || page.metadata.is_tag_description) {
     next();
     return;
   }

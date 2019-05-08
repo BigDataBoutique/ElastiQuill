@@ -72,6 +72,7 @@ class BaseItemsPage extends Component {
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => this.props.history.push(`/stats/${urlPart}/` + item.id)}>
           {item.title}
+          {item.series && <div style={{ marginLeft: 10 }} className='badge badge-secondary'>{item.series}</div>}
         </div>
         <div>
           {this._renderLineItemExtra && this._renderLineItemExtra(item)}

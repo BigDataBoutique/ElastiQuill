@@ -2,14 +2,15 @@ import express from 'express';
 import asyncHandler from 'express-async-handler';
 
 import * as blogPosts from '../services/blogPosts';
-import { blogpostUrl, pageUrl } from './util';
+import { blogpostUrl, pageUrl, seriesUrl } from './util';
 
 const router = express.Router();
 
 router.get('/tags', asyncHandler(async (req, res) => {
-  const tags = await blogPosts.getAllTags();
+  const { tags, series } = await blogPosts.getAllTags();
   res.json({
-    tags
+    tags,
+    series
   });
 }));
 
@@ -23,17 +24,24 @@ router.get('/:type(post|page)', asyncHandler(async (req, res) => {
     pageSize: 10
   });
 
+  let getUrl = null;
+  switch (type) {
+    case 'post': getUrl = blogpostUrl; break; 
+    case 'page': getUrl = pageUrl; break; 
+  }
+
   res.json({
     items: items.map(p => ({
       ...p,
-      url: type === 'post' ? blogpostUrl(p) : pageUrl(p)
+      url: getUrl(p)
     })),
     total_pages: totalPages
   });
 }));
 
 router.get('/:type(post|page)/:id', asyncHandler(async (req, res) => {
-  const item = await blogPosts.getItemById(req.params.id, true);
+  const includeComments = req.params.type === 'post';
+  const item = await blogPosts.getItemById(req.params.id, includeComments);
   res.json(item);
 }));
 

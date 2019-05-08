@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Joi from 'joi';
 import uid from 'uid';
 import slugify from 'slugify';
@@ -6,14 +7,17 @@ import * as events from './events';
 import * as commentsService from './comments';
 
 export const BLOGPOST_ID_PREFIX = 'blogpost-';
+export const CONTENT_DESCRIPTION_ID_PREFIX = 'content:description:';
 
 const ES_INDEX = config.elasticsearch['blog-index-name'];
+const SERIES_REGEXP_STR = '\{.*\}';
 
 export const CreatePostArgSchema = Joi.object().keys({
   "title": Joi.string().required(),
   "content": Joi.string().allow(''),
   "description": Joi.string().allow(''),
   "tags": Joi.array().items(Joi.string()),
+  "series": Joi.string().allow(null),
   "metadata": Joi.object().keys({
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
@@ -32,6 +36,7 @@ const UpdatePostArgSchema = Joi.object().keys({
   "content": Joi.string().allow(''),
   "description": Joi.string().allow(''),
   "tags": Joi.array().items(Joi.string()),
+  "series": Joi.string().allow(null),
   "metadata": Joi.object().keys({
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
@@ -47,8 +52,13 @@ const CreateContentPageArgSchema = Joi.object().keys({
   "description": Joi.string().allow(''),
   "metadata": Joi.object().keys({
     "is_embed": Joi.boolean().optional(),
+    "is_tag_description": Joi.boolean().optional(),
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
+    "tag_description": Joi.object().keys({
+      "tag": Joi.string(),
+      "is_series": Joi.boolean()
+    }).optional()
   }).required(),
   "author": Joi.object().keys({
     "name": Joi.string().required(),
@@ -63,8 +73,13 @@ const UpdateContentPageArgSchema = Joi.object().keys({
   "description": Joi.string().allow(''),
   "metadata": Joi.object().keys({
     "is_embed": Joi.boolean().optional(),
+    "is_tag_description": Joi.boolean().optional(),
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
+    "tag_description": Joi.object().keys({
+      "tag": Joi.string(),
+      "is_series": Joi.boolean()
+    }).optional()
   }).required(),
 });
 
@@ -79,10 +94,7 @@ export async function getItemById(id, withComments = false) {
     resp._source.comments = await commentsService.getComments([ id ]);
   }
 
-  return {
-    ...resp._source,
-    id: resp._id
-  };
+  return prepareHit(resp);
 }
 
 export async function getItemsByIds(ids, withComments = false) {
@@ -97,10 +109,7 @@ export async function getItemsByIds(ids, withComments = false) {
     }
   });
 
-  const docs = resp.docs.filter(d => d.found).map(d => ({
-    ...d._source,
-    id: d._id
-  }));
+  const docs = resp.docs.filter(d => d.found).map(prepareHit);
 
   if (withComments) {
     const comments = await commentsService.getComments(docs.map(d => d.id));
@@ -114,10 +123,18 @@ export async function getItemsByIds(ids, withComments = false) {
 }
 
 export async function createItem(type, post) {
-  const result = Joi.validate(post, type === 'post' ? CreatePostArgSchema : CreateContentPageArgSchema);
+  let schema;
+  switch (type) {
+    case 'post': schema = CreatePostArgSchema; break;
+    case 'page': schema = CreateContentPageArgSchema; break;
+  }
+
+  const result = Joi.validate(post, schema);
   if (result.error) {
     throw result.error;
   }
+
+  const { tagDescription } = convertToDatastoreFormat(post);
 
   const query = {
     index: ES_INDEX,
@@ -142,9 +159,16 @@ export async function createItem(type, post) {
     resp = await indexWithUniqueId(query);    
   }
   else {
+    let id = query.body.slug;
+    if (post.metadata.is_tag_description && tagDescription) {
+      const { tag, is_series } = tagDescription;
+      id = CONTENT_DESCRIPTION_ID_PREFIX;
+      id += is_series ? `{${tag}}` : tag;
+    }
+
     resp = await esClient.index({
       ...query,
-      id: query.body.slug
+      id
     });
   }
 
@@ -170,11 +194,19 @@ export async function deleteItem(id) {
 }
 
 export async function updateItem(id, type, post) {
-  const result = Joi.validate(post, type === 'post' ? UpdatePostArgSchema : UpdateContentPageArgSchema);
+  let schema;
+  switch (type) {
+    case 'post': schema = UpdatePostArgSchema; break;
+    case 'page': schema = UpdateContentPageArgSchema; break;
+  }
+
+  const result = Joi.validate(post, schema);
   if (result.error) {
     throw result.error;
   }
 
+  convertToDatastoreFormat(post);
+  
   const doc = {
     ...post,
     last_edited_at: new Date().toISOString()
@@ -200,7 +232,7 @@ export async function updateItem(id, type, post) {
   return updatedItem;
 }
 
-export async function getAllItems({ type }) {
+export async function getAllItems({ type, series }) {
   let resp = await esClient.search({
     index: ES_INDEX,
     scroll: '10s',
@@ -216,6 +248,12 @@ export async function getAllItems({ type }) {
     }
   });
 
+  if (series) {
+    query.body.query.bool.filter.push({
+      term: { 'series.id': series }
+    });
+  }
+
   const items = [];
   while (resp.hits.hits.length) {
     resp.hits.hits.forEach(hit => items.push(hit));
@@ -225,13 +263,10 @@ export async function getAllItems({ type }) {
     });
   }
 
-  return items.map(hit => ({
-    ...hit._source,
-    id: hit._id
-  }))
+  return items.map(prepareHit);
 }
 
-export async function getItems({ type, tag, search, pageIndex, pageSize, includePrivatePosts }) {
+export async function getItems({ type, tag, series, search, pageIndex, pageSize, includePrivatePosts }) {
   const query = {
     index: ES_INDEX,
     from: pageIndex * pageSize,
@@ -247,12 +282,12 @@ export async function getItems({ type, tag, search, pageIndex, pageSize, include
       },
       sort: [
         {
-          published_at: { order: 'desc' }
+          published_at: { order: series ? 'asc' : 'desc' }
         }
       ],
       aggs: {
         tags: {
-          terms: { field: 'tags', size: 50 }
+          terms: { field: 'tags', exclude: SERIES_REGEXP_STR, size: 50 }
         }
       },
       highlight: {
@@ -283,18 +318,24 @@ export async function getItems({ type, tag, search, pageIndex, pageSize, include
     };
   }
 
+  const filterByTags = [];
+
   if (tag) {
-    query.body.query.bool.filter.push({
-      terms: { tags: [tag] }
-    });
+    filterByTags.push(tag);
+  }  
+
+  if (series) {
+    filterByTags.push('{' + series + '}');
   }
 
+  if (filterByTags.length) {
+    query.body.query.bool.filter.push({
+      terms: { tags: filterByTags }
+    });    
+  }  
+
   const resp = await esClient.search(query);
-  const items = resp.hits.hits.map(hit => ({
-    ...hit._source,
-    highlight: hit.highlight,
-    id: hit._id
-  }));
+  const items = resp.hits.hits.map(prepareHit);
 
   const comments = await commentsService.getComments(items.map(p => p.id));
   items.forEach(item => item.comments = comments.filter(c => c.post_id === item.id));
@@ -314,17 +355,26 @@ export async function getAllTags() {
     body: {
       aggs: {
         tags: {
-          terms: { field: 'tags', size: 50 }
+          terms: { field: 'tags', exclude: SERIES_REGEXP_STR, size: 50 }
+        },
+        series: {
+          terms: { field: 'tags', include: SERIES_REGEXP_STR, size: 50 }
         }
       }
     }
   });
 
   if (! resp.aggregations) {
-    return [];
+    return {
+      tags: [],
+      series: []
+    };
   }
 
-  return resp.aggregations.tags.buckets.map(b => b.key);
+  return {
+    tags: resp.aggregations.tags.buckets.map(b => b.key),
+    series: resp.aggregations.series.buckets.map(b => stripSeriesTag(b.key)),
+  }
 };
 
 async function indexWithUniqueId(indexProps) {
@@ -355,4 +405,62 @@ function makeSlug(title) {
     remove: /[*+~.\/,()'"!:@^#?]/g,
     lower: true
   });
+}
+
+function prepareHit(hit) {
+  const res = {
+    id: hit._id,
+    highlight: hit.highlight,
+    ...hit._source
+  };
+
+  if (res.type === 'post' && res.tags) {
+    const series = res.tags.filter(t => t.match(SERIES_REGEXP_STR))
+    res.tags = res.tags.filter(t => ! series.includes(t));
+
+    res.series = null;
+    if (series.length) {
+      res.series = stripSeriesTag(series[0]);
+    }
+  }
+  else if (res.type === 'page' && res.metadata.is_tag_description) {
+    const tag = res.id.substring(CONTENT_DESCRIPTION_ID_PREFIX.length);
+    const isSeries = tag.length && tag[0] === '{' && tag[tag.length - 1] === '}';
+
+    res.metadata.tag_description = {
+      tag: isSeries ? stripSeriesTag(tag) : tag,
+      is_series: isSeries
+    };
+  }
+
+  return res;
+}
+
+function convertToDatastoreFormat(item) {
+  let series = null;
+  let tagDescription = null;
+
+  if (item.series) {
+    series = item.series;
+    item.tags = item.tags || [];
+    item.tags = _.uniq(item.tags.concat('{' + item.series + '}'));
+    delete item.series;
+  }
+
+  if (item.metadata && item.metadata.tag_description) {
+    tagDescription = item.metadata.tag_description;
+    delete item.metadata.tag_description;
+  }
+
+  return {
+    series,    
+    tagDescription
+  };
+}
+
+export function stripSeriesTag(series) {
+  if (series && series[0] === '{' && series[series.length - 1] === '}') {
+    series = series.substr(1, series.length - 2);
+  }
+  return series;
 }

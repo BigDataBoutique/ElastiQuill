@@ -9,6 +9,7 @@ import * as Showdown from "showdown";
 import FileUploadProgress from 'react-fileupload-progress';
 
 import ContentEditor from './ContentEditor';
+import SeriesPicker from './SeriesPicker';
 import TagsInput from './TagsInput';
 import * as api from '../api';
 import { getJwtToken } from '../util';
@@ -38,6 +39,24 @@ class BaseForm extends Component {
       }
     };
 
+    let saveBtnLabel = this.props.isNew ? 'Create' : 'Save changes';
+    if (this._renderModal && this.props.isNew) {
+      saveBtnLabel = 'Ready to publish?';
+    }
+
+    if (this.props.isFormSaving) {
+      saveBtnLabel = 'Saving...';
+    }
+
+    const onClickSave = () => {
+      if (this._renderModal) {
+        this.props.setFormModalOpen(true);
+      }
+      else {
+        this.props.onSubmit(this.state.formValues);        
+      }
+    };
+
     return (
       <div style={{ background: 'white', padding: 30 }}>
         <div style={{ display: 'flex' }}>
@@ -45,8 +64,8 @@ class BaseForm extends Component {
             {this._renderSimpleInput({ prop: 'title', placeholder: 'Title', style: { border: '0px', fontSize: '30px' } })}
           </div>
           <div>
-            <div onClick={() => this.props.setFormModalOpen(true)} className='btn btn-outline-success btn-sm'>
-              {this.props.isNew ? 'Ready to publish?' : 'Save changes'}
+            <div onClick={onClickSave} className='btn btn-outline-success btn-sm'>
+              {saveBtnLabel}
             </div>
           </div>
         </div>
@@ -113,6 +132,23 @@ class BaseForm extends Component {
     )
   }
 
+  _renderSeriesPicker({ disabled, placeholder, includeTags, prop }) {
+    return (
+      <div className='row' style={{ paddingBottom: 10 }}>
+        <div className='col-12'>
+          <div style={{ display: 'flex' }}>
+            <SeriesPicker
+              disabled={disabled}
+              placeholder={placeholder}
+              includeTags={includeTags}
+              value={this._getValue(prop, null)}
+              onChange={value => this._setValue(prop, value)} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+          
   _renderFileInput({ label, prop, disabled }) {
     const formRenderer = (onSubmit) => (
       <form className="_react_fileupload_form_content" ref="form" method="post" onSubmit={onSubmit}>
@@ -197,6 +233,8 @@ class BaseForm extends Component {
     const selectComponent = (
       <div style={{ width: '100%' }}>
         <ReactSelect key={prop}
+          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+          menuPortalTarget={document.body}        
           value={_.find(options, ['value', value])}
           onChange={onChange}
           options={options} />

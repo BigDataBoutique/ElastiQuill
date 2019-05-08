@@ -30,7 +30,7 @@ if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== '/') {
 
 // lowercase urls
 router.use((req, res, next) => {
-  if (req.path.toLowerCase() !== req.path) {
+  if (req.method === 'GET' && req.path.toLowerCase() !== req.path) {
     var parsedUrl = url.parse(req.originalUrl)
     parsedUrl.pathname = parsedUrl.pathname.toLowerCase()
     res.redirect(url.format(parsedUrl));
