@@ -5,6 +5,8 @@ export function logout() {
   window.location.href = '/api/auth/logout';
 }
 
+// Post
+
 export async function createPost(values) {
   return await createItem('/api/content/post', values);
 }
@@ -19,6 +21,7 @@ export async function updatePost(id, post) {
     'content',
     'description',
     'tags',
+    'series',
     'metadata',
     'allow_comments'
   ]));
@@ -31,6 +34,8 @@ export async function loadPostById(id) {
 export async function loadPosts(pageIndex) {
   return await authFetchJson(`/api/content/post?page_index=${pageIndex}`);
 }
+
+// Content Page
 
 export async function createContentPage(values) {
   return await createItem('/api/content/page', values);

@@ -12,7 +12,7 @@ import * as akismet from '../services/akismet';
 import * as emails from '../services/emails';
 import * as events from '../services/events';
 import { cachePageHandler, cacheAndReturn, clearPageCache } from '../services/cache';
-import { preparePost, preparePostJson, blogpostUrl } from './util';
+import { preparePost, preparePage, preparePostJson, blogpostUrl } from './util';
 import { config } from '../app';
 
 const router = express.Router();
@@ -31,6 +31,8 @@ router.get('/', cachePageHandler(asyncHandler(handlePostsRequest('index'))));
 router.get('/page/:pageNum', asyncHandler(handlePostsRequest('index')));
 router.get('/tagged/:tag', asyncHandler(handlePostsRequest('tagged')));
 router.get('/tagged/:tag/page/:pageNum', asyncHandler(handlePostsRequest('tagged')));
+router.get('/series/:series', asyncHandler(handlePostsRequest('series')));
+router.get('/series/:series/page/:pageNum', asyncHandler(handlePostsRequest('series')));
 router.get('/search', asyncHandler(handlePostsRequest('search')))
 router.get('/search/page/:pageNum', asyncHandler(handlePostsRequest('search')))
 
@@ -235,12 +237,13 @@ export default router;
 
 function handlePostsRequest(template) {
   return async (req, res) => {
-    const { pageNum, tag } = req.params;
+    const { pageNum, tag, series } = req.params;
     const pageIndex = _.isUndefined(pageNum) ? 0 : parseFloat(pageNum) - 1;
     const { items, total, totalPages } = await blogPosts.getItems({
       type: 'post',
       search: _.isEmpty(req.query.q) ? null : req.query.q,
       tag,
+      series,
       pageIndex,
       pageSize: PAGE_SIZE
     });
@@ -254,10 +257,36 @@ function handlePostsRequest(template) {
       }
     };
 
+    let tagDescription = null;
+
+    if (series) {
+      try {
+        const item = await blogPosts.getItemById(blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + '{' + series + '}');
+        tagDescription = preparePage(item);
+      }
+      catch (err) {
+        if (err.status !== 404) {
+          throw err;
+        }
+      }
+    }
+    else if (tag) {
+      try {
+        const item = await blogPosts.getItemById(blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + tag);
+        tagDescription = preparePage(item);
+      }
+      catch (err) {
+        if (err.status !== 404) {
+          throw err;
+        }
+      }
+    }
+
     res.render(template, {
       tag,
       total,
       totalPages,
+      tagDescription,
       searchQuery: req.query.q,
       sidebarWidgetData: res.locals.sidebarWidgetData,
       pageSize: PAGE_SIZE,

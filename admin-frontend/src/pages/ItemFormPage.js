@@ -15,40 +15,58 @@ import * as api from '../api';
 class ItemFormPage extends Component {
   constructor(props) {
     super(props);
+
+    switch (this._getType()) {
+      case 'post':
+        this.loadItem = api.loadPostById;
+        this.createItem = api.createPost;
+        this.updateItem = api.updatePost;
+
+        this.ItemForm = PostForm;
+        this.store = this.props.postsStore;
+        this.breadcrumbs = [{
+          url: urls.posts,
+          label: 'Posts'
+        }];
+        break;
+      case 'page':
+        this.loadItem = api.loadContentPageById;
+        this.createItem = api.createContentPage;
+        this.updateItem = api.updateContentPage;
+
+        this.ItemForm = ContentPageForm;
+        this.store = this.props.pagesStore;
+        this.breadcrumbs = [{
+          url: urls.pages,
+          label: 'Content Pages'
+        }];
+        break;      
+    }
+
     if (! this._isNew()) {
-      const loadItem = this._getType() == 'post' ? api.loadPostById : api.loadContentPageById;
-      this._getStore()._loadItem(props.match.params.id, this._getType(), loadItem);
+      this.store._loadItem(props.match.params.id, this._getType(), this.loadItem);
     }
   }
 
   render() {
-    const ItemForm = this._getType() == 'post' ? PostForm : ContentPageForm;
-    const breadcrumbs = [
-      this._getType() === 'post' ? {
-        url: urls.posts,
-        label: 'Posts'
-      } : {
-        url: urls.pages,
-        label: 'Content Pages'
-      }
-    ];
+    const ItemForm = this.ItemForm;
 
     let blogpostId = null;
     if (! this._isNew() && this._getType() === 'post') {
       blogpostId = this.props.match.params.id;
     }
 
-    return <LoggedInLayout pageTitle={this._renderPageTitle()} breadcrumbs={breadcrumbs}>
+    return <LoggedInLayout pageTitle={this._renderPageTitle()} breadcrumbs={this.breadcrumbs}>
       <div className="content">
-        {this._getStore().isLoading ? 'Loading...' : (
+        {this.store.isLoading ? 'Loading...' : (
           <ItemForm
             blogpostId={blogpostId}
             isNew={this._isNew()}
-            isFormSaving={this._getStore().isFormSaving}
-            isFormModalOpen={this._getStore().isFormModalOpen}
-            setFormModalOpen={open => this._getStore().setFormModalOpen(open)}
+            isFormSaving={this.store.isFormSaving}
+            isFormModalOpen={this.store.isFormModalOpen}
+            setFormModalOpen={open => this.store.setFormModalOpen(open)}
             onSubmit={this._onSubmit.bind(this)}
-            item={this._getStore().currentItem} />
+            item={this.store.currentItem} />
         )}
       </div>
     </LoggedInLayout>;
@@ -68,37 +86,26 @@ class ItemFormPage extends Component {
     return this.props.match.params.type;
   }
 
-  _getStore() {
-    return this._getType() == 'post' ? this.props.postsStore : this.props.pagesStore
-  }
-
   async _onSubmit(formValues) {
-    const store = this._getStore();
-    let save = null;
+    const store = this.store;
+    let save = this._isNew() ? this.createItem : this.updateItem.bind(this, store.currentItem.id);
 
-    if (this._getType() === 'post') {
-      save = this._isNew() ? api.createPost : api.updatePost.bind(this, store.currentItem.id);
-    }
-    else {
-      save = this._isNew() ? api.createContentPage : api.updateContentPage.bind(this, store.currentItem.id);
-    }
-
-    this._getStore().setFormSaving(true);
+    this.store.setFormSaving(true);
     try {
       const resp = await save({
         ...formValues,
-        description: _.isEmpty(formValues.description) ? '' : formValues.description,
         ///private_viewing_key: null // TODO auto generate UUID
       });
 
       if (this._isNew()) {
         this.props.history.replace('/edit/'+this._getType()+'/' + resp.id);
       }
-      this._getStore().setFormModalOpen(false);
+
+      toast.success('Changes saved');
+      this.store.setFormModalOpen(false);
     }
     catch (err) {
       console.log(err);
-      
       let errorMsg = err.message;
       if (err.message === 'Conflict') {
         errorMsg = 'Page with that name already exists';
@@ -106,7 +113,7 @@ class ItemFormPage extends Component {
       toast.error(errorMsg);
     }
     finally {
-      this._getStore().setFormSaving(false);
+      this.store.setFormSaving(false);
     }
   }
 }

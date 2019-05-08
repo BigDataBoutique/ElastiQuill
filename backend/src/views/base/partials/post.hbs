@@ -23,6 +23,11 @@
         </span>
         <br>
         {{> tags tags=this.tags}}
+        {{#if this.series}}
+          <p>
+            Part of <a href="{{this.series_url}}">{{this.series}}</a> series.
+          </p>
+        {{/if}}
       </div>
       <div class="col-lg-3 col-md-3 col-sm-4 read-more">
         <a href="{{this.url}}" class="pull-right">Read more »</a>

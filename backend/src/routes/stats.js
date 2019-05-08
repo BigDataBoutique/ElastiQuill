@@ -9,7 +9,7 @@ import { preparePost, prepareComments, blogpostUrl } from './util';
 
 const router = express.Router();
 
-router.get('/:type(post|page)/:id', asyncHandler(async (req, res) => {
+router.get('/:type(post|page|series)/:id', asyncHandler(async (req, res) => {
   const stats = await logging.getStats({
     type: req.params.type,
     postId: req.params.id

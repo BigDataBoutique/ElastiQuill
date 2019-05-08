@@ -28,6 +28,7 @@ class PostForm extends BaseForm {
         </div>
         <div className='col-6'>
           {this._renderTagsInput({ label: 'Tags', prop: 'tags' })}
+          {this._renderSeriesPicker({ label: 'Series', prop: 'series' })}
           {this._renderToggle({ label: 'Allow comments', prop: 'allow_comments' })}
           <div style={{ marginTop: 10 }}>
             <Button

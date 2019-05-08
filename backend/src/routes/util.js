@@ -6,6 +6,7 @@ import readingTime from 'reading-time';
 import sanitizeHtml from 'sanitize-html';
 
 import { config } from '../app';
+import { stripSeriesTag, CONTENT_DESCRIPTION_ID_PREFIX } from '../services/blogPosts';
 
 const BLOG_ROUTE_PREFIX = config.blog['blog-route-prefix'];
 const COMMENTS_POST_PERIOD = config.blog['comments-post-period'];
@@ -74,6 +75,7 @@ export function preparePost(p) {
     ...p,
     comments,
     highlight,
+    series_url: p.series ? seriesUrl(p.series) : undefined,
     allow_comments: allowComments,
     reading_time: readTime.minutes > 1 ? readTime.text : null,
     comments_count: p.comments_count ? p.comments_count : countComments(comments),
@@ -122,5 +124,25 @@ export function blogpostUrl(post) {
 }
 
 export function pageUrl(page) {
+  if (page.metadata.is_tag_description) {
+    const tag = page.id.substring(CONTENT_DESCRIPTION_ID_PREFIX.length);
+    if (tag.length && tag[0] === '{' && tag[tag.length - 1] === '}') {
+      return seriesUrl(stripSeriesTag(tag));
+    }
+    else {
+      return tagUrl(tag);
+    }
+  }
+  
   return `/${page.id}`;
+}
+
+export function seriesUrl(series) {
+  const url = '/series/' + series;
+  return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
+}
+
+export function tagUrl(tag) {
+  const url = '/tagged/' + tag;
+  return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
 }
