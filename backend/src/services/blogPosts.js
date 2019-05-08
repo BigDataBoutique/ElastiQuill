@@ -203,7 +203,6 @@ export async function updateItem(id, type, post) {
 export async function getAllItems({ type }) {
   let resp = await esClient.search({
     index: ES_INDEX,
-    type: '_doc',
     scroll: '10s',
     ignore_unavailable: true,
     body: {

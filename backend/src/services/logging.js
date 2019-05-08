@@ -171,7 +171,6 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
 export async function* allLogsGenerator() {
   let resp = await esClient.search({
     index: LOGS_INDICES_PREFIX + '*',
-    type: '_doc',
     scroll: '10s',
     ignore_unavailable: true,
     body: {

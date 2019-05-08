@@ -85,7 +85,6 @@ export async function createComment(comment) {
 export async function getComments(postIds) {
   let resp = await esClient.search({
     index: ES_INDEX,
-    type: '_doc',
     scroll: '10s',
     ignore_unavailable: true,
     body: {
@@ -212,7 +211,6 @@ export async function getCommentsStats({ postId }) {
 export async function getAllComments() {
   let resp = await esClient.search({
     index: ES_INDEX,
-    type: '_doc',
     scroll: '10s',
     ignore_unavailable: true,
     body: {
