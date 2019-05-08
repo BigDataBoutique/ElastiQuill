@@ -27,8 +27,52 @@ export function getAvailability(connected = {}) {
   return res;
 }
 
-export async function postToLinkedin(authorId, accessToken, title, url) {
-  await request({
+export async function postToLinkedin(authorId, accessToken, title, url, imageUrl) {
+  let imageAsset = undefined;
+
+  if (imageUrl) {
+    const imageBinary = await request({
+      method: 'GET',
+      url: imageUrl,
+      encoding: null
+    });
+
+    const resp = await request({
+      method: 'POST',
+      url: 'https://api.linkedin.com/v2/assets?action=registerUpload&oauth2_access_token=' + accessToken,
+      body: JSON.stringify({
+        "registerUploadRequest": {
+          "recipes": [
+            "urn:li:digitalmediaRecipe:feedshare-image"
+          ],
+          "owner": "urn:li:person:" + authorId,
+          "serviceRelationships": [
+            {
+              "relationshipType": "OWNER",
+              "identifier": "urn:li:userGeneratedContent"
+            }
+          ]
+        }
+      })
+    });
+    
+    const { value } = JSON.parse(resp);
+    imageAsset = value.asset;
+
+    const { uploadUrl } = value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'];
+
+    await request({
+      method: 'POST',
+      url: uploadUrl,
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      },
+      body: imageBinary,
+      encoding: null
+    });
+  }
+
+  const postResp = await request({
     method: 'POST',
     url: 'https://api.linkedin.com/v2/ugcPosts?oauth2_access_token=' + accessToken,
     body: JSON.stringify({
@@ -39,11 +83,12 @@ export async function postToLinkedin(authorId, accessToken, title, url) {
           'shareCommentary': {
             'text': title
           },
-          'shareMediaCategory': 'ARTICLE',
+          'shareMediaCategory': imageAsset ? 'IMAGE' : 'ARTICLE',
           'media': [
             {
               'status': 'READY',
               'originalUrl': url,
+              'media': imageAsset
             }
           ]
         }
@@ -57,6 +102,7 @@ export async function postToLinkedin(authorId, accessToken, title, url) {
       'Content-Type': 'application/json'
     }
   });
+
   return { url: null };
 }
 

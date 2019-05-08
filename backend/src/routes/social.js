@@ -19,9 +19,10 @@ router.post('/post/linkedin/:id', asyncHandler(async (req, res) => {
   }
 
   const link = config.blog.url + preparePost(post).url;
+  const imgUrl = post.metadata && post.metadata.header_image_url;
   try {
     const { token, profileId } = req.user.connected.linkedin;
-    const resp = await social.postToLinkedin(profileId, token, post.title, link);
+    const resp = await social.postToLinkedin(profileId, token, post.title, link, imgUrl);
     res.json({
       url: resp.url
     });
