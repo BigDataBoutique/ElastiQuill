@@ -1,12 +1,18 @@
 import React, {Component} from 'react';
-import {Layout} from "./Layout";
-import {FAIcon} from "./FAIcon";
-import {Link, Redirect, withRouter} from "react-router-dom";
-import {inject, observer} from "mobx-react/index";
-import classNames from "classnames";
-import urls from "../config/urls";
-import NavLiLink from "./NavLiLink";
+import { Collapse, Navbar, NavbarToggler, Nav, NavItem } from 'reactstrap';
+import { Link, Redirect, withRouter } from 'react-router-dom';
+import { inject, observer } from 'mobx-react/index';
+import classnames from 'classnames';
+
+import FAIcon from './FAIcon';
+import NavLink from './NavLink';
+import { Layout } from './Layout';
+import urls from '../config/urls';
 import logo from '../assets/img/logo.png';
+import dashboardIcon from '../assets/img/dashboard.svg'
+import postsIcon from '../assets/img/pages.svg'
+import contentPagesIcon from '../assets/img/posts.svg'
+
 
 @inject('appStore')
 @withRouter
@@ -21,7 +27,7 @@ class LoggedInLayout extends Component {
     const {appStore} = this.props;
 
     if (appStore.isLoading) {
-      return <Spinner/>;
+      return false;
     }
 
     if (!appStore.isAuthenticated) {
@@ -33,127 +39,70 @@ class LoggedInLayout extends Component {
       }}/>;
     }
 
-    return <Layout>
-      <aside id="left-panel" className={classNames("left-panel", {"open-menu": this.state.leftMenuOpen})}>
-        <nav className="w-100 navbar navbar-expand-sm navbar-default">
-          <div id="main-menu" className="w-100 main-menu collapse navbar-collapse">
-            {this._renderMenuItems([
-              { label: 'Dashboard', url: urls.dashboard, icon: 'tachometer-alt' },
-              { label: 'Posts', url: urls.posts, icon: 'pencil-alt' },
-              { label: 'Content Pages', url: urls.pages, icon: 'file' },
-              { label: 'Backup', url: urls.backup, icon: 'archive' },
-              { label: 'Status', url: urls.status, icon: 'notes-medical' },
-            ])}
-          </div>
-        </nav>
-      </aside>
-      <div id="right-panel" className="right-panel">
-        <header id="header" className="header">
-          <div className="top-left">
-            <div className="navbar-header">
-              <Link to='/dashboard'>
-                <img src={logo} style={{ height: '2rem' }} />
-              </Link>
-              <button id="menuToggle" className="btn btn-link menutoggle"
-                onClick={this.handleMenuToggleClick}><FAIcon icon="bars"/></button>
-            </div>
-          </div>
-          <div className="top-right">
-            <div className="header-menu">
-              <div className="header-left"></div>
-              <div
-                className={classNames("user-area dropdown float-right", {'show': this.state.userMenuOpen})}>
-                <button className="btn btn-link dropdown-toggle active"
-                    onClick={this.handleUserMenuToggle}>
-                  <img className="user-avatar rounded-circle"
-                     src={this.props.appStore.user.avatarUrl}
-                     alt="User Avatar"/>
+    return (
+      <Layout>
+        <div className='elastiquill-navbar'>
+          <div className='container' style={{ display: 'flex', flexFlow: 'row', paddingTop: '35px' }}>
+            <img className='elastiquill-logo' src={logo} />
+            <span className='elastiquill-admin-label'>Admin</span>
+            <div className='elastiquill-user-area'>
+              <div className={classnames('dropdown float-right', {'show': this.state.userMenuOpen})}>
+                <button style={{ padding: '0px' }} className='btn btn-link active' onClick={this.handleUserMenuToggle}>
+                  <img
+                    className='rounded-circle'
+                    src={this.props.appStore.user.avatarUrl}
+                    alt='User Avatar'/>
+
+                  <div className='elastiquill-user-area-label'>
+                    {this.props.appStore.user.name}
+                  </div>
                 </button>
                 <div
-                  className={classNames("user-menu dropdown-menu", {'show': this.state.userMenuOpen})}>
-                  {this.props.appStore.user.name && <strong className="nav-link">{this.props.appStore.user.name}</strong>}
-                  {this.props.appStore.user.company && <strong className="nav-link">{this.props.appStore.user.company}</strong>}
-                  {this.props.appStore.user.email && <span className="nav-link">{this.props.appStore.user.email} </span>}
-                  <button className="btn btn-link nav-link" onClick={this.handleLogoutClick}><FAIcon
-                    icon="power-off"/>Logout
+                  className={classnames('dropdown-menu', {'show': this.state.userMenuOpen})}>
+                  {this.props.appStore.user.company && <strong className='nav-link'>{this.props.appStore.user.company}</strong>}
+                  {this.props.appStore.user.email && <span className='nav-link'>{this.props.appStore.user.email} </span>}
+                  <button className='btn btn-link nav-link' onClick={this.handleLogoutClick}><FAIcon
+                    icon='power-off'/>Logout
                   </button>
                 </div>
-              </div>
+              </div>        
             </div>
           </div>
-        </header>
-        {this.props.pageTitle &&
-        <div className="breadcrumbs">
-          <div className="breadcrumbs-inner">
-            <div className="row m-0">
-              <div className="col-md-8 col-sm-12">
-                <div className="page-header float-left">
-                  {this.props.navButtons ? this.props.navButtons : (
-                    <div className="page-title">
-                      <h1>{this.props.pageTitle}</h1>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {this.props.breadcrumbs &&
-              <div className="col-md-4 col-sm-12">
-                <div className="page-header float-right">
-                  <div className="page-title">
-                    <ol className="breadcrumb text-right">
-                      {this.props.breadcrumbs.map((crumb) => (
-                        <li key={crumb.url}><Link to={crumb.url}>{crumb.label}</Link></li>
-                      ))}
-                      <li className="active" style={{
-                        maxWidth: '300px',
-                        paddingRight: 10,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
-                      }} >{this.props.pageTitle}</li>
-                    </ol>
-                  </div>
-                </div>
-              </div>
-              }
-              {this.props.toolbar && (
-                <div className="col-md-4 col-sm-12">
-                  <div style={{ textAlign: 'right', paddingTop: 7 }}>
-                    {this.props.toolbar ? this.props.toolbar : false}
-                  </div>
-                </div>
-              )}
-            </div>
+        </div>
+        <div className='elastiquill-nav-link-container'>
+          <div className='container'>
+            <Navbar light expand='lg'>
+              <NavbarToggler onClick={() => this.setState({ navbarOpen: ! this.state.navbarOpen })} />
+              <Collapse isOpen={!! this.state.navbarOpen} navbar>
+                <Nav navbar>
+                  {[
+                    { label: 'Dashboard', url: urls.dashboard, icon: 'tachometer-alt' },
+                    { label: 'Posts', url: urls.posts, icon: 'pencil-alt' },
+                    { label: 'Content Pages', url: urls.pages, icon: 'file' },
+                    { label: 'Backup', url: urls.backup, icon: 'archive' },
+                    { label: 'Status', url: urls.status, icon: 'notes-medical' },
+                  ].map((item, i) => (
+                    <NavItem key={i}>
+                      <NavLink {...item} />
+                    </NavItem>
+                  ))}
+                </Nav>
+              </Collapse>
+            </Navbar>
           </div>
-        </div>}
-        {this.props.children}
-        <div className="clearfix"/>
-        <footer className="site-footer">
-          <div className="footer-inner bg-white">
-            <div className="row">
-              <div className="col-sm-8">
-                Designed by Colorlib <br/>
-                <a href="https://github.com/BigDataBoutique/ElastiQuill">ElastiQuill</a> Copyright &copy; 2019 <a href="https://bigdataboutique.com" target="_blank">BigData Boutique</a>
-              </div>
-              <div className="col-sm-4 text-right">
-                <a href="#">Back to top</a>
+        </div>
+        <div className='container' style={{ paddingTop: '17px' }}>
+          {this.props.pageTitle && (
+            <div style={{ display: 'flex' }}>
+              <div className='elastiquill-header' style={{ flex: 1 }}>{this.props.pageTitle}</div>
+              <div>
+                {this.props.toolbar}
               </div>
             </div>
-          </div>
-        </footer>
-      </div>
-    </Layout>;
-  }
-
-  _renderMenuItems(items) {
-    return (
-      <ul className="w-100 nav navbar-nav">
-        {items.map((item, i) => (
-          <NavLiLink key={i} to={item.url}>
-            <FAIcon className='menu-icon' icon={item.icon} />
-            {item.label}
-          </NavLiLink>
-        ))}
-      </ul>
+          )}
+          {this.props.children}
+        </div>
+      </Layout>
     )
   }
 

@@ -1,14 +1,10 @@
-import {action, computed, observable} from 'mobx';
-import md5 from 'md5';
+import { action, computed, observable } from 'mobx';
 import localforage from 'localforage';
-import {jsonFetch} from '../util';
+import { jsonFetch } from '../util';
 import BaseStore from "./BaseStore";
 import * as api from '../api';
 
 class Dashboard extends BaseStore {
-
-  @observable
-  visitsHistogramData = [];
 
   @observable
   visitsByLocation = [];
@@ -20,6 +16,12 @@ class Dashboard extends BaseStore {
   recentComments = [];
 
   @observable
+  commentsCount = null;
+
+  @observable
+  postsCount = null;
+
+  @observable
   mostCommentedPosts = [];
 
   @observable
@@ -28,33 +30,28 @@ class Dashboard extends BaseStore {
   @observable
   referrerFromDomain = [];
 
-  async loadCommentsData() {
+  async loadStats() {
+    this.loading('stats');
+
     try {
-      this.loading('comments');
       const commentsData = await api.loadCommentsStats();
+      this.commentsCount = commentsData.comments_count;
       this.recentComments = commentsData.recent_comments;
       this.mostCommentedPosts = commentsData.most_commented_posts;
-    }
-    catch (err) {
-      console.error(err);
-    }
-    this.loaded('comments');
-  }
 
-  async loadVisitsData() {
-    try {
-      this.loading('visits');
-      const visitsData = await api.loadVisitsStats();
-      this.visitsHistogramData = visitsData.visits_by_date;
-      this.visitsByLocation = visitsData.visits_by_location;
-      this.popularPosts = visitsData.popular_posts;
-      this.referrerType = visitsData.referrer_type;
-      this.referrerFromDomain = visitsData.referrer_from_domain;
+      const allStats = await api.loadAllStats();
+      this.visitsByLocation = allStats.visits_by_location;
+      this.popularPosts = allStats.popular_posts;
+      this.referrerType = allStats.referrer_type;
+      this.referrerFromDomain = allStats.referrer_from_domain;
+      this.postsCount = allStats.posts_count;
     }
     catch (err) {
       console.error(err);
     }
-    this.loaded('visits');
+    finally {
+      this.loaded('stats');    
+    }
   }
 }
 

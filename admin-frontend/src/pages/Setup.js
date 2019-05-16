@@ -20,7 +20,7 @@ class Setup extends Component {
   render() {
     return (
       <LoggedInLayout pageTitle='Elasticsearch setup'>
-        <div className='content'>
+        <div className='elastiquill-content'>
           <div className='row'>
             <div className='col-12'>
               {this._renderContent()}

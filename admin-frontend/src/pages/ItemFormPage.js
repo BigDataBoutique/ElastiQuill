@@ -57,7 +57,7 @@ class ItemFormPage extends Component {
     }
 
     return <LoggedInLayout pageTitle={this._renderPageTitle()} breadcrumbs={this.breadcrumbs}>
-      <div className="content">
+      <div className='elastiquill-content'>
         {this.store.isLoading ? 'Loading...' : (
           <ItemForm
             blogpostId={blogpostId}

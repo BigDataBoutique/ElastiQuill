@@ -22,13 +22,11 @@ class Status extends React.Component {
   render() {
     return (
       <LoggedInLayout pageTitle='Blog Status'>
-        <div className='content'>
+        <div className='elastiquill-content'>
           <div className='row'>
             <div className='col-12'>
-              <div className='card'>
-                <div className='card-body'>
-                  {this._renderStatus()}
-                </div>
+              <div className='elastiquill-card'>
+                {this._renderStatus()}
               </div>
             </div>
           </div>
@@ -119,7 +117,6 @@ class Status extends React.Component {
           {this._renderLabel({ label: 'Twitter', success: social.twitter !== 'not_configured' })}
           {this._renderLabel({ label: 'Reddit', success: social.reddit !== 'not_configured' })}
           {this._renderLabel({ label: 'LinkedIn', success: social.linkedin !== 'not_configured' })}
-          <hr/>
         </div>
       </div>
     )

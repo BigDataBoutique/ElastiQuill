@@ -349,6 +349,50 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
   };
 }
 
+export async function getStats({ startDate = null, endDate = null, interval = '1d' }) {
+  const filters = [];
+  if (startDate || endDate) {
+    filters.push({
+      range: {
+        'published_at': {
+          lte: endDate || null,
+          gte: startDate || null
+        }
+      }
+    });
+  }
+
+  const query = {
+    index: ES_INDEX,
+    body: {
+      query: {
+        bool: {
+          filter: filters
+        }
+      },
+      aggs: {
+        posts_histogram: {
+          date_histogram: {
+            field: 'published_at',
+            interval
+          }
+        }
+      }
+    }
+  };
+
+  const resp = await esClient.search(query);
+  let postsByDate = [],
+      postsCount = 0;
+
+  if (resp.aggregations) {
+    postsByDate = resp.aggregations.posts_histogram.buckets;
+    postsCount = _.sumBy(postsByDate, 'doc_count');
+  }
+
+  return { postsByDate, postsCount };
+}
+
 export async function getAllTags() {
   const resp = await esClient.search({
     index: ES_INDEX,

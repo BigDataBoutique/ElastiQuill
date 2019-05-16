@@ -16,6 +16,9 @@ export default class ItemsStore extends BaseStore {
   deleteItemId = null;
 
   @observable
+  searchQuery = '';
+
+  @observable
   pageIndex = 0;
 
   @observable
@@ -35,6 +38,8 @@ export default class ItemsStore extends BaseStore {
 
   @observable
   isItemDeleting = false;
+
+  isSearchResult = false;
 
   @action
   setItemDeleting(deleting) {
@@ -72,11 +77,17 @@ export default class ItemsStore extends BaseStore {
   }
 
   @action
+  setSearchQuery(text) {
+    this.searchQuery = text;
+  }
+
+  @action
   async _loadPage(pageIndex, name, func) {
     this.loading(name);
 
     try {
-      const resp = await func(pageIndex);
+      const resp = await func(pageIndex, this.searchQuery);
+      this.isSearchResult = this.searchQuery.length > 0;
       this.items = resp.items;
       this.totalPages = resp.total_pages;
       this.pageIndex = pageIndex;
@@ -102,5 +113,5 @@ export default class ItemsStore extends BaseStore {
     finally {
       this.loaded(name);
     }
-  }
+  }  
 }

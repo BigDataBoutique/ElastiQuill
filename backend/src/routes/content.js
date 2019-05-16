@@ -17,9 +17,12 @@ router.get('/tags', asyncHandler(async (req, res) => {
 router.get('/:type(post|page)', asyncHandler(async (req, res) => {
   const type = req.params.type;
   const pageIndex = req.query.page_index || 0;
+  const searchQuery = req.query.query.length ? req.query.query : null;
+
   const { items, totalPages } = await blogPosts.getItems({
     type,
     pageIndex,
+    search: searchQuery,
     includePrivatePosts: true,
     pageSize: 10
   });

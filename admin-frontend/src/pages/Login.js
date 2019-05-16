@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {inject, observer} from "mobx-react";
-import {Layout} from "../components/Layout";
-import {Redirect, withRouter} from "react-router-dom";
-import AuthButtons from "../components/AuthButtons";
-import urls from "../config/urls";
+import {inject, observer} from 'mobx-react';
+import {Layout} from '../components/Layout';
+import {Redirect, withRouter} from 'react-router-dom';
+import AuthButtons from '../components/AuthButtons';
+import urls from '../config/urls';
 import logo from '../assets/img/logo.png';
 
 @inject('appStore')
@@ -34,21 +34,23 @@ class Login extends Component {
       return <Redirect to={urls.defaultUrl}/>;
     }
 
-    return <Layout>
-      <div className="sufee-login d-flex align-content-center flex-wrap">
-        <div className="container">
-          <div className="login-content">
-            <div className="login-form">
-              <div style={{ marginBottom: 15 }}>
-                <p style={{ textAlign: 'center' }}><img src={logo} /></p>
-                {this._renderError()}
+    return (
+      <Layout>
+        <div className='flex align-content-center flex-wrap'>
+          <div className='container'>
+            <div className='card' style={{ maxWidth: 540, margin: '8vh auto' }}>
+              <div style={{ padding: 30 }}>
+                <div style={{ marginBottom: 15 }}>
+                  <p style={{ textAlign: 'center' }}><img src={logo} /></p>
+                  {this._renderError()}
+                </div>
+                <AuthButtons sources={this.props.appStore.socialAuthSources}/>
               </div>
-              <AuthButtons sources={this.props.appStore.socialAuthSources}/>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>;
+      </Layout>
+    );
   }
 
   _renderError() {
@@ -85,10 +87,10 @@ class Login extends Component {
     }
 
     return (
-      <div className="alert alert-danger" style={{ marginTop: 20, marginBottom: 20, color: 'black' }}>
-        <h4 className="alert-heading mb-0">Authentication error</h4>
+      <div className='alert alert-danger' style={{ marginTop: 20, marginBottom: 20, color: 'black' }}>
+        <h4 className='alert-heading mb-0'>Authentication error</h4>
         <hr/>
-        <p className="mb-0">
+        <p className='mb-0'>
           {errorLabel}
         </p>
       </div>

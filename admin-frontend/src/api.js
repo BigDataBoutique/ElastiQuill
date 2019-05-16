@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import md5 from 'md5';
+import qs from 'query-string';
 import { authFetchJson, getJwtToken } from './util';
 
 export function logout() {
@@ -31,8 +33,8 @@ export async function loadPostById(id) {
   return await authFetchJson(`/api/content/post/${id}`);
 }
 
-export async function loadPosts(pageIndex) {
-  return await authFetchJson(`/api/content/post?page_index=${pageIndex}`);
+export async function loadPosts(pageIndex, searchQuery) {
+  return await authFetchJson(`/api/content/post?page_index=${pageIndex}&query=${searchQuery}`);
 }
 
 // Content Page
@@ -54,24 +56,32 @@ export async function updateContentPage(id, page) {
   ]));
 }
 
-export async function loadContentPages(pageIndex) {
-  return await authFetchJson(`/api/content/page?page_index=${pageIndex}`);
+export async function loadContentPages(pageIndex, searchQuery) {
+  return await authFetchJson(`/api/content/page?page_index=${pageIndex}&query=${searchQuery}`);
 }
 
 export async function loadContentPageById(id) {
   return await authFetchJson(`/api/content/page/${id}`);
 }
 
-export async function loadVisitsStats() {
-  return await authFetchJson('/api/stats/visits');
+export async function loadAllStats(startDate, interval) {
+  return await authFetchJson('/api/stats/all?' + qs.stringify({
+    start: startDate ? startDate.toISOString() : 0,
+    interval
+  }));
+}
+
+export async function loadItemStats(itemType, id, startDate, interval) {
+  return await authFetchJson(`/api/stats/all?` + qs.stringify({
+    type: itemType,
+    item_id: id,
+    start: startDate ? startDate.toISOString() : 0,
+    interval
+  }));
 }
 
 export async function loadCommentsStats(postId = null) {
   return await authFetchJson('/api/stats/comments?post_id='+(postId || ''));
-}
-
-export async function loadItemStats(itemType, id) {
-  return await authFetchJson(`/api/stats/${itemType}/${id}`);
 }
 
 export async function loadSocialAvailability() {
@@ -140,6 +150,10 @@ export async function loadStatus() {
 
 export function uploadImageUrl() {
   return '/api/uploads/image';
+}
+
+export function userAvatarUrl(email) {
+  return `https://www.gravatar.com/avatar/${md5(email.toLowerCase().trim())}?size=100&default=identicon`;
 }
 
 async function createItem(url, values) {

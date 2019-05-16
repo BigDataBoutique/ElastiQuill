@@ -1,6 +1,6 @@
 import React from 'react';
 import GoogleButton from 'react-google-button'
-import GitHubLogo from "../assets/img/github-logo.svg";
+import GitHubLogo from '../assets/img/github-logo.svg';
 
 export default function(props) {
   if (! props.sources) {
@@ -10,25 +10,28 @@ export default function(props) {
   const btns = props.sources.map(source => {
     if (source === 'github') {
       return (
-        <div key="github" className='col-md' style={{textAlign: 'center'}}>
-          <a className="btn btn-secondary mb-3 mb-md-0" style={{
-            padding: "10px 20px",
-            textTransform: "none"
+        <div key='github' className='col-md' style={{textAlign: 'center'}}>
+          <a className='btn btn-secondary mb-3 mb-md-0' style={{
+            padding: '10px 20px',
+            textTransform: 'none',
+            fontSize: '14px',
+            width: '100%',
+            border: 0
           }} href='/api/auth/github'>
-            <img style={{height: 30, marginRight: 5}} alt='Sign in with Github'
+            <img style={{ height: 30, marginRight: 5 }} alt='Sign in with Github'
                src={GitHubLogo}/> Sign in with GitHub
           </a>
         </div>
       )
     } else if (source === 'google') {
       return (
-        <div key="google" className='col-md'>
+        <div key='google' className='col-md'>
           <GoogleButton onClick={() => location.href = '/api/auth/google'}/>
         </div>
       )
     } else if (source === 'anonymous') {
       return (
-        <div key="anonymous" className='col-md'>
+        <div key='anonymous' className='col-md'>
           <a href='/api/auth/anonymous' className='btn btn-primary'>Login</a> 
         </div>
       )

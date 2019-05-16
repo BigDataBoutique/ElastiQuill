@@ -41,16 +41,12 @@ export async function getStatus() {
   }
 }
 
-export async function getStats({ startDate, endDate, type = null, postId = null }) {
-  const filters = [
-    {
-      term: { tags: 'visit' }
-    }
-  ];
+export async function getStats({ startDate, endDate, interval = '1d', type = null, postId = null }) {
+  const filters = [];
 
   filters.push({
     terms: {
-      tags: postId ? ['read_item'] : ['list_items', 'read_item']
+      tags: postId ? ['read_item'] : ['list_items', 'read_item', 'visit']
     }
   });
 
@@ -99,7 +95,22 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
         visits_histogram: {
           date_histogram: {
             field: '@timestamp',
-            interval: '1d'
+            interval
+          }
+        },        
+        views_histogram: {
+          filter: {
+            term: {
+              'read_item.type': 'post'
+            }
+          },
+          aggs: {
+            views: {
+              date_histogram: {
+                field: '@timestamp',
+                interval
+              }              
+            }
           }
         },
         referrer_type: {
@@ -136,6 +147,7 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
 
   const resp = await esClient.search(query);
   let visits_by_date = [],
+      views_by_date = [],
       visits_by_location = [],
       popular_posts = [],
       referrer_type = [],
@@ -145,6 +157,7 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
     visits_by_date = resp.aggregations.visits_histogram.buckets;
+    views_by_date = resp.aggregations.views_histogram.views.buckets;
     visits_by_location = resp.aggregations.visits_by_location.buckets.map(bucket => ({
       location: geohash.decode_bbox(bucket.key),
       visits: bucket.doc_count
@@ -160,6 +173,7 @@ export async function getStats({ startDate, endDate, type = null, postId = null 
   }
 
   return {
+    views_by_date,
     visits_by_date,
     visits_by_location,
     popular_posts,
