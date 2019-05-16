@@ -357,7 +357,7 @@ class BaseForm extends Component {
   }
 
   _getValue(prop, defaultValue = '') {
-    return _.result(this.state.formValues, prop, defaultValue);
+    return _.result(this.state.formValues, prop) || defaultValue;
   }
 
   _setValue(prop, value, cb) {

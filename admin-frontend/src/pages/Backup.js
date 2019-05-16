@@ -10,29 +10,27 @@ class Backup extends React.Component {
   render() {
     return (
       <LoggedInLayout pageTitle={'Backup'}>
-        <div className='content'>
+        <div className='elastiquill-content'>
           <SetupWarning />
           <div className='row'>
             <div className='col-12'>
-              <div className='card'>
-                <div className='card-body'>
-                  <div>
-                    <div style={{ marginBottom: 10 }}>
-                      JSON document with all posts and comments.
-                    </div>
-                    <button
-                      onClick={this._onClick.bind(this, api.downloadBackup)}
-                      className='btn btn-primary'>Download complete backup</button>
+              <div className='elastiquill-card'>
+                <div>
+                  <div style={{ marginBottom: 10 }}>
+                    JSON document with all posts and comments.
                   </div>
-                  <hr/>
-                  <div>
-                    <div style={{ marginBottom: 10 }}>
-                      Archive of all logs in JSONL format.
-                    </div>
-                    <button
-                      onClick={this._onClick.bind(this, api.downloadLogs)}
-                      className='btn btn-primary'>Download logs archive</button>
+                  <button
+                    onClick={this._onClick.bind(this, api.downloadBackup)}
+                    className='btn btn-primary'>Download complete backup</button>
+                </div>
+                <hr/>
+                <div>
+                  <div style={{ marginBottom: 10 }}>
+                    Archive of all logs in JSONL format.
                   </div>
+                  <button
+                    onClick={this._onClick.bind(this, api.downloadLogs)}
+                    className='btn btn-primary'>Download logs archive</button>
                 </div>
               </div>
             </div>

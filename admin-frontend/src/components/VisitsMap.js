@@ -67,9 +67,9 @@ class VisitsMap extends React.Component {
                   cx={0}
                   cy={0}
                   r={10 * bucket.visits / maxVisits}
-                  fill="rgba(255,87,34,0.8)"
-                  stroke="#607D8B"
-                  strokeWidth="2"
+                  fill="#d9156d"
+                  stroke="rgba(217, 21, 109, 0.1)"
+                  strokeWidth='2%'
                 />
               </Marker>
             ))}

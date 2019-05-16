@@ -1,63 +1,101 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {action, computed, observable} from 'mobx';
 import {inject, observer} from 'mobx-react';
 
 import VisitsMap from '../components/VisitsMap';
-import VisitsGraph from '../components/VisitsGraph';
 import SetupWarning from '../components/SetupWarning';
 import CommentsList from '../components/CommentsList';
 import LoggedInLayout from '../components/LoggedInLayout';
+import StatsOverTimeGraph from '../components/StatsOverTimeGraph';
 
 @inject('dashboardStore')
 @observer
 class Dashboard extends React.Component {
   componentDidMount() {
-    this.props.dashboardStore.loadVisitsData();
-    this.props.dashboardStore.loadCommentsData();
+    this.props.dashboardStore.loadStats();
   }
 
   render() {
-    const {
-      popularPosts,
-      recentComments,
-      visitsByLocation,
-      mostCommentedPosts,
-      visitsHistogramData
-    } = this.props.dashboardStore;
-
     return (
       <LoggedInLayout>
-        <div className='content'>
+        <div className='elastiquill-content'>
           <SetupWarning />
-          <div className='row'>
-            <div className='col-12'>
-              {this._renderCard('Visits', (
-                <VisitsGraph histogramData={visitsHistogramData} />
-              ))}
-            </div>
-          </div>
-          <div className='row'>
-            <div className='col-12 col-md-6'>
-              {this._renderCard('Visits Map', (
-                <VisitsMap mapData={visitsByLocation} />
-              ))}
-              {this._renderCard('Referrals Stats', this._renderReferrals())}
-            </div>
-            <div className='col-12 col-md-6'>
-              {this._renderCard('Most viewed', this._renderPostsList(popularPosts, item => {
-                return <span>({item.visits_count} {item.visits_count > 1 ? 'views' : 'view'})</span>
-              }))}
-              {this._renderCard('Most commented', this._renderPostsList(mostCommentedPosts, item => {
-                return <span>({item.comments_count} {item.comments_count > 1 ? 'comments' : 'comment'})</span>
-              }))}
-              {this._renderCard('Recent comments', (
-                <CommentsList comments={recentComments} />
-              ))}
-            </div>
-          </div>
+          {this._renderContent()}
         </div>
       </LoggedInLayout>
     );
+  }
+
+  _renderContent() {
+    const {
+      postsCount,
+      beingLoaded,
+      popularPosts,
+      commentsCount,
+      recentComments,
+      visitsByLocation,
+      mostCommentedPosts
+    } = this.props.dashboardStore;
+
+    if (beingLoaded.length) {
+      return 'Loading...';
+    }
+
+    return (
+      <Fragment>
+        <div className='elastiquill-header'>Overview</div>
+        <div className='row' style={{ minHeight: '124px', marginBottom: '63px', marginLeft: -5 }}>
+          <div className='col-lg-3 mr-lg-4 elastiquill-card'>
+            <h1>{postsCount || 0}</h1>
+            <h2>Posts created</h2>
+          </div>
+          <div className='col-lg-3 elastiquill-card'>
+            <h1>{commentsCount || 0}</h1>
+            <h2>Comments on posts</h2>
+          </div>
+          <div className='col-lg-6' />
+        </div>
+
+        <div className='row' style={{ marginBottom: '41px' }}>
+          <div className='col-12'>
+            <div className='elastiquill-header'>Statistics over time</div>
+            <div className='elastiquill-card'>
+              <StatsOverTimeGraph />
+            </div>
+          </div>
+        </div>
+        
+        <div className='row' style={{ marginBottom: '41px' }}>
+          <div className='col-lg-8'>
+            <div className='elastiquill-header'>Visitors map</div>
+            <div className='elastiquill-card'>
+              <VisitsMap mapData={visitsByLocation} />
+            </div>
+          </div>
+          <div className='col-lg-4' style={{ display: 'flex', flexFlow: 'column' }}>
+            <div className='elastiquill-header'>Info</div>
+            <div className='elastiquill-card' style={{ flex: 1 }}>
+              {this._renderSection('Referrals Stats', this._renderReferrals())}
+              {this._renderSection('Most viewed', this._renderPostsList(popularPosts, item => {
+                return <span>({item.visits_count} {item.visits_count > 1 ? 'views' : 'view'})</span>
+              }))}
+              {this._renderSection('Most commented', this._renderPostsList(mostCommentedPosts, item => {
+                return <span>({item.comments_count} {item.comments_count > 1 ? 'comments' : 'comment'})</span>
+              }))}
+            </div>
+          </div>
+        </div>
+
+        <div className='row'>
+          <div className='col-12'>
+            <div className='elastiquill-header'>Recent comments</div>
+            <div className='elastiquill-card'>
+              <CommentsList comments={recentComments} />
+            </div>
+          </div>
+        </div>          
+      </Fragment>      
+    )
   }
 
   _renderReferrals() {
@@ -94,23 +132,21 @@ class Dashboard extends React.Component {
     }
 
     return (
-      <ul className='list-group'>
+      <div>
         {list.map(item => (
-          <li key={item.id} className='list-group-item p-2'>
+          <div key={item.id}>
             <a target='_blank' href={item.url}>{item.title}</a> {label(item)}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     )
   }
 
-  _renderCard(title, content) {
+  _renderSection(title, content) {
     return (
-      <div className='card'>
-        <div className='card-header'>
-          <strong className='card-title'>{title}</strong>
-        </div>
-        <div className='card-body'>
+      <div>
+        <strong>{title}</strong>
+        <div>
           {content}
         </div>
       </div>

@@ -154,22 +154,45 @@ export async function deleteComment(id) {
   });
 }
 
-export async function getCommentsStats({ postId }) {
+export async function getStats({ startDate, postId, interval = '1d' }) {
   let query = {
     match_all: {}
   };
 
+  const filters = [];
+
   if (postId) {
-    query = {
-      bool: {
-        filter: {
-          term: {
-            post_id: postId
-          }
+    filters.push({
+      term: {
+        post_id: postId
+      }
+    });
+  }
+
+  if (startDate) {
+    filters.push({
+      range: {
+        'published_at': {
+          gte: startDate
         }
       }
-    };
+    });
   }
+
+  if (filters.length) {
+    query = {
+      bool: {
+        filter: filters
+      }
+    };
+  }  
+
+  const countResp = await esClient.count({
+    index: ES_INDEX,
+    body: {
+      query
+    }
+  });
 
   const resp = await esClient.search({
     index: ES_INDEX,
@@ -187,12 +210,20 @@ export async function getCommentsStats({ postId }) {
             field: 'post_id',
             size: 5
           }
-        }
+        },
+        comments_histogram: {
+          date_histogram: {
+            field: 'published_at',
+            interval
+          }
+        }        
       }
     }
   });
 
   let mostCommentedPosts = [];
+  let commentsByDate = [];
+
   if (resp.aggregations) {
     const postIdsBuckets = resp.aggregations.post_ids.buckets;
     const posts = await blogPosts.getItemsByIds(postIdsBuckets.map(b => b.key));
@@ -200,11 +231,15 @@ export async function getCommentsStats({ postId }) {
        ...p,
        comments_count: _.find(postIdsBuckets, ['key', p.id]).doc_count
     }));
+
+    commentsByDate = resp.aggregations.comments_histogram.buckets;
   }
 
   return {
+    commentsByDate,
+    mostCommentedPosts,
     recentComments: resp.hits.hits.map(h => ({ ...h._source, id: h._id })),
-    mostCommentedPosts
+    commentsCount: countResp.count
   };
 }
 

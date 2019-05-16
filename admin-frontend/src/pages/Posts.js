@@ -4,7 +4,7 @@ import {inject, observer} from "mobx-react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
 import { ListGroup, ListGroupItem } from 'reactstrap';
-import { Button, ButtonGroup } from 'reactstrap';
+import { InputGroup, InputGroupAddon, Input, Button, ButtonGroup } from 'reactstrap';
 import { UncontrolledButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import LoggedInLayout from "../components/LoggedInLayout";
@@ -28,7 +28,7 @@ class Posts extends BaseItemsPage {
       <div>
         {this._renderContent({
           title: 'Posts',
-          newItem: 'New post',
+          newItem: 'Create a new post',
           noItems: 'No posts created yet',
           urlPart: this._getUrlPart()
         }, this.props.postsStore)}
@@ -46,10 +46,24 @@ class Posts extends BaseItemsPage {
   _renderNav() {
     return (
       <div style={{ display: 'inline-block', marginLeft: 5 }}>
-        <Button
-          onClick={() => this.props.postsStore.setImportModalOpen(true)}>
-          Import post
-        </Button>
+        <div style={{ display: 'flex' }}>
+          <Button
+            style={{ minWidth: 150, marginRight: 5 }}
+            className='elastiquill-button'
+            onClick={() => this.props.postsStore.setImportModalOpen(true)}>
+            Import post
+          </Button>
+          <InputGroup>
+            <Input
+              value={this.props.postsStore.searchQuery}
+              onChange={ev => this.props.postsStore.setSearchQuery(ev.target.value)}
+              onKeyPress={ev => ev.charCode === 13 && this.props.postsStore.loadPage(0)}
+              style={{ height: '100%' }} />
+            <InputGroupAddon addonType='append'>
+              <Button onClick={() => this.props.postsStore.loadPage(0)}>Search</Button>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
       </div>
     )
   }
@@ -100,10 +114,20 @@ class Posts extends BaseItemsPage {
       )
     };
 
+    const style = {
+      marginRight: 10,
+      margin: 0,
+      padding: 0,
+      background: 0,
+      border: 0,
+      boxShadow: 'none',
+      color: '#c3c4c3'
+    };
+
     return (
-      <UncontrolledButtonDropdown style={{ marginRight: 10 }}>
-        <DropdownToggle caret>
-          <i style={{ marginLeft: 5 }} className='fa fa-share-alt' />
+      <UncontrolledButtonDropdown>
+        <DropdownToggle style={style}>
+          <i style={{ marginRight: 10, fontSize: '18px' }} className='fa fa-share-alt' />
         </DropdownToggle>
         <DropdownMenu style={{ marginTop: 0, border: '1px solid #aaa' }}>
           <div style={{ paddingLeft: 10 }}>

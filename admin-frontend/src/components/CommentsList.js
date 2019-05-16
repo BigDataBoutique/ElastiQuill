@@ -9,8 +9,8 @@ function CommentsList(props) {
 
   return (
     <div>
-      {comments.map(comment => (
-        <div className='card card-body p-2' key={comment.comment_id}>
+      {comments.map((comment, i) => (
+        <div key={comment.comment_id}>
           <div style={{ display: 'flex', flexFlow: 'row' }}>
             <img
               style={{ width: 64, height: 64, marginRight: 10 }}
@@ -27,10 +27,10 @@ function CommentsList(props) {
               <div dangerouslySetInnerHTML={{ __html: comment.content }} />
             </div>
           </div>
-          <hr style={{ marginBottom: 5 }} />
-          <div>
+          <div style={{ marginTop: 10 }}>
             Commented on post <a target='_blank' href={comment.post_url}>"{comment.post_title}"</a>
           </div>
+          {i + 1 !== comments.length && <hr />}
         </div>
       ))}
     </div>

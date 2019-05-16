@@ -22,7 +22,7 @@ class Pages extends BaseItemsPage {
   render() {
     return this._renderContent({
       title: 'Content Pages',
-      newItem: 'New page',
+      newItem: 'Create a new content page',
       noItems: 'No pages created yet',
       urlPart: this._getUrlPart()
     }, this.props.pagesStore);

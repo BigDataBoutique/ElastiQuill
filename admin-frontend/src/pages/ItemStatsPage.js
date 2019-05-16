@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {inject, observer} from "mobx-react";
-import {Layout} from "../components/Layout";
-import {Redirect, withRouter} from "react-router-dom";
+import React, { Component, Fragment } from 'react';
+import { inject, observer } from 'mobx-react';
+import { Layout } from '../components/Layout';
+import { Redirect, withRouter } from 'react-router-dom';
 import LoggedInLayout from '../components/LoggedInLayout';
-import VisitsGraph from '../components/VisitsGraph';
+import StatsOverTimeGraph from '../components/StatsOverTimeGraph';
 import CommentsList from '../components/CommentsList';
-import urls from "../config/urls";
+import urls from '../config/urls';
 
 @inject('statsStore')
 @withRouter
@@ -32,34 +32,29 @@ class ItemStatsPage extends Component {
     }];
 
     return (
-      <LoggedInLayout pageTitle={item ? `Stats for "${item.title}"` : 'Loading...'} breadcrumbs={breadcrumbs}>
-        <div className='content'>
+      <LoggedInLayout pageTitle={item ? `Stats for '${item.title}'` : 'Loading...'} breadcrumbs={breadcrumbs}>
+        <div className='elastiquill-content'>
           <div className='row'>
-            <div className='col-12 col-md-6'>
-              <div className='card'>
-                <div className='card-header'>
-                  <strong className='card-title'>Visits</strong>
-                </div>
-                <div className='card-body'>
-                  <VisitsGraph
-                    histogramData={visitsHistogramData}
-                    mapData={visitsByLocation} />
-                </div>
+            <div className='col-12'>
+              <div className='elastiquill-card'>
+                <StatsOverTimeGraph
+                  key={item ? item.id : null}
+                  item={item} />
               </div>
             </div>
-            {this._getType() === 'post' && (
-              <div className='col-12 col-md-6'>
-                <div className='card'>
-                  <div className='card-header'>
-                    <strong className='card-title'>Recent comments</strong>
-                  </div>
-                  <div className='card-body'>
+          </div>
+          {this._getType() === 'post' && (
+            <Fragment>
+              <div className='elastiquill-header'>Comments</div>
+              <div className='row'>
+                <div className='col-12'>
+                  <div className='elastiquill-card'>
                     <CommentsList comments={recentComments} />
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            </Fragment>
+          )}
         </div>
       </LoggedInLayout>
     )

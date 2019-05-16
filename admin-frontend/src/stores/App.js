@@ -1,5 +1,4 @@
 import { action, computed, observable } from 'mobx';
-import md5 from 'md5';
 import localforage from 'localforage';
 import * as api from '../api';
 import { authFetch } from '../util';
@@ -60,7 +59,7 @@ class App extends BaseStore {
   @action
   setUser = (user) => {
     if (user) {
-      user.avatarUrl = `https://www.gravatar.com/avatar/${md5(user.email.toLowerCase().trim())}?size=100&default=identicon`;
+      user.avatarUrl = api.userAvatarUrl(user.email);
     }
 
     this.user = user;

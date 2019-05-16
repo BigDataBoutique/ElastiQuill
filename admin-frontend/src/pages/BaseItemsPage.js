@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import $ from 'jquery';
+import moment from 'moment';
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import classnames from 'classnames';
@@ -8,9 +10,15 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { Button, ButtonGroup, ListGroup, ListGroupItem } from 'reactstrap';
 
+import defaultItemImage from '../assets/img/default-post-image.jpg';
+import deleteIcon from '../assets/img/delete.svg';
+import editIcon from '../assets/img/edit.svg';
+import newWindowIcon from '../assets/img/newindow.svg';
 import LoggedInLayout from '../components/LoggedInLayout';
 import SetupWarning from '../components/SetupWarning';
+import FAIcon from '../components/FAIcon';
 import urls from '../config/urls';
+import * as api from '../api';
 
 class BaseItemsPage extends Component {
 
@@ -21,7 +29,10 @@ class BaseItemsPage extends Component {
     const toolbar = (
       <div>
         <Link to={`/new/${strings.urlPart}`}>
-          <Button>{strings.newItem}</Button>
+          <Button className='elastiquill-button'>
+            <FAIcon icon='plus' style={{ marginRight: '12px' }} />
+            {strings.newItem}
+          </Button>
         </Link>
         {this._renderNav && this._renderNav()}
       </div>
@@ -29,7 +40,7 @@ class BaseItemsPage extends Component {
 
     return (
       <LoggedInLayout pageTitle={strings.title} toolbar={toolbar}>
-        <div className='content'>
+        <div className='elastiquill-content'>
           <SetupWarning />
           {isLoading ? 'Loading...' : this._renderItems(strings, store)}
         </div>
@@ -43,22 +54,22 @@ class BaseItemsPage extends Component {
     if (totalPages === 0) {
       return (
         <div>
-          {strings.noItems}
+          {store.isSearchResult ? 'Nothing matched your search' : strings.noItems}
         </div>
       )
     }
 
     return (
       <div>
-        <ListGroup>
+        <div>
           {store.items.map((item, i) => {
             return (
-              <ListGroupItem key={i}>
+              <div key={i}>
                 {this._renderLineItem(item)}
-              </ListGroupItem>
+              </div>
             )
           })}
-        </ListGroup>
+        </div>
         {this._renderPagination(store)}
       </div>
     )
@@ -67,6 +78,66 @@ class BaseItemsPage extends Component {
   _renderLineItem(item) {
     const url = `${item.url}${_.isEmpty(item.private_viewing_key) ? '' : '?secret=' + item.private_viewing_key}`
     const urlPart = this._getUrlPart();
+
+    let imageSrc = item.metadata.header_image_url || defaultItemImage;
+
+    const onClick = ev => {
+      if ($(ev.target).closest('.elastiquill-icon-button').length) {
+        return;
+      }
+      this.props.history.push(`/stats/${urlPart}/` + item.id);
+    };
+
+    return (
+      <div      
+        className='elastiquill-card'
+        onClick={onClick}
+        style={{ display: 'flex', marginBottom: '24px', cursor: 'pointer' }}>
+        <img src={imageSrc} style={{ width: '170px', height: '153px', objectFit: 'cover' }}/>
+        <div style={{ display: 'flex', flexFlow: 'column', flex: 1, minWidth: '0px', paddingLeft: '33px' }}>
+          <div style={{ display: 'flex' }}>
+            <div style={{ flex: 1, paddingRight: 10 }} className='elastiquill-header-2 elastiquill-text-ellipsis'>{item.title}</div>
+            <div style={{ display: 'flex' }}>
+              {this._renderLineItemExtra && this._renderLineItemExtra(item)}
+              <div className='elastiquill-icon-button'>
+                <Link to={`/edit/${urlPart}/` + item.id}>
+                  <img src={editIcon} />
+                </Link>
+              </div>
+              <div className='elastiquill-icon-button'>
+                <a href={url} target='_blank'>
+                  <img src={newWindowIcon} />
+                </a>
+              </div>
+              <div onClick={() => this._getStore().setDeleteItemId(item.id)} className='elastiquill-icon-button'>
+                <img src={deleteIcon} />
+              </div>
+            </div>
+          </div>
+          <div style={{ marginTop: '10px' }} className='elastiquill-text elastiquill-text-ellipsis'>
+            {item.description || item.content}
+          </div>
+          <div style={{ marginTop: '16px' }}>
+            {item.tags && item.tags.map(t => (
+              <div key={t} className='elastiquill-tag'>{t}</div>
+            ))}
+          </div>
+          <div style={{ marginTop: 'auto', display: 'flex' }}>
+            <div className='elastiquill-text' style={{ flex: 1 }}>
+              <img
+                style={{ width: 31, height: 31, marginRight: 10 }}
+                className='rounded-circle'
+                src={api.userAvatarUrl(item.author.email)}
+                alt='User Avatar'/>
+              {item.author.name}
+            </div>
+            <div className='elastiquill-text' style={{ fontSize: '16px', opacity: 0.31 }}>
+              {moment(item.published_at).format('MMMM DD, YYYY')}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
 
     return (
       <div style={{ display: 'flex' }}>
