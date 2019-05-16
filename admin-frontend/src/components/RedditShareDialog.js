@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, {Component} from 'react';
 import ReactModal from 'react-modal';
-import { Button, ButtonGroup } from 'reactstrap';
+import { Button } from 'reactstrap';
 
 const MIN_SUBREDDIT_LENGTH = 3;
 

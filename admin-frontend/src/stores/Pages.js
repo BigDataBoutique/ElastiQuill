@@ -1,5 +1,4 @@
-import { action, computed, observable } from 'mobx';
-import localforage from 'localforage';
+import { action } from 'mobx';
 import ItemsStore from './ItemsStore';
 import * as api from '../api';
 

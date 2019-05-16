@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import ReactModal from 'react-modal';
 import { Button } from 'reactstrap';
 
 import BaseForm from './BaseForm';

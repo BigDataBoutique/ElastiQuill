@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import classnames from 'classnames';
 import {toast} from 'react-toastify';
 import LoggedInLayout from '../components/LoggedInLayout';
 import PostForm from '../components/PostForm';

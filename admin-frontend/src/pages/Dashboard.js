@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import {action, computed, observable} from 'mobx';
 import {inject, observer} from 'mobx-react';
 
 import VisitsMap from '../components/VisitsMap';

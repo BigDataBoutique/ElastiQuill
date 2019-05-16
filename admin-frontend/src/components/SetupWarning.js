@@ -1,7 +1,5 @@
 import React from 'react';
-import {action, computed, observable} from 'mobx';
-import {inject, observer} from 'mobx-react';
-import * as api from '../api';
+import { inject, observer } from 'mobx-react';
 
 @inject('setupStore')
 @observer

@@ -1,15 +1,7 @@
 import _ from 'lodash';
-import React, {Component} from 'react';
 import {inject, observer} from "mobx-react";
-import classnames from "classnames";
-import { Link } from "react-router-dom";
-import { ListGroup, ListGroupItem } from 'reactstrap';
-import { Button, ButtonGroup } from 'reactstrap';
 
-import LoggedInLayout from "../components/LoggedInLayout";
-import ContentPageForm from "../components/ContentPageForm";
 import BaseItemsPage from "./BaseItemsPage";
-import urls from "../config/urls";
 import * as api from '../api';
 
 @inject('pagesStore')
