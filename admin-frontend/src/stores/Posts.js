@@ -2,7 +2,6 @@ import _ from 'lodash';
 import React from 'react';
 import { action, computed, observable } from 'mobx';
 import { toast } from 'react-toastify';
-import localforage from 'localforage';
 import ItemsStore from './ItemsStore';
 import * as api from '../api';
 

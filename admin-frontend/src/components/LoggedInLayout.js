@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Collapse, Navbar, NavbarToggler, Nav, NavItem } from 'reactstrap';
-import { Link, Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react/index';
 import classnames from 'classnames';
 
@@ -9,9 +9,6 @@ import NavLink from './NavLink';
 import { Layout } from './Layout';
 import urls from '../config/urls';
 import logo from '../assets/img/logo.png';
-import dashboardIcon from '../assets/img/dashboard.svg'
-import postsIcon from '../assets/img/pages.svg'
-import contentPagesIcon from '../assets/img/posts.svg'
 
 
 @inject('appStore')

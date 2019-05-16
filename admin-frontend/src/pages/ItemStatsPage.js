@@ -1,11 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Layout } from '../components/Layout';
-import { Redirect, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import LoggedInLayout from '../components/LoggedInLayout';
 import StatsOverTimeGraph from '../components/StatsOverTimeGraph';
 import CommentsList from '../components/CommentsList';
-import urls from '../config/urls';
 
 @inject('statsStore')
 @withRouter

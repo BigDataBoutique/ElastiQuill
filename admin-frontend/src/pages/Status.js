@@ -1,7 +1,5 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import { action, computed, observable } from 'mobx';
-import { inject, observer } from 'mobx-react';
 import { UncontrolledTooltip, Badge } from 'reactstrap';
 
 import LoggedInLayout from '../components/LoggedInLayout';

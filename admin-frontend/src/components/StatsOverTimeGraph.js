@@ -2,7 +2,6 @@ import React from 'react';
 import moment from 'moment';
 import {
   FlexibleXYPlot,
-  XYPlot,
   XAxis,
   YAxis,
   Borders,

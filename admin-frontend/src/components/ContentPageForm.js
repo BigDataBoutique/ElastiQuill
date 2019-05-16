@@ -1,5 +1,4 @@
-import React, { Component, Fragment } from 'react';
-import ReactModal from 'react-modal';
+import React, { Fragment } from 'react';
 import { Button } from 'reactstrap';
 import ReactSelect from 'react-select';
 
