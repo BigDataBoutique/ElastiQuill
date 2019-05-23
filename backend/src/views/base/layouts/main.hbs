@@ -1,32 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {{> head}}
+  {{> head}}
 </head>
 <body>
-  <div class="boxed animated fadeIn animation-delay-5">
-    <div id="all-but-footer">
-      {{> header}}
-      <div class="container">
-        {{#if isContentPage}}
-        <div class="row">
-          <main class="col-md-12">
-            {{{body}}}
-          </main>
-        </div>
-        {{else}}
-        <div class="row">
-          <main class="col-md-8">
-            {{{body}}}
-          </main>
-          <aside class="col-md-4" id="sidebar">
-            {{> sidebar}}
-          </aside>
-        </div>        
-        {{/if}}
-      </div>
-    </div>
-    {{> footer}}
+  <div class="non-footer-content">
+    {{> header}}
+    {{{body}}}
   </div>
+  {{> footer}}  
+
+  <!-- Optional JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
 </html>

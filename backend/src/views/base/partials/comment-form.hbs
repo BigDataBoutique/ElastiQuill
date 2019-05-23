@@ -1,39 +1,42 @@
-<div id="comment-form" class="panel panel-default panel-body" style="display:none; min-height: 330px;">
-<form action="" method="POST">
-  {{#if comments.error}}
-  <div class="alert alert-danger">
-    {{comments.error}}
-  </div>
-  {{/if}}
-  <div class="form-group {{comments.validity.author}}">
-    <label for="inputAuthor">Author</label>
-    <input type="text" name='author' value="{{comments.values.author}}" class="form-control" id="inputAuthor" placeholder="Author">
-  </div>
-  <div class="form-group {{comments.validity.email}}">
-    <label for="inputEmail">Email</label>
-    <input type="email" name='email' value="{{comments.values.email}}" class="form-control" id="inputEmail" placeholder="Email">
-  </div>
-  <div class="form-group {{comments.validity.website}}">
-    <label for="inputWebsite">Website (optional)</label>
-    <input type="text" name='website' value="{{comments.values.website}}" class="form-control" id="inputWebsite" placeholder="Website">
-  </div>
-  <div class="form-group {{comments.validity.content}}">
-    <label for="textareaContent">Your comment</label>
-    <textarea name='content' id="textareaContent" class="form-control">{{comments.values.content}}</textarea>
-  </div>
-  <div class="form-group">
-    <div class="g-recaptcha" data-sitekey="{{recaptchaClientKey}}"></div>
-  </div>
-  <input id="recipient-hidden-input" type="hidden" name='recipient_path'>
-  <div class="form-group">
-    <input class="btn btn-primary" type="submit" value="Submit">
-    <button class="btn btn-secondary" type="button" onclick="onClickCancelReply()">Cancel</button>
-  </div>
-</form>
+<div id="comment-form" class="comments-widget__form">
+  <h2>Leave a Comment</h2>
+  <form method="post">
+    {{#if comments.error}}
+    <div class="alert alert-danger">
+      {{comments.error}}
+    </div>
+    {{/if}}    
+    <div class="form-group my-3">
+      <label class="my-5" for="inputAuthor">Name *</label>
+      <input type="text" class="form-control" id="inputAuthor"
+      placeholder="Your Name" name="author" value="{{comments.values.author}}">
+    </div>
+    <div class="form-group my-3">
+      <label class="my-5" for="inputEmail">Email *</label>
+      <input type="email" class="form-control" id="inputEmail"
+      placeholder="example@example.com" name="email" value="{{comments.values.email}}">
+    </div>
+    <div class="form-group my-3">
+      <label class="my-5" for="inputWebsite">Website </label>
+      <input type="text" class="form-control" id="inputWebsite"
+      placeholder="http://website.com" name="website" value="{{comments.values.website}}">
+    </div>
+    <div class="form-group my-3">
+      <label class="my-5" for="textareaContent">Your Comment</label>
+      <textarea class="form-control" id="textareaContent" name="content"
+      rows="6">{{comments.values.content}}</textarea>
+    </div>
+    <div class="form-group my-3">
+      <div class="g-recaptcha" data-sitekey="{{recaptchaClientKey}}"></div>
+    </div>
+    <input id="recipient-hidden-input" type="hidden" name='recipient_path'>
+    <button type="submit" class="btn my-3 submit-comment">Submit</button>
+    <button style="display: none;" type="button" class="btn my-3 cancel-comment" onclick="onClickReply()">Cancel</button>
+  </form>
 </div>
 
 <script type="text/javascript">
     window.COMMENTS_RECIPIENT_PATH = '{{{comments.values.recipient_path}}}';
     window.COMMENTS_ERROR = '{{{comments.error}}}';
 </script>
-<script src="/static/base/javascripts/comments.js"></script>
+<script src="/static/base/js/comments.js"></script>

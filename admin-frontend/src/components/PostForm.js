@@ -22,7 +22,6 @@ class PostForm extends BaseForm {
       <div className='row'>
         <div className='col-6'>
           {this._renderTextarea({ placeholder: 'Description', maxLength: 300, prop: 'description', optional: true })}
-          {this._renderSimpleInput({ className: 'form-control', placeholder: 'Canonical URL', prop: 'metadata.canonical_url', optional: true })}
           {this._renderFileInput({ label: 'Header image URL', prop: 'metadata.header_image_url' })}
         </div>
         <div className='col-6'>

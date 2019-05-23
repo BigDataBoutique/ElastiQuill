@@ -57,6 +57,8 @@ spec:
 #        env:
 #        - name: BLOG_THEME_PATH
 #          value: /etc/elastiquill-theme/theme
+        - name: BLOG_LOGS_PERIOD
+          value: monthly
         volumeMounts:
         - name: elastiquill-config
           mountPath: /etc/elastiquill

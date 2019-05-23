@@ -1,25 +1,41 @@
-<header class="blog-header" style="background-image: url({{#if headerImageUrl}}{{headerImageUrl}}{{else}}'/static/base/images/daylight-environment-forest-459225.jpg'{{/if}});">
-  <nav class="navbar navbar-default">
-    <div class="container">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">ElastiQuill</a>
-      </div>
-
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="/contact">Contact</a></li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
+<header class="container">
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="/">
+      <img src="/static/base/img/logo.svg" width="160" height="29" class="d-inline-block align-top" alt="">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav w-100 justify-content-end">
+        <li class="nav-item mx-4" style="line-height: 34px;">
+          {{> search-widget}}
+        </li>
+        <li class="nav-item mx-4" style="line-height: 34px;">
+          <a href="{{blogRoutePrefix}}/rss" target="_blank">
+            <i style="padding: 0rem 0.5rem" class="fas fa-rss"></i>
+          </a>
+        </li>
+        <li class="nav-item mx-4">
+          <a class="nav-link" href="/contact">Contact</a>
+        </li>
+        <li class="nav-item mx-4">
+          <a class="nav-link nav-login" href="{{adminRoute}}">Login</a>
+        </li>
+      </ul>
     </div>
   </nav>
+  {{#if (and posts.length (eq pageNum 1) (eq template "index"))}}
+    {{> fresh-post (head posts)}}
+  {{/if}}
+  {{#if (or (eq template "tagged") (eq template "series")) }}
+    <div class="blog-title my-5">
+      {{#if tagDescription}}
+        <h1><span>Blog /</span> {{tagDescription.title}}</h1>
+      {{else}}
+        <h1><span>Blog /</span> {{tag}}{{series}}</h1>
+      {{/if}}
+    </div>
+  {{/if}}
 </header>
-
-

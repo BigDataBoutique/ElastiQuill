@@ -1,8 +1,0 @@
-{{#if tags}}
-<span class="tags">
-  tagged
-{{#each tags}}
-  <a href="/blog/tagged/{{toLowerCase this}}">{{this}}</a>{{#if @last}}{{else}},{{/if}}
-{{/each}}
-</span>
-{{/if}}

@@ -59,6 +59,11 @@ if (BLOG_THEME_PATH) {
 
 export const hbs = exphbs({
   helpers: {
+    eq: (arg1, arg2) => arg1 == arg2,
+    or: (...args) => _.some(args.slice(0, -1)),
+    and: (...args) => _.every(args.slice(0, -1)),
+    head: xs => xs[0],
+    tail: xs => xs.slice(1),
     truncateHtml: require('truncate-html'),
     toLowerCase: s => s.toLowerCase()
   },
@@ -208,6 +213,7 @@ function initConfig() {
     ['blog.admin-route', 'ADMIN_ROUTE', '/admin'],
     ['blog.admin-frontend-path', 'ADMIN_FRONTEND_PATH', './build'],
     ['blog.uploads-bucket-prefix', 'UPLOADS_BUCKET_PREFIX', ''],
+    ['blog.default-header-image', 'DEFAULT_HEADER_IMAGE', '/static/base/img/default.jpg'],
     ['credentials.google.analytics-code', 'GOOGLE_ANALYTICS_CODE'],
     ['credentials.google.oauth-client-id', 'GOOGLE_OAUTH_CLIENT_ID'],
     ['credentials.google.oauth-client-secret', 'GOOGLE_OAUTH_CLIENT_SECRET'],
@@ -246,6 +252,13 @@ function initConfig() {
   });
 
   config.blog['admin-emails'] = new EmailString(config.blog['admin-emails']);
+
+  config.blog['blog-route-prefix'] = _.trimEnd(config.blog['blog-route-prefix'], '/');
+  const adminRoute = _.trimEnd(config.blog['admin-route'], '/');
+  if (! adminRoute.length) {
+    throw new Error(`Invalid admin route: "${config.blog['admin-route']}"`)
+  }
+  config.blog['blog.admin-route'] = adminRoute;
 
   return config;
 }

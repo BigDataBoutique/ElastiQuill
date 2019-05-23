@@ -73,8 +73,13 @@ router.use(BLOGPOST_ROUTE, (req, res, next) => {
 events.onChange('post', post => clearPageCache(blogpostUrl(post)));
 router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
   const { slug, isJson } = parseSlug(req.params.slug);
+  
+  let post = await blogPosts.getItemById({
+    id: blogPosts.BLOGPOST_ID_PREFIX + req.params.id,
+    withComments: true,
+    moreLikeThis: true
+  });
 
-  let post = await blogPosts.getItemById(blogPosts.BLOGPOST_ID_PREFIX + req.params.id, true);
   if (post.slug !== slug) {
     res.redirect(blogpostUrl(post));
     return;
@@ -122,7 +127,10 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
   let isSpam = false;
 
   const postId = blogPosts.BLOGPOST_ID_PREFIX + req.params.id;
-  const post = preparePost(await blogPosts.getItemById(postId, true));
+  const post = preparePost(await blogPosts.getItemById({
+    id: postId,
+    withComments: true
+  }));
 
   if (! post.allow_comments) {
     res.redirect(req.originalUrl);
@@ -228,7 +236,11 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
       values: commentError ? req.body : null
     },
     recaptchaClientKey: recaptcha.clientKey(),
-    post: preparePost(await blogPosts.getItemById(postId, true))
+    post: preparePost(await blogPosts.getItemById({
+      id: postId,
+      withComments: true,
+      moreLikeThis: true
+    }))
   });
 }));
 
@@ -261,7 +273,7 @@ function handlePostsRequest(template) {
 
     if (series) {
       try {
-        const item = await blogPosts.getItemById(blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + '{' + series + '}');
+        const item = await blogPosts.getItemById({ id: blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + '{' + series + '}' });
         tagDescription = preparePage(item);
       }
       catch (err) {
@@ -272,7 +284,7 @@ function handlePostsRequest(template) {
     }
     else if (tag) {
       try {
-        const item = await blogPosts.getItemById(blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + tag);
+        const item = await blogPosts.getItemById({ id: blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + tag });
         tagDescription = preparePage(item);
       }
       catch (err) {
@@ -285,6 +297,8 @@ function handlePostsRequest(template) {
     res.render(template, {
       tag,
       total,
+      series,
+      template,
       totalPages,
       tagDescription,
       searchQuery: req.query.q,

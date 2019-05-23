@@ -1,9 +1,15 @@
-<header class="page-title">
-{{#if tagDescription}}
-  <h1 class="content-title">{{tagDescription.title}}<h1/>
-  <p>{{{tagDescription.content}}}<p/>
-{{/if}}
-</header>
-{{#each posts}}
-{{> post this}}
-{{/each}}
+<div class="container">
+  <div class="row">
+    <main class="col-md-9">
+      {{#if tagDescription}}
+        <p class="header-text">{{{tagDescription.content}}}</p>
+      {{/if}}
+      {{#each posts}}
+      {{> post this}}
+      {{/each}}
+    </main>
+    <aside class="col-md-3 sidebar">
+      {{> sidebar}}
+    </aside>
+  </div>
+</div>

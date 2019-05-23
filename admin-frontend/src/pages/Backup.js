@@ -2,7 +2,6 @@ import React from 'react';
 import { toast } from 'react-toastify';
 
 import LoggedInLayout from '../components/LoggedInLayout';
-import SetupWarning from '../components/SetupWarning';
 import * as api from '../api';
 
 
@@ -11,7 +10,6 @@ class Backup extends React.Component {
     return (
       <LoggedInLayout pageTitle={'Backup'}>
         <div className='elastiquill-content'>
-          <SetupWarning />
           <div className='row'>
             <div className='col-12'>
               <div className='elastiquill-card'>

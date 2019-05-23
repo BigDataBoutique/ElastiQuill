@@ -11,7 +11,7 @@ const router = express.Router();
 hbs.registerAsyncHelper('embedContentPage', async (id) => {
   let page;
   try {
-    page = await blogPosts.getItemById(id);    
+    page = await blogPosts.getItemById({ id });
   }
   catch (err) {
     return `<div class="alert alert-danger">Invalid embed: ${id}</div>`;
@@ -22,7 +22,7 @@ hbs.registerAsyncHelper('embedContentPage', async (id) => {
 router.get('/:slug', cachePageHandler(asyncHandler(async (req, res, next) => {
   let page;
   try {
-    page = await blogPosts.getItemById(req.params.slug);    
+    page = await blogPosts.getItemById({ id: req.params.slug });
   }
   catch (err) {
     next();

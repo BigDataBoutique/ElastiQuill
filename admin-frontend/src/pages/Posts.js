@@ -7,6 +7,7 @@ import { ListGroup, ListGroupItem } from 'reactstrap';
 import { InputGroup, InputGroupAddon, Input, Button, ButtonGroup } from 'reactstrap';
 import { UncontrolledButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
+import FAIcon from '../components/FAIcon';
 import LoggedInLayout from "../components/LoggedInLayout";
 import ImportPostModal from "../components/ImportPostModal";
 import RedditShareDialog from "../components/RedditShareDialog";
@@ -45,12 +46,13 @@ class Posts extends BaseItemsPage {
 
   _renderNav() {
     return (
-      <div style={{ display: 'inline-block', marginLeft: 5 }}>
+      <div className='elastiquill-nav-submenu-extra'>
         <div style={{ display: 'flex' }}>
           <Button
+            color='link'
             style={{ minWidth: 150, marginRight: 5 }}
-            className='elastiquill-button'
             onClick={() => this.props.postsStore.setImportModalOpen(true)}>
+            <FAIcon icon='cloud-download-alt' style={{ marginRight: '12px' }} />
             Import post
           </Button>
           <InputGroup>
@@ -60,7 +62,9 @@ class Posts extends BaseItemsPage {
               onKeyPress={ev => ev.charCode === 13 && this.props.postsStore.loadPage(0)}
               style={{ height: '100%' }} />
             <InputGroupAddon addonType='append'>
-              <Button onClick={() => this.props.postsStore.loadPage(0)}>Search</Button>
+              <Button onClick={() => this.props.postsStore.loadPage(0)}>
+                <FAIcon icon='search' />
+              </Button>
             </InputGroupAddon>
           </InputGroup>
         </div>

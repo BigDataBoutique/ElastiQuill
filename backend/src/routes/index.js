@@ -13,7 +13,7 @@ import { authInfoTokenMiddleware } from './auth';
 import * as blogPosts from '../services/blogPosts';
 import * as logging from '../services/logging';
 import * as cache from '../services/cache';
-import { preparePost } from './util';
+import { preparePost, tagUrl, seriesUrl } from './util';
 import { config } from '../app';
 
 const BLOG_ROUTE_PREFIX = config.blog['blog-route-prefix'];
@@ -71,12 +71,22 @@ router.use(asyncHandler(async (req, res, next) => {
 
   res.locals.adminRoute = config.blog['admin-route'];
   res.locals.isLocalhost = config.blog.url.startsWith('http://localhost');
+  res.locals.blogRoutePrefix = BLOG_ROUTE_PREFIX;
+  res.locals.blogTitle = config.blog['title'];
+  res.locals.blogDescription = config.blog['description'];
 
   res.locals.sidebarWidgetData = await cache.cacheAndReturn('sidebar-widget-data', async () => {
-    const { items, allTags } = await blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 });
+    const { items, allTags, allSeries } = await blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 });
     return {
       recentPosts: items.map(preparePost),
-      allTags
+      allTags: allTags.map(t => ({
+        ...t,
+        url: tagUrl(t.key)
+      })),
+      allSeries: allSeries.map(t => ({
+        ...t,
+        url: seriesUrl(t.key)
+      }))      
     };
   });  
 

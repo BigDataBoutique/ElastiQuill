@@ -15,21 +15,19 @@ function onClickReply(btn) {
     }
     path.reverse();
 
-    $(btn).closest('.comment').find('.list-unstyled').eq(0).prepend(commentForm);
+    $(btn).closest('.comment').find('.replies-container').eq(0).prepend(commentForm);
     $('#recipient-hidden-input').val(JSON.stringify(path));
+    $('.cancel-comment').show();
   }
   else {
-    $('#comments-container').after(commentForm);
+    $('#comments-container').append(commentForm);
     $('#recipient-hidden-input').val('');
-    $('#btn-add-comment').hide();
+    $('.cancel-comment').hide();
   }
 
   commentForm.show();
 }
-function onClickCancelReply() {
-  $("#comment-form").hide();
-  $('.btn-add-comment').show();
-}
+
 $(function() {
   var commentFormPath = null;
   try { commentFormPath = JSON.parse(COMMENTS_RECIPIENT_PATH); } catch {}

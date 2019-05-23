@@ -1,0 +1,37 @@
+<article class="fresh-post">
+  <div class="fresh-post__img">
+    <a href="{{this.url}}"><img src="{{#if this.metadata.header_image_url}}{{{this.metadata.header_image_url}}}{{else}}/static/base/img/post1.jpg{{/if}}" alt=""></a>
+  </div>
+  <div class="post-content">
+      <h5 class="fresh-title">Fresh From the Oven</h5>
+      <a href="{{this.url}}">
+        <h5 class="post-title">{{this.title}}<br></h5>
+      </a>
+      {{#if this.reading_time}}
+      <span class="read">{{this.reading_time}}</span>
+      {{/if}}
+      <div class="post-author__container d-flex justify-content-between">
+        <div class="post-author">
+          <a href="#"><img src="{{this.author.avatar}}" alt="">
+            <span class="author-name">{{this.author.name}}</span>
+          </a>
+        </div>
+        <div class="post-date">
+          {{this.published_at_str}}
+        </div>
+      </div>
+      <div class="post-excerpt">{{{this.excerpt}}}</div>
+      <div class="post-badges">
+        {{#if series}}
+        <a href="{{series_url}}">
+          <div class="series-badge badge my-4">{{series}}</div>
+        </a>
+        {{/if}}        
+        {{#each tags}}
+          <a href="{{this.url}}">
+            <div class="tags-badge badge">{{this.key}}</div>
+          </a>
+        {{/each}}
+      </div>      
+  </div>
+</article>

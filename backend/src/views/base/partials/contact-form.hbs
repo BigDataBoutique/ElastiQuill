@@ -10,33 +10,34 @@
   </div>
   {{/if}}
   <div class="form-row">
-    <div class="form-group {{validity.name}} col-md-6">
+    <div class="form-group {{validity.name}} col-md-6 my-3">
       <label for="inputName">Name</label>
-      <input type="text" name='name' value="{{values.name}}" class="form-control" id="inputName" placeholder="Name">
+      <input type="text" name='name' value="{{values.name}}" class="form-control" id="inputName">
     </div>
-    <div class="form-group {{validity.email}} col-md-6">
+    <div class="form-group {{validity.email}} col-md-6 my-3">
       <label for="inputEmail">Email</label>
-      <input type="email" name='email' value="{{values.email}}" class="form-control" id="inputEmail" placeholder="Email">
+      <input type="email" name='email' value="{{values.email}}" class="form-control" id="inputEmail">
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group {{validity.subject}} col-md-12">
+    <div class="form-group {{validity.subject}} col-md-12 my-3">
       <label for="inputSubject">Subject</label>
-      <input type="subject" name='subject' value="{{values.subject}}" class="form-control" id="inputSubject" placeholder="Subject">
+      <input type="subject" name='subject' value="{{values.subject}}" class="form-control" id="inputSubject">
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group {{validity.content}} col-md-12">
-      <textarea name='content' class="form-control">{{values.content}}</textarea>
+    <div class="form-group {{validity.content}} col-md-12 my-3">
+      <label for="inputContent">Message</label>
+      <textarea name='content' class="form-control" id="inputContent" rows="6">{{values.content}}</textarea>
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group col-md-12">
+    <div class="form-group col-md-12 my-3">
       <div class="g-recaptcha" data-sitekey="{{recaptchaClientKey}}"></div>
     </div>
   </div>  
   <div class="form-row">
-    <div class="form-group col-md-12">
+    <div class="form-group col-md-12 my-3">
       <input class="btn btn-primary" type="submit" value="Submit">
     </div>
   </div>

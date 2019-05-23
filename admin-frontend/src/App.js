@@ -1,9 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'flag-icon-css/css/flag-icon.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'typeface-nunito-sans';
 import './App.css';
 
 import React, { Component } from 'react';
+import ReactModal from 'react-modal';
 import { hot } from 'react-hot-loader';
 import { reaction } from "mobx";
 import { Provider } from "mobx-react";
@@ -34,6 +36,10 @@ class App extends Component {
     );
   }
 
+  componentDidMount() {
+    ReactModal.setAppElement(document.getElementById('elastiquill-root'));
+  }
+
   render() {
     const privateRoutes = [
       { path: '/', component: () => <Redirect to={urls.defaultUrl}/> },
@@ -50,7 +56,7 @@ class App extends Component {
 
     return <Provider {...stores}>
       <HashRouter>
-        <div>
+        <div id='elastiquill-root'>
           <Switch>
             <Route path={urls.login} component={pages.Login}/>
             {privateRoutes.map(route => {

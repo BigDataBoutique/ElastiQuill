@@ -11,6 +11,7 @@ export const CONTENT_DESCRIPTION_ID_PREFIX = 'content:description:';
 
 const ES_INDEX = config.elasticsearch['blog-index-name'];
 const SERIES_REGEXP_STR = '\{.*\}';
+const SERIES_REGEXP = new RegExp(SERIES_REGEXP_STR);
 const SLUG_MAX_LENGTH = 100;
 
 export const CreatePostArgSchema = Joi.object().keys({
@@ -84,18 +85,24 @@ const UpdateContentPageArgSchema = Joi.object().keys({
   }).required(),
 });
 
-export async function getItemById(id, withComments = false) {
+export async function getItemById({ id, withComments = false, moreLikeThis = false }) {
   const resp = await esClient.get({
     index: ES_INDEX,
     type: '_doc',
     id
   });
 
+  const item = prepareHit(resp);
+
   if (withComments) {
-    resp._source.comments = await commentsService.getComments([ id ]);
+    item.comments = await commentsService.getComments([ id ]);
   }
 
-  return prepareHit(resp);
+  if (moreLikeThis) {
+    item.more_like_this = await getMoreLikeThis(id);
+  }
+
+  return item;
 }
 
 export async function getItemsByIds(ids, withComments = false) {
@@ -179,7 +186,7 @@ export async function createItem(type, post) {
 }
 
 export async function deleteItem(id) {
-  const item = await getItemById(id);
+  const item = await getItemById({ id });
   await esClient.delete({
     id,
     index: ES_INDEX,
@@ -226,11 +233,36 @@ export async function updateItem(id, type, post) {
       doc
     }
   });
-  const updatedItem = await getItemById(id);
+  const updatedItem = await getItemById({ id });
 
   events.emitChange(updatedItem.type, updatedItem);
 
   return updatedItem;
+}
+
+export async function getMoreLikeThis(itemId) {
+  let resp = await esClient.search({
+    index: ES_INDEX,
+    ignore_unavailable: true,
+    size: 3,
+    body: {
+      query: {
+        more_like_this: {
+          fields: ['title', 'content'],
+          like: [
+            {
+              _index: ES_INDEX,
+              _id: itemId
+            }
+          ],
+          min_term_freq : 1,
+          max_query_terms : 12
+        }
+      }
+    }
+  });
+
+  return resp.hits.hits.map(prepareHit);
 }
 
 export async function getAllItems({ type, series }) {
@@ -289,7 +321,10 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
       aggs: {
         tags: {
           terms: { field: 'tags', exclude: SERIES_REGEXP_STR, size: 50 }
-        }
+        },
+        series: {
+          terms: { field: 'tags', include: SERIES_REGEXP_STR, size: 50 }
+        }        
       },
       highlight: {
         pre_tags: ["<em class='search-highlight'>"],
@@ -341,8 +376,17 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
   const comments = await commentsService.getComments(items.map(p => p.id));
   items.forEach(item => item.comments = comments.filter(c => c.post_id === item.id));
 
+  let allSeries = [];
+  if (resp.aggregations) {
+    allSeries = resp.aggregations.series.buckets.map(b => ({
+      ...b,
+      key: stripSeriesTag(b.key)
+    }));
+  }
+
   return {
     items,
+    allSeries,
     allTags: resp.aggregations ? resp.aggregations.tags.buckets : [],
     total: resp.hits.total,
     totalPages: Math.ceil(resp.hits.total / pageSize)
@@ -420,7 +464,7 @@ export async function getAllTags() {
     tags: resp.aggregations.tags.buckets.map(b => b.key),
     series: resp.aggregations.series.buckets.map(b => stripSeriesTag(b.key)),
   }
-};
+}
 
 async function indexWithUniqueId(indexProps) {
   const MAX_TRIES = 100;
