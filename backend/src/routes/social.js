@@ -13,7 +13,7 @@ router.get('/availability', asyncHandler(async (req, res) => {
 }));
 
 router.post('/post/linkedin/:id', asyncHandler(async (req, res) => {
-  const post = await blogPosts.getItemById(req.params.id);
+  const post = await blogPosts.getItemById({ id: req.params.id });
   if (! req.user.connected.linkedin) {
     throw new Error('Linkedin is not connected');
   }

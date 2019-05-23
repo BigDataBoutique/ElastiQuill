@@ -18,7 +18,7 @@ import * as api from '../api';
 
 const VISITS_COLOR = '#2196f3';
 const VIEWS_COLOR = '#000dc8';
-const POSTS_COLOR = '#66dddc';
+const POSTS_COLOR = '#d9156d';
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 class StatsOverTimeGraph extends React.Component {
@@ -181,6 +181,7 @@ class StatsOverTimeGraph extends React.Component {
     }
     else {
       startDate.setDate(1);
+      today.setDate(1);
       let date = moment(startDate);
       while (date.toDate().getTime() < today.getTime()) {
         date.add(1, 'months');
@@ -205,27 +206,14 @@ class StatsOverTimeGraph extends React.Component {
       return data.filter(item => item.y > 0);
     }
 
-    const startDate = this._normalizeDate(this._getStartDate());
-    const today = this._normalizeDate(new Date());
-
-    let first = startDate;
-    let last = today;
-
     if (data.length) {
-      first = _.first(data).x;
-      last = _.last(data).x;
+      const { interval } = this._getInterval();
+      const zeroItem = {
+        x: new Date(_.first(data).x.getTime() - interval),
+        y: 0
+      };
+      data = [zeroItem].concat(data);
     }
-
-    const { interval } = this._getInterval();
-
-    const startRange = [];
-    for (let i = startDate.getTime() + interval; i < first.getTime(); i += interval) {
-      startRange.push({ x: new Date(i), y: 0 });
-    }
-    for (let i = last.getTime(); i < today.getTime(); i += interval) {
-      data.push({ x: new Date(i), y: 0 });
-    }
-    data = startRange.concat(data);    
 
     return data;
   }

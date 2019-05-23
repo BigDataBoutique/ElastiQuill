@@ -77,6 +77,8 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
     });
   }
 
+  const visitsPerDayAgg = interval === '1d' ? 'visits_histogram' : 'visits_per_day';
+
   const query = {
     index: LOGS_INDICES_PREFIX + '*',
     body: {
@@ -92,12 +94,33 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
             precision : 3
           }
         },
+        posts: {
+          filter: {
+            term: {
+              'read_item.type': 'post'
+            }
+          },
+          aggs: {
+            by_views: {
+              terms: {
+                field: 'read_item.id',
+                size: 1
+              }
+            }
+          }
+        },
+        visits_by_country: {
+          terms: {
+            field: 'source.geo.country_iso_code',
+            size: 10
+          }
+        },
         visits_histogram: {
           date_histogram: {
             field: '@timestamp',
             interval
           }
-        },        
+        },
         views_histogram: {
           filter: {
             term: {
@@ -110,7 +133,12 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
                 field: '@timestamp',
                 interval
               }              
-            }
+            }            
+          }
+        },
+        avg_visits_per_day: {
+          avg_bucket: {
+            buckets_path: visitsPerDayAgg + '>_count'
           }
         },
         referrer_type: {
@@ -129,6 +157,15 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
     }
   };
 
+  if (interval !== '1d') {
+    query.body.aggs.visits_per_day = {
+      date_histogram: {
+        field: '@timestamp',
+        interval: '1d'
+      }
+    };
+  }
+
   if (! postId) {
     query.body.aggs.posts_visits = {
       filter: {
@@ -146,7 +183,11 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
   }
 
   const resp = await esClient.search(query);
-  let visits_by_date = [],
+  let avg_visits_per_day = 0,
+      most_busy_day = null,
+      most_viewed_post = null,
+      visits_by_country = [],
+      visits_by_date = [],
       views_by_date = [],
       visits_by_location = [],
       popular_posts = [],
@@ -154,14 +195,28 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
       referrer_from_domain = [];
 
   if (resp.aggregations) {
+    avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
     visits_by_date = resp.aggregations.visits_histogram.buckets;
     views_by_date = resp.aggregations.views_histogram.views.buckets;
+    visits_by_country = resp.aggregations.visits_by_country.buckets;
     visits_by_location = resp.aggregations.visits_by_location.buckets.map(bucket => ({
       location: geohash.decode_bbox(bucket.key),
       visits: bucket.doc_count
     }));
+
+    const mostViewedPost = _.first(resp.aggregations.posts.by_views.buckets);
+    if (mostViewedPost) {
+      most_viewed_post = await blogPosts.getItemById({ id: mostViewedPost.key });
+      most_viewed_post.views_count = mostViewedPost.doc_count;
+    }
+
+    const largestBucket = _.maxBy(_.get(resp.aggregations, visitsPerDayAgg + '.buckets'), b => b.doc_count);
+    most_busy_day = largestBucket ? {
+      date: new Date(largestBucket.key),
+      count: largestBucket.doc_count
+    } : null;
 
     if (resp.aggregations.posts_visits) {
       const postsVisitsBuckets = resp.aggregations.posts_visits.visits.buckets;
@@ -173,8 +228,12 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
   }
 
   return {
+    avg_visits_per_day,
+    most_viewed_post,
+    most_busy_day,
     views_by_date,
     visits_by_date,
+    visits_by_country,
     visits_by_location,
     popular_posts,
     referrer_type,

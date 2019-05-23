@@ -14,7 +14,7 @@ function CommentsList(props) {
           <div style={{ display: 'flex', flexFlow: 'row' }}>
             <img
               style={{ width: 64, height: 64, marginRight: 10 }}
-              src={`https://gravatar.com/avatar/${md5(comment.author.email)}?size=100&default=identicon`} />
+              src={comment.author.avatar} />
             <div style={{ flex: 1 }}>
               <div>
                 {comment.author.name}

@@ -1,37 +1,36 @@
 <article class="post">
-  <h1 class="post-title">
-    <a href="{{this.url}}">{{this.title}}</a>
-  </h1>
-  {{#if this.reading_time}}
-  <div class="reading-time">
-    {{this.reading_time}}
-  </div>  
-  {{/if}}  
-  <div class="row">
-    <div class="col-lg-12">
-      {{{truncateHtml this.content 1100}}}
-    </div>
+  <div class="post-img">
+    <a href="{{this.url}}"><img src="{{this.metadata.header_image_url}}" alt=""></a>
   </div>
-  <div class="panel-footer">
-    <div class="row">
-      <div class="col-lg-9 col-md-9 col-sm-8">
-        <span class="date">
-          <time datetime="{{this.published_at}}">{{this.published_at_str}}</time>
-        </span>
-        <span class="comments">
-          <a href="{{this.url}}#comments">{{#if this.comments_count}}Comments ({{ this.comments_count }}){{else}}No Comments{{/if}}</a>
-        </span>
-        <br>
-        {{> tags tags=this.tags}}
-        {{#if this.series}}
-          <p>
-            Part of <a href="{{this.series_url}}">{{this.series}}</a> series.
-          </p>
+  <div class="post-content">
+      <a href="{{this.url}}">
+        <h5 class="post-title">{{this.title}}<br></h5>
+      </a>
+      {{#if this.reading_time}}
+      <span class="read">{{this.reading_time}}</span>
+      {{/if}}
+      <div class="post-excerpt">{{{this.excerpt}}}</div>
+      <div class="post-badges">
+        {{# if this.series}}
+        <a href="{{this.series_url}}">
+          <div class="series-badge badge my-4">{{this.series}}</div>
+        </a>
         {{/if}}
+        {{#each tags}}
+          <a href="{{this.url}}">
+            <div class="tags-badge badge">{{this.key}}</div>
+          </a>
+        {{/each}}
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-4 read-more">
-        <a href="{{this.url}}" class="pull-right">Read more »</a>
+      <div class="post-author__container d-flex justify-content-between">
+        <div class="post-author">
+          <a href="#"><img src="{{this.author.avatar}}" alt="">
+            <span class="author-name">{{this.author.name}}</span>
+          </a>
+        </div>
+        <div class="post-date">
+          {{this.published_at_str}}
+        </div>
       </div>
-    </div>
   </div>
 </article>

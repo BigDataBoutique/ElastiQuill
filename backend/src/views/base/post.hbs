@@ -1,47 +1,77 @@
-<article>
-    <h1>{{post.title}}</h1>
-    <div class="meta">
-        <span class="date">
-            <time datetime="{{post.published_at}}">{{post.published_at_str}}</time>
-        </span>
-        {{> tags tags=post.tags}}
-        <p class="comments">
-            <a href="{{post.url}}#comments">Comments ({{ post.comments_count }})</a>
-        </p>
-        {{#if post.reading_time}}
-        <div class="reading-time">
-            {{post.reading_time}}
+<main class="post-page">
+  <article class="container post-container">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="post-title">{{post.title}}<div>{{post.reading_time}}</div></h1>
+        <div class="badge-cloud">
+          {{# if post.series}}
+          <a href="{{post.series_url}}">
+            <div class="series-badge badge my-4">{{post.series}}</div>
+          </a>
+          {{/if}}
+          {{#each post.tags}}
+            <a href="{{this.url}}"><div class="tags-badge badge my-4">{{this.key}}</div></a>
+          {{/each}}          
         </div>
-        {{/if}}
+        <div class="post-author__container d-flex justify-content-between mt-4 mb-5">
+          <div class="post-author">
+            <a><img src="{{post.author.avatar}}" alt="">
+              <span class="author-name">{{post.author.name}}</span>
+            </a>
+          </div>
+          <div class="post-date">
+            {{post.published_at_str}}
+          </div>
+        </div>
+        <div class="post-image">
+          <img src="{{{post.metadata.header_image_url}}}" alt="">
+        </div>
+        <div class="post-content">
+          {{{post.content}}}
+        </div>
+      </div>
+    </article>
+    {{#if post.more_like_this}}
+    <div class="posts-widget__container col-12">
+      <h2 class="posts-widge__title">More stories you may also like</h2>
+      <div class="posts-widget">
+        {{#each post.more_like_this}}
+        <div class="card">
+          <a href="{{this.url}}"><img src="{{this.metadata.header_image_url}}" class="card-img-top" alt="..."></a>
+          <div class="card-body">
+            <a href="{{this.url}}">
+              <p class="card-text">{{this.title}}</p>
+            </a>
+            <div class="post-date">
+              {{this.published_at_str}}
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
     </div>
-    {{# if post.series}}
-    <p>
-        This post is part of <a href="{{post.series_url}}">{{post.series}}</a> series.
-    </p>
-    {{/if}}    
-    {{{post.content}}}
-</article>
-<hr />
-<section>
-    <a name="comments"></a>
-    {{#if post.comments}}
-        <h2>Comments</h2>
     {{/if}}
-    <ul class="list-unstyled" id="comments-container">
-    {{#each post.comments}}
+    <div class="comments-widget__container col-12" id="comments-container">
+      {{#if post.comments}}
+        <h2>Comments ({{post.comments.length}})</h2>
+      {{/if}}
+      {{#each post.comments}}
         {{> comment this index=@index }}
-    {{/each}}
-    </ul>
-    {{# if post.allow_comments}}
+      {{/each}}
+
+      {{#if post.allow_comments}}
         {{> comment-form}}
-        <button id="btn-add-comment" class="btn btn-primary btn-add-comment" style="margin-top: 20px" type="button" onclick="onClickReply()">Leave a new comment</button>
-    {{else}}
+      {{else}}
         <h2>Comments are now closed</h2>
-    {{/if}}
-</section>
+      {{/if}}
+    </div>
+  </div>
+  
+</main>
+
 <script>
 $(function() {
-  $('article img').each(function() {
+  $('.post-content').find('img').each(function() {
     var href = $(this).attr('src');
     $(this).replaceWith($('<a data-fancybox="gallery" href="' + href + '"><img src="' + href + '"></a>'));
   });

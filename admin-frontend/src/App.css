@@ -44,7 +44,8 @@ body {
 .elastiquill-user-area-label {
   display: inline-block;
 
-  width: 94px;
+  margin-left: 10px;
+  max-width: 180px;
   height: 24px;
   opacity: 0.62;
   font-family: "Nunito Sans";
@@ -68,6 +69,21 @@ body {
   background: white;
   min-height: 92px;
   padding-top: 26px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.elastiquill-nav-submenu {
+  width: 100%;
+  padding: 10px 0px;
+}
+
+.elastiquill-nav-submenu a, .elastiquill-nav-submenu .btn-link {
+  color: black;
+}
+
+.elastiquill-nav-submenu-extra {
+  display: inline-block;
+  margin-left: 5px;
 }
 
 .elastiquill-nav-link {
@@ -146,12 +162,12 @@ body {
 }
 
 .elastiquill-button {
-  height: 44px;
+  height: 36px;
   border-radius: 6px;
   border: none;
   background-image: radial-gradient(circle at 0 0, #e32dab, #c31473);
   font-family: "Nunito Sans";
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   font-style: normal;
   font-stretch: normal;
@@ -181,9 +197,10 @@ body {
 }
 
 .elastiquill-card h2 {
+  margin-bottom: 15px;
   height: 24px;
   font-family: "Nunito Sans";
-  font-size: 18px;
+  font-size: 17px;
   font-weight: normal;
   font-style: normal;
   font-stretch: normal;
@@ -211,11 +228,33 @@ body {
   color: #ea3798;
 }
 
+.elastiquill-series {
+  cursor: default;
+  display: inline-block;  
+  margin-right: 12px;
+  padding: 0px 7px;
+  height: 24px;
+  font-family: "Nunito Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.71;
+  letter-spacing: normal;
+  background-color: #f2f2f2;
+  color: rgb(126, 119, 119);
+  font-weight: 500;
+  border-radius: 13px;
+}
+
 .elastiquill-icon-button {
   width: 20px;
   height: 20px;
   margin: 0px 7.5px;
   cursor: pointer;
+}
+
+.elastiquill-icon-button:hover {
+  opacity: 0.8;
 }
 
 .elastiquill-text-ellipsis {
@@ -231,6 +270,31 @@ body {
   border: solid 1px #d4d4d4;
   background-color: #f7f7f7;
 }
+
+.elastiquill-footer {
+  margin-top: 30px;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  font-size: 10pt;
+  text-align: center;
+  background-color: white;
+  display: block;
+  width: 100%;    
+}
+
+@media screen and (max-width: 992px) {
+  .elastiquill-nav-link {
+    margin: 10px;
+  }
+
+  .elastiquill-nav-submenu-extra {
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+    margin-left: 0px;
+  }
+}
+
 
 .ReactModal__Overlay {
     z-index: 1000;

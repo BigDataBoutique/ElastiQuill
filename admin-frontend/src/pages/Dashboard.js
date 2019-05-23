@@ -1,8 +1,11 @@
 import React, { Fragment } from 'react';
+import moment from 'moment';
+import countries from 'i18n-iso-countries';
 import {inject, observer} from 'mobx-react';
 
+countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
+
 import VisitsMap from '../components/VisitsMap';
-import SetupWarning from '../components/SetupWarning';
 import CommentsList from '../components/CommentsList';
 import LoggedInLayout from '../components/LoggedInLayout';
 import StatsOverTimeGraph from '../components/StatsOverTimeGraph';
@@ -18,7 +21,6 @@ class Dashboard extends React.Component {
     return (
       <LoggedInLayout>
         <div className='elastiquill-content'>
-          <SetupWarning />
           {this._renderContent()}
         </div>
       </LoggedInLayout>
@@ -31,33 +33,59 @@ class Dashboard extends React.Component {
       beingLoaded,
       popularPosts,
       commentsCount,
+      mostViewedPost,
       recentComments,
+      mostBusyDayEver,
+      visitsByCountry,
       visitsByLocation,
-      mostCommentedPosts
+      mostCommentedPosts,
+      averageVisitsPerDay,
     } = this.props.dashboardStore;
 
     if (beingLoaded.length) {
       return 'Loading...';
     }
 
+    const mostBusyDayEverCard = mostBusyDayEver && this._renderCard(
+      <React.Fragment>
+        <div style={{ flex: 1 }}>
+          <h4>{moment(mostBusyDayEver.date).format('DD/MM/YYYY')}</h4>
+          <h6>{mostBusyDayEver.count + ' visits'}</h6>
+        </div>
+        <h2>Most busy day ever</h2>
+      </React.Fragment>
+    );
+
+    const mostViewedCard = mostViewedPost && this._renderCard(
+      <React.Fragment>
+        <h4 style={{ flex: 1 }}>
+          <a
+            target='_blank'
+            style={{ fontSize: '13px' }}
+            href={mostViewedPost.url}>
+            {this._textEllipsis(mostViewedPost.title, 40)}
+          </a>
+        </h4>
+        <h6>{mostViewedPost.views_count + ' views'}</h6>
+        <h2>Most viewed post</h2>
+      </React.Fragment>
+    );
+
     return (
       <Fragment>
         <div className='elastiquill-header'>Overview</div>
         <div className='row' style={{ minHeight: '124px', marginBottom: '63px', marginLeft: -5 }}>
-          <div className='col-lg-3 mr-lg-4 elastiquill-card'>
-            <h1>{postsCount || 0}</h1>
-            <h2>Posts created</h2>
-          </div>
-          <div className='col-lg-3 elastiquill-card'>
-            <h1>{commentsCount || 0}</h1>
-            <h2>Comments on posts</h2>
-          </div>
-          <div className='col-lg-6' />
+          {this._renderTextCard('Posts created', postsCount || 0)}
+          {this._renderTextCard('Comments on posts', commentsCount || 0)}
+          {this._renderTextCard('Visitors / day (average)', averageVisitsPerDay || 0)}
+          {mostBusyDayEverCard}
+          {mostViewedCard}
+          <div className='col-lg-2' />
         </div>
 
         <div className='row' style={{ marginBottom: '41px' }}>
           <div className='col-12'>
-            <div className='elastiquill-header'>Statistics over time</div>
+            <div className='elastiquill-header'>Blog Statistics</div>
             <div className='elastiquill-card'>
               <StatsOverTimeGraph />
             </div>
@@ -66,13 +94,22 @@ class Dashboard extends React.Component {
         
         <div className='row' style={{ marginBottom: '41px' }}>
           <div className='col-lg-8'>
-            <div className='elastiquill-header'>Visitors map</div>
+            <div className='elastiquill-header'>Visitors Map</div>
             <div className='elastiquill-card'>
               <VisitsMap mapData={visitsByLocation} />
             </div>
           </div>
           <div className='col-lg-4' style={{ display: 'flex', flexFlow: 'column' }}>
-            <div className='elastiquill-header'>Info</div>
+            <div className='elastiquill-header'>Visits by country</div>
+            <div className='elastiquill-card'>
+              {this._renderVisitsByCountry(visitsByCountry)}
+            </div>
+          </div>
+        </div>
+
+        <div className='row' style={{ marginBottom: '41px' }}>
+          <div className='col-lg-12'>
+            <div className='elastiquill-header'>Other stats</div>
             <div className='elastiquill-card' style={{ flex: 1 }}>
               {this._renderSection('Referrals Stats', this._renderReferrals())}
               {this._renderSection('Most viewed', this._renderPostsList(popularPosts, item => {
@@ -83,7 +120,7 @@ class Dashboard extends React.Component {
               }))}
             </div>
           </div>
-        </div>
+        </div>        
 
         <div className='row'>
           <div className='col-12'>
@@ -93,7 +130,27 @@ class Dashboard extends React.Component {
             </div>
           </div>
         </div>          
-      </Fragment>      
+      </Fragment>
+    )
+  }
+
+  _renderVisitsByCountry(visitsByCountry) {
+    if (! visitsByCountry.length) {
+      return 'No data yet';
+    }
+
+    return (
+      <div>
+        {visitsByCountry.map((bucket, i) => (
+          <div key={bucket.key} style={{ margin: '5px 0px' }}>
+            <span
+              style={{ marginRight: 10 }}
+              className={'flag-icon flag-icon-' + bucket.key.toLowerCase()}></span>
+            {countries.getName(bucket.key, 'en')}
+            <span className='float-right text-muted'>{bucket.doc_count}</span>
+          </div>
+        ))}
+      </div>
     )
   }
 
@@ -143,13 +200,38 @@ class Dashboard extends React.Component {
 
   _renderSection(title, content) {
     return (
-      <div>
+      <div style={{ marginBottom: 10 }}>
         <strong>{title}</strong>
         <div>
           {content}
         </div>
       </div>
     )
+  }
+
+  _renderTextCard(label, text) {
+    return this._renderCard(
+      <React.Fragment>
+        <h1 style={{ flex: 1 }}>{text}</h1>
+        <h2>{label}</h2>
+      </React.Fragment>
+    )
+  }
+
+  _renderCard(contents) {
+    const minHeight = 120;
+    return (
+      <div style={{ display: 'flex', flexFlow: 'column', minHeight }} className='col-lg-2 mr-lg-4 elastiquill-card'>
+        {contents}
+      </div>
+    )
+  }
+
+  _textEllipsis(text, len) {
+    if (text.length - 3 > len) {
+      text = text.substring(0, len - 3) + '...';
+    }
+    return text;
   }
 }
 

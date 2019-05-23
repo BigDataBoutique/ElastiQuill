@@ -13,7 +13,6 @@ import deleteIcon from '../assets/img/delete.svg';
 import editIcon from '../assets/img/edit.svg';
 import newWindowIcon from '../assets/img/newindow.svg';
 import LoggedInLayout from '../components/LoggedInLayout';
-import SetupWarning from '../components/SetupWarning';
 import FAIcon from '../components/FAIcon';
 import * as api from '../api';
 
@@ -24,12 +23,10 @@ class BaseItemsPage extends Component {
     const isNew = currentItem === null;
 
     const toolbar = (
-      <div>
+      <div style={{ lineHeight: '38px' }}>
         <Link to={`/new/${strings.urlPart}`}>
-          <Button className='elastiquill-button'>
-            <FAIcon icon='plus' style={{ marginRight: '12px' }} />
-            {strings.newItem}
-          </Button>
+          <FAIcon icon='plus' style={{ marginRight: '12px' }} />
+          {strings.newItem}
         </Link>
         {this._renderNav && this._renderNav()}
       </div>
@@ -38,7 +35,6 @@ class BaseItemsPage extends Component {
     return (
       <LoggedInLayout pageTitle={strings.title} toolbar={toolbar}>
         <div className='elastiquill-content'>
-          <SetupWarning />
           {isLoading ? 'Loading...' : this._renderItems(strings, store)}
         </div>
         {this._renderDeleteItemModal(store)}
@@ -115,6 +111,7 @@ class BaseItemsPage extends Component {
             {item.description || item.content}
           </div>
           <div style={{ marginTop: '16px' }}>
+            {item.series && <div style={{ marginRight: 10 }} className='elastiquill-series'>{item.series}</div>}
             {item.tags && item.tags.map(t => (
               <div key={t} className='elastiquill-tag'>{t}</div>
             ))}
@@ -132,47 +129,6 @@ class BaseItemsPage extends Component {
               {moment(item.published_at).format('MMMM DD, YYYY')}
             </div>
           </div>
-        </div>
-      </div>
-    )
-
-    return (
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => this.props.history.push(`/stats/${urlPart}/` + item.id)}>
-          {item.title}
-          {item.series && <div style={{ marginLeft: 10 }} className='badge badge-secondary'>{item.series}</div>}
-        </div>
-        <div>
-          {this._renderLineItemExtra && this._renderLineItemExtra(item)}
-          {item.metadata.is_embed ? (
-            <Button
-              onClick={() => {
-                copyToClipboard(`{{embedContentPage "${item.slug}"}}`);
-                toast.success('Copied embed code into clipboard');
-              }}
-              style={{ marginRight: 10 }}
-              color='primary'>Copy embed code
-              <i style={{ marginLeft: 5 }} className='fa fa-copy' />
-            </Button>
-          ) : (
-            <a href={url} target='_blank'>
-              <Button
-                style={{ marginRight: 10 }}
-                color='primary'>Open{!_.isEmpty(item.private_viewing_key) && ' (secret URL)'}
-                <i style={{ marginLeft: 5 }} className='fa fa-external-link-alt' />
-              </Button>
-            </a>
-          )}
-          <Link to={`/edit/${urlPart}/` + item.id}>
-            <Button
-              style={{ marginRight: 10 }}
-              color='primary'>Edit<i style={{ marginLeft: 5 }} className='fa fa-pencil-alt' /></Button>
-          </Link>
-          <Button
-            onClick={() => this._getStore().setDeleteItemId(item.id)}
-            style={{ marginRight: 10 }}
-            color='danger'>Delete<i style={{ marginLeft: 5 }} className='fa fa-trash' />
-          </Button>
         </div>
       </div>
     )

@@ -43,8 +43,8 @@ router.get('/:type(post|page)', asyncHandler(async (req, res) => {
 }));
 
 router.get('/:type(post|page)/:id', asyncHandler(async (req, res) => {
-  const includeComments = req.params.type === 'post';
-  const item = await blogPosts.getItemById(req.params.id, includeComments);
+  const withComments = req.params.type === 'post';
+  const item = await blogPosts.getItemById({ id: req.params.id, withComments });
   res.json(item);
 }));
 

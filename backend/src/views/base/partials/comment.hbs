@@ -1,25 +1,26 @@
-<li class="comment" data-id="{{id}}" data-index={{index}} id="{{comment_id}}">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <img src="https://www.gravatar.com/avatar.php?gravatar_id={{emailMD5}}&amp;size=100&amp;default=identicon" alt="{{author.name}}" style="width: 100px; height: 100px;" class="imageborder alignleft">
-            {{{content}}}
-        </div>
-        <div class="panel-footer">
-            <div class="row">
-                <div class="col-lg-10 col-md-9 col-sm-8">
-                    <i class="fa fa-user"> </i> <a href="{{author.website}}" rel="nofollow">{{author.name}}</a> <i class="fa fa-clock-o"></i> <time datetime="{{published_at}}">{{published_at_str}}</time>
-                </div>
-            {{#if allow_comments}}
-                <div class="col-lg-2 col-md-3 col-sm-4" style="text-align: right">
-                    <button class="btn btn-primary btn-add-comment" onclick="onClickReply(this)">Reply</button>
-                </div>
-            {{/if}}
-            </div>
-        </div>
+<div class="comment" data-id="{{id}}" data-index={{index}} id="{{comment_id}}">
+  <div class="post-author__container d-flex justify-content-between">
+    <div class="post-author">
+      <a href="#">
+        <img src="{{author.avatar}}" alt="{{author.name}}">
+        <span class="ml-3">{{author.name}}</span>
+      </a>
     </div>
-    <ul class="list-unstyled" style="padding-left: 30px;">
+    <div class="post-date">
+      {{published_at_str}}
+    </div>
+  </div>
+  <div class="comments-widget__content my-4">{{{content}}}</div>
+  <div class="comments-widget__footer">
+    {{#if allow_comments}}
+    <a class="reply btn-add-comment" onclick="onClickReply(this)">
+      <img src="/static/base/img/comment.png" alt=""><span class="secondary mx-3">Reply</span>
+    </a>
+    {{/if}}
+  </div>
+  <div class="replies-container">
     {{#each replies}}
         {{> comment this index=@index }}
     {{/each}}
-    </ul>
-</li>
+  </div>
+</div>

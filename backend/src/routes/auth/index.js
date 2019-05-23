@@ -16,6 +16,7 @@ const socialAuthSources = [];
 const ADMIN_ROUTE = config.blog['admin-route'];
 const ADMIN_EMAILS = config.blog['admin-emails'];
 const JWT_SECRET = config.blog['jwt-secret'];
+const BLOG_URL = config.blog['url'];
 const AUTH_INFO_TOKEN_COOKIE = 'auth-info-token';
 
 if (ADMIN_EMAILS.isEmpty()) {
@@ -32,7 +33,7 @@ router.get('/auth-sources', function (req, res) {
 
 router.get('/logout', function (req, res) {
   res.clearCookie(AUTH_INFO_TOKEN_COOKIE);
-  res.redirect(frontendAddress() + '/admin');
+  res.redirect(BLOG_URL);
 });
 
 passport.serializeUser((user, done) => done(null, user));

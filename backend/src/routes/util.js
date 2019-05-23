@@ -2,6 +2,7 @@ import _ from 'lodash';
 import md5 from 'md5';
 import moment from 'moment';
 import MarkdownIt from 'markdown-it';
+import htmlToText from 'html-to-text';
 import readingTime from 'reading-time';
 import sanitizeHtml from 'sanitize-html';
 
@@ -10,6 +11,7 @@ import { stripSeriesTag, CONTENT_DESCRIPTION_ID_PREFIX } from '../services/blogP
 
 const BLOG_ROUTE_PREFIX = config.blog['blog-route-prefix'];
 const COMMENTS_POST_PERIOD = config.blog['comments-post-period'];
+const DEFAULT_HEADER_IMAGE = config.blog['default-header-image'];
 
 const blogpostMarkdown = new MarkdownIt({
   html: true
@@ -17,8 +19,16 @@ const blogpostMarkdown = new MarkdownIt({
 const commentMarkdown = new MarkdownIt();
 
 export function preparePage(p) {
+  if (! p) return null;
+  
+  const metadata = {
+    ...p.metadata,
+    header_image_url: p.metadata.header_image_url || DEFAULT_HEADER_IMAGE
+  };
+
   return {
     ...p,
+    metadata,
     published_at_str: prepareDate(p.published_at),
     content: p.metadata.content_type === 'markdown' ? blogpostMarkdown.render(p.content) : p.content,
     url: pageUrl(p)
@@ -44,6 +54,8 @@ export function preparePostJson(p) {
 }
 
 export function preparePost(p) {
+  if (! p) return null;
+
   const highlight = p.highlight;
 
   for (const key in highlight) {
@@ -71,8 +83,41 @@ export function preparePost(p) {
 
   const comments = prepareComments(p.comments || [], allowComments);
 
+  if (p.more_like_this) {
+    p.more_like_this = p.more_like_this.map(preparePost);
+  }
+
+  let tags = p.tags;
+  if (tags) {
+    tags = p.tags.map(key => ({
+      key,
+      url: tagUrl(key)
+    }));
+  }
+
+  const author = {
+    ...p.author,
+    avatar: avatarUrl(p.author.email)
+  };
+
+  const metadata = {
+    ...p.metadata,
+    header_image_url: p.metadata.header_image_url || DEFAULT_HEADER_IMAGE
+  };  
+
+  const content = p.metadata.content_type === 'markdown' ? blogpostMarkdown.render(p.content) : p.content;
+  const excerpt = htmlToText.fromString(content, {
+    ignoreHref: true,
+    ignoreImage: true
+  }).substring(0, 200) + '...';
+
   return {
     ...p,
+    tags,
+    author,
+    excerpt,
+    content,
+    metadata,
     comments,
     highlight,
     series_url: p.series ? seriesUrl(p.series) : undefined,
@@ -80,7 +125,6 @@ export function preparePost(p) {
     reading_time: readTime.minutes > 1 ? readTime.text : null,
     comments_count: p.comments_count ? p.comments_count : countComments(comments),
     published_at_str: prepareDate(p.published_at),
-    content: p.metadata.content_type === 'markdown' ? blogpostMarkdown.render(p.content) : p.content,
     url: blogpostUrl(p)
   };
 
@@ -100,17 +144,22 @@ export function prepareComments(comments, allowComments, parentComment = null) {
 }
 
 function prepareComment(c) {
+  const author = {
+    ...c.author,
+    avatar: avatarUrl(c.author.email),
+  };
+  
   return {
     ...c,
+    author,
     website: _.isEmpty(c.website) ? '#' : c.website,
-    emailMD5: md5(c.author.email),
     content: commentMarkdown.render(c.content),
     published_at_str: prepareDate(c.published_at)
   };
 }
 
 export function prepareDate(d) {
-  return moment(d).format('MMMM Do YYYY, h:mm');
+  return moment(d).format('MMMM Do, YYYY');
 }
 
 export function blogpostUrl(post) {
@@ -138,11 +187,15 @@ export function pageUrl(page) {
 }
 
 export function seriesUrl(series) {
-  const url = '/series/' + series;
+  const url = '/series/' + encodeURIComponent(series.toLowerCase());
   return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
 }
 
 export function tagUrl(tag) {
-  const url = '/tagged/' + tag;
+  const url = '/tagged/' + encodeURIComponent(tag.toLowerCase());
   return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
+}
+
+function avatarUrl(email) {
+  return `https://www.gravatar.com/avatar/${md5(email)}?size=100&default=identicon`;
 }

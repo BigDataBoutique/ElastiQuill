@@ -33,6 +33,7 @@
     "express-async-handler": "^1.1.4",
     "globby": "9.2.0",
     "handlebars": "^4.1.2",
+    "html-to-text": "^5.1.1",
     "http-errors": "~1.7.2",
     "inbound": "0.0.6",
     "joi": "^14.3.1",

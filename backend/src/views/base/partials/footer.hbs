@@ -1,3 +1,6 @@
 <footer>
-    <a href="https://github.com/BigDataBoutique/ElastiQuill">ElastiQuill</a> Copyright © 2019 <a href="https://bigdataboutique.com">BigData Boutique</a>
+  <p>
+    {{#if title}}{{title}}{{else}}{{blogTitle}}{{/if}}{{#if description}} - {{description}}{{else}} - {{blogDescription}}{{/if}}
+  </p>
+  <p>Powered by <a href="https://github.com/BigDataBoutique/ElastiQuill">ElastiQuill</a>, Copyright © 2019 <a href="https://bigdataboutique.com">BigData Boutique</a></p>
 </footer>
