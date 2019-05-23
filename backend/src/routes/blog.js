@@ -57,12 +57,12 @@ router.get('/rss', asyncHandler(async (req, res) => {
 const BLOGPOST_ROUTE = '/:year(\\d+)/:month(\\d+)/:slug-:id([^-]+$)';
 
 router.use(BLOGPOST_ROUTE, (req, res, next) => {
-  const { slug, isJson } = parseSlug(req.params.slug);
+  const { id, isJson } = parseBlogpostId(req.params.id);
 
   res.locals.logData = {
     read_item: {
-      slug,
-      id: blogPosts.BLOGPOST_ID_PREFIX + req.params.id,
+      id,
+      slug: req.params.slug,
       type: 'post',
       is_json: isJson
     }
@@ -72,15 +72,15 @@ router.use(BLOGPOST_ROUTE, (req, res, next) => {
 
 events.onChange('post', post => clearPageCache(blogpostUrl(post)));
 router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
-  const { slug, isJson } = parseSlug(req.params.slug);
+  const { id, isJson } = parseBlogpostId(req.params.id);
   
   let post = await blogPosts.getItemById({
-    id: blogPosts.BLOGPOST_ID_PREFIX + req.params.id,
+    id,
     withComments: true,
     moreLikeThis: true
   });
 
-  if (post.slug !== slug) {
+  if (post.slug !== req.params.slug) {
     res.redirect(blogpostUrl(post));
     return;
   }
@@ -313,16 +313,16 @@ function handlePostsRequest(template) {
 }
 
 
-function parseSlug(slug) {
-  if (slug.endsWith('.json')) {
+function parseBlogpostId(id) {
+  if (id.endsWith('.json')) {
     return {
-      slug: slug.slice(0, -5),
+      id: blogPosts.BLOGPOST_ID_PREFIX + id.slice(0, -5),
       isJson: true
     };
   }
 
   return {
-    slug,
+    id: blogPosts.BLOGPOST_ID_PREFIX + id,
     isJson: false
   };
 }
