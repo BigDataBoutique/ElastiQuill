@@ -322,6 +322,11 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
       }
     }
 
+    // Avoid logging clouds load-balancer healthchecks
+    if (req.get('User-Agent') && req.get('User-Agent').startsWith('GoogleHC/')) {
+      return;
+    }
+
     const body = {
       'ecs.version': '1.0.0',
       '@timestamp': new Date().toISOString(),
