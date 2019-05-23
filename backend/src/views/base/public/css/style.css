@@ -275,7 +275,7 @@ main.post-page {
 
 .post-container {
     max-width: 777px;
-    margin: 8rem auto 0 auto;
+    margin: 4rem auto 0 auto;
     padding: 0 1.5rem;
 }
 
@@ -453,7 +453,7 @@ main.post-page {
 }
 
 .post-title {
-    margin: 1rem 0;
+    margin: 15px 0 1rem;
 }
 
 .post-content {
@@ -627,7 +627,7 @@ footer a {
     }
 
     .post-title {
-        margin: 0;
+        margin: 15px 0 0;
     }
 
     .post-img {

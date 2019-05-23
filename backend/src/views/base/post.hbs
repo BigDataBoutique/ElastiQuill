@@ -2,6 +2,11 @@
   <article class="container post-container">
     <div class="row">
       <div class="col-12">
+  {{#if post.metadata.header_image_url}}
+      <div class="post-image">
+          <img src="{{{post.metadata.header_image_url}}}" alt="">
+      </div>
+  {{/if}}
         <h1 class="post-title">{{post.title}}<div>{{post.reading_time}}</div></h1>
         <div class="badge-cloud">
           {{# if post.series}}
@@ -22,9 +27,6 @@
           <div class="post-date">
             {{post.published_at_str}}
           </div>
-        </div>
-        <div class="post-image">
-          <img src="{{{post.metadata.header_image_url}}}" alt="">
         </div>
         <div class="post-content my-3">
           {{{post.content}}}
