@@ -48,8 +48,10 @@ class Dashboard extends React.Component {
 
     const mostBusyDayEverCard = mostBusyDayEver && this._renderCard(
       <React.Fragment>
-        <div style={{ flex: 1 }}>
-          <h4>{moment(mostBusyDayEver.date).format('DD/MM/YYYY')}</h4>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <h1 style={{ fontSize: '29px' }}>
+            {moment(mostBusyDayEver.date).format('DD/MM/YYYY')}
+          </h1>
           <h6>{mostBusyDayEver.count + ' visits'}</h6>
         </div>
         <h2>Most busy day ever</h2>
@@ -61,9 +63,9 @@ class Dashboard extends React.Component {
         <h4 style={{ flex: 1 }}>
           <a
             target='_blank'
-            style={{ fontSize: '13px' }}
+            style={{ fontSize: '24px' }}
             href={mostViewedPost.url}>
-            {this._textEllipsis(mostViewedPost.title, 40)}
+            {this._textEllipsis(mostViewedPost.title, 35)}
           </a>
         </h4>
         <h6>{mostViewedPost.views_count + ' views'}</h6>
@@ -77,7 +79,7 @@ class Dashboard extends React.Component {
         <div className='row' style={{ minHeight: '124px', marginBottom: '63px', marginLeft: -5 }}>
           {this._renderTextCard('Posts created', postsCount || 0)}
           {this._renderTextCard('Comments on posts', commentsCount || 0)}
-          {this._renderTextCard('Visitors / day (average)', averageVisitsPerDay || 0)}
+          {this._renderTextCard('Visitors / day (average)', _.round(averageVisitsPerDay, 1) || 0)}
           {mostBusyDayEverCard}
           {mostViewedCard}
           <div className='col-lg-2' />
