@@ -40,6 +40,12 @@ class Dashboard extends BaseStore {
   @observable
   referrerFromDomain = [];
 
+  @observable
+  userAgentOperatingSystem = [];
+
+  @observable
+  userAgentName = [];  
+
   async loadStats() {
     this.loading('stats');
 
@@ -59,6 +65,8 @@ class Dashboard extends BaseStore {
       this.averageVisitsPerDay = allStats.avg_visits_per_day;
       this.mostBusyDayEver = allStats.most_busy_day;
       this.mostViewedPost = allStats.most_viewed_post;
+      this.userAgentOperatingSystem = allStats.user_agent_os;
+      this.userAgentName = allStats.user_agent_name;
     }
     catch (err) {
       console.error(err);
