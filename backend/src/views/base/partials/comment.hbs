@@ -6,9 +6,9 @@
         <span class="ml-3">{{author.name}}</span>
       </a>
     </div>
-    <div class="post-date">
+    <time class="post-date" datetime="{{published_at}}">
       {{published_at_str}}
-    </div>
+    </time>
   </div>
   <div class="comments-widget__content my-4">{{{content}}}</div>
   <div class="comments-widget__footer">
