@@ -109,29 +109,27 @@ class Dashboard extends React.Component {
           </div>
         </div>
 
-        <div className='row' style={{ marginBottom: '41px' }}>
-          <div className='col-lg-12'>
-            <div className='elastiquill-header'>Other stats</div>
-            <div className='elastiquill-card' style={{ flex: 1 }}>
-              {this._renderSection('Referrals Stats', this._renderReferrals())}
-              {this._renderSection('Most viewed', this._renderPostsList(popularPosts, item => {
-                return <span>({item.visits_count} {item.visits_count > 1 ? 'views' : 'view'})</span>
-              }))}
-              {this._renderSection('Most commented', this._renderPostsList(mostCommentedPosts, item => {
-                return <span>({item.comments_count} {item.comments_count > 1 ? 'comments' : 'comment'})</span>
-              }))}
-            </div>
+        <div className='row'>
+          <div className='col-md-6'>
+            {this._renderSection('Referrals stats', this._renderReferrals())}
+          </div>
+          <div className='col-md-6'>
+            {this._renderSection('User-Agent stats', this._renderUserAgentStats())}
+          </div>
+        </div>
+        <div className='row' style={{ marginTop: 20 }}>
+          <div className='col-md-6'>
+            {this._renderSection('Most viewed', this._renderPostsList(popularPosts, item => {
+              return <span>({item.visits_count} {item.visits_count > 1 ? 'views' : 'view'})</span>
+            }))}
+            {this._renderSection('Most commented', this._renderPostsList(mostCommentedPosts, item => {
+              return <span>({item.comments_count} {item.comments_count > 1 ? 'comments' : 'comment'})</span>
+            }))}
+          </div>
+          <div className='col-md-6'>
+            {this._renderSection('Recent comments', <CommentsList comments={recentComments} />)}
           </div>
         </div>        
-
-        <div className='row'>
-          <div className='col-12'>
-            <div className='elastiquill-header'>Recent comments</div>
-            <div className='elastiquill-card'>
-              <CommentsList comments={recentComments} />
-            </div>
-          </div>
-        </div>          
       </Fragment>
     )
   }
@@ -168,18 +166,42 @@ class Dashboard extends React.Component {
 
     return (
       <div>
-        <h4>Type</h4>
-        <ul style={{ marginTop: 15 }}>
-        {referrerType.map(bucket => (
-          <li key={bucket.key} className='list-group-item py-1'>{bucket.key} ({bucket.doc_count})</li>
-        ))}
-        </ul>
-        <h4>Domain</h4>
-        <ul style={{ marginTop: 15 }}>
-        {referrerFromDomain.map(bucket => (
-          <li key={bucket.key} className='list-group-item py-1'>{bucket.key} ({bucket.doc_count})</li>
-        ))}
-        </ul>
+        {this._renderStatsList('Domain', referrerFromDomain)}
+        {this._renderStatsList('Type', referrerType)}
+      </div>
+    )
+  }
+
+  _renderUserAgentStats() {
+    const {
+      userAgentOperatingSystem,
+      userAgentName
+    } = this.props.dashboardStore;
+
+    if (userAgentOperatingSystem.length + userAgentName.length === 0) {
+      return 'No data';
+    }
+
+    return (
+      <div>
+        {this._renderStatsList('Operating system', userAgentOperatingSystem)}
+        {this._renderStatsList('User agent name', userAgentName)}
+      </div>
+    )
+  }
+
+  _renderStatsList(title, list) {
+    return (
+      <div style={{ minHeight: 160 }}>
+        <strong>{title}</strong>
+        <div style={{ marginTop: 10 }}>
+          {list.map(item => (
+            <div key={item.key}>
+              {item.key}
+              <span className='float-right text-muted'>{item.doc_count}</span>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -203,8 +225,8 @@ class Dashboard extends React.Component {
   _renderSection(title, content) {
     return (
       <div style={{ marginBottom: 10 }}>
-        <strong>{title}</strong>
-        <div>
+        <div className='elastiquill-header'>{title}</div>
+        <div className='elastiquill-card' style={{ marginTop: 15 }}>
           {content}
         </div>
       </div>

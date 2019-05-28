@@ -152,6 +152,18 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
             field: 'http.request.referrer_parsed.domain',
             size: 5
           }
+        },
+        user_agent_os: {
+          terms: {
+            field: 'http.request.user_agent_parsed.os_name',
+            size: 5
+          }
+        },
+        user_agent_name: {
+          terms: {
+            field: 'http.request.user_agent_parsed.name',
+            size: 5
+          }
         }
       }
     }
@@ -192,12 +204,16 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
       visits_by_location = [],
       popular_posts = [],
       referrer_type = [],
-      referrer_from_domain = [];
+      referrer_from_domain = [],
+      user_agent_os = [],
+      user_agent_name = [];
 
   if (resp.aggregations) {
     avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
+    user_agent_os = resp.aggregations.user_agent_os.buckets;
+    user_agent_name = resp.aggregations.user_agent_name.buckets;
     visits_by_date = resp.aggregations.visits_histogram.buckets;
     views_by_date = resp.aggregations.views_histogram.views.buckets;
     visits_by_country = resp.aggregations.visits_by_country.buckets;
@@ -237,7 +253,9 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
     visits_by_location,
     popular_posts,
     referrer_type,
-    referrer_from_domain
+    referrer_from_domain,
+    user_agent_os,
+    user_agent_name
   };
 }
 
