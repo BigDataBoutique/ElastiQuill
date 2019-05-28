@@ -24,9 +24,9 @@
               <span class="author-name">{{post.author.name}}</span>
             </a>
           </div>
-          <div class="post-date">
+          <time class="post-date" datetime="{{post.published_at}}">
             {{post.published_at_str}}
-          </div>
+          </time>
         </div>
         <div class="post-content my-3">
           {{{post.content}}}
@@ -44,9 +44,9 @@
             <a href="{{this.url}}">
               <p class="card-text">{{this.title}}</p>
             </a>
-            <div class="post-date">
+            <time class="post-date" datetime="{{this.published_at}}">
               {{this.published_at_str}}
-            </div>
+            </time>
           </div>
         </div>
         {{/each}}

@@ -13,7 +13,9 @@
     <div class="row">
       <div class="col-lg-9 col-md-9 col-sm-8">
         <span class="date">
-          <time datetime="{{this.published_at}}">{{this.published_at_str}}</time>
+          <time datetime="{{this.published_at}}">
+            {{this.published_at_str}}
+          </time>
         </span>
         <br>
         {{> tags tags=this.tags}}
