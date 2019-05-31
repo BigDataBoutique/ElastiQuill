@@ -187,11 +187,19 @@ export function pageUrl(page) {
 }
 
 export function seriesUrl(series) {
+  if (! _.isString(series)) {
+    throw new Error('Invalid argument provided to seriesUrl');
+  }
+
   const url = '/series/' + encodeURIComponent(series.toLowerCase());
   return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
 }
 
 export function tagUrl(tag) {
+  if (! _.isString(tag)) {
+    throw new Error('Invalid argument provided to tagUrl');
+  }
+
   const url = '/tagged/' + encodeURIComponent(tag.toLowerCase());
   return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
 }
