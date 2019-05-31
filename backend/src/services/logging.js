@@ -222,10 +222,16 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
       visits: bucket.doc_count
     }));
 
-    const mostViewedPost = _.first(resp.aggregations.posts.by_views.buckets);
-    if (mostViewedPost) {
-      most_viewed_post = await blogPosts.getItemById({ id: mostViewedPost.key });
-      most_viewed_post.views_count = mostViewedPost.doc_count;
+    for (const mostViewedPost of resp.aggregations.posts.by_views.buckets) {
+      try {
+        most_viewed_post = await blogPosts.getItemById({ id: mostViewedPost.key });
+        most_viewed_post.views_count = mostViewedPost.doc_count;
+      }
+      catch (err) {
+        if (err.statusCode != 404) {
+          throw err;
+        }        
+      }
     }
 
     const largestBucket = _.maxBy(_.get(resp.aggregations, visitsPerDayAgg + '.buckets'), b => b.doc_count);
