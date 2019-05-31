@@ -341,7 +341,7 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
     }
 
     // Avoid logging clouds load-balancer healthchecks
-    if (req.get('User-Agent') && req.get('User-Agent').startsWith('GoogleHC/')) {
+    if (req && req.get('User-Agent') && req.get('User-Agent').startsWith('GoogleHC/')) {
       return;
     }
 
