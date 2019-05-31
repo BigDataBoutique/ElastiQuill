@@ -54,7 +54,7 @@ class Dashboard extends React.Component {
           </h1>
           <h6>{mostBusyDayEver.count + ' visits'}</h6>
         </div>
-        <h2>Most busy day ever</h2>
+        <h2>Busiest day ever</h2>
       </React.Fragment>
     );
 
@@ -77,7 +77,7 @@ class Dashboard extends React.Component {
       <Fragment>
         <div className='elastiquill-header'>Overview</div>
         <div className='row' style={{ minHeight: '124px', marginBottom: '63px', marginLeft: -5 }}>
-          {this._renderTextCard('Posts created', postsCount || 0)}
+          {this._renderTextCard('Total blog posts', postsCount || 0)}
           {this._renderTextCard('Comments on posts', commentsCount || 0)}
           {this._renderTextCard('Visitors / day (average)', _.round(averageVisitsPerDay, 1) || 0)}
           {mostBusyDayEverCard}
