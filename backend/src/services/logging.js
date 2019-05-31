@@ -362,7 +362,7 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
       ...(res ? res.locals.logData : {}),      
     };
 
-    if (! excludeUrl) {
+    if (! excludeUrl && req) {
       const url = ecsUrl(req.protocol + '://' + req.get('host') + req.originalUrl);
       for (const key in url) {
         body[key] = url[key];
