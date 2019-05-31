@@ -375,7 +375,7 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
       };
     }
 
-    if (res.locals.logData) {
+    if (res && res.locals.logData) {
       body.tags.push.apply(body.tags, _.keys(res.locals.logData));
     }
 
