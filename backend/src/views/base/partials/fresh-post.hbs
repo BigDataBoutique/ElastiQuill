@@ -12,9 +12,10 @@
       {{/if}}
       <div class="post-author__container d-flex justify-content-between">
         <div class="post-author">
-          <a href="#"><img src="{{this.author.avatar}}" alt="">
+            {{#if author.website}}<a href="{{author.website}}" rel="nofollow" target="_blank">{{/if}}
+            <img src="{{this.author.avatar}}" alt="">
             <span class="author-name">{{this.author.name}}</span>
-          </a>
+            {{#if author.website}}</a>{{/if}}
         </div>
         <time class="post-date" datetime="{{this.published_at}}">
           {{this.published_at_str}}

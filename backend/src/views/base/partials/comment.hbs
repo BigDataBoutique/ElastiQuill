@@ -1,10 +1,10 @@
 <div class="comment" data-id="{{id}}" data-index={{index}} id="{{comment_id}}">
   <div class="post-author__container d-flex justify-content-between">
     <div class="post-author">
-      <a href="#">
+        {{#if author.website}}<a href="{{author.website}}" rel="nofollow" target="_blank">{{/if}}
         <img src="{{author.avatar}}" alt="{{author.name}}">
         <span class="ml-3">{{author.name}}</span>
-      </a>
+        {{#if author.website}}</a>{{/if}}
     </div>
     <time class="post-date" datetime="{{published_at}}">
       {{published_at_str}}
