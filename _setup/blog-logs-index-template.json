@@ -1,37 +1,23 @@
 {
   "index_patterns": "blog-logs*",
   "settings": {
-    "number_of_shards": 1,
-    "analysis": {
-      "normalizer": {
-        "keyword_lowercase": {
-          "type": "custom",
-          "filter": [
-            "lowercase"
-          ]
+    "index": {
+      "analysis": {
+        "normalizer": {
+          "keyword_lowercase": {
+            "filter": [
+              "lowercase"
+            ],
+            "type": "custom"
+          }
         }
-      }
+      },
+      "number_of_shards": "1"
     }
   },
   "mappings": {
     "_doc": {
       "properties": {
-        "list_items": {
-          "properties": {
-            "search_query": {
-              "type": "text"
-            },
-            "tag": {
-              "type": "keyword"
-            },
-            "page_index": {
-              "type": "long"
-            },
-            "page_size": {
-              "type": "long"
-            }
-          }
-        },
         "read_item": {
           "properties": {
             "id": {
@@ -42,89 +28,88 @@
             }
           }
         },
-        "ecs" : {
-          "properties" : {
-            "version" : {
-              "type" : "keyword"
+        "took": {
+          "type": "long"
+        },
+        "@timestamp": {
+          "type": "date"
+        },
+        "ecs": {
+          "properties": {
+            "version": {
+              "type": "keyword"
             }
           }
-        },        
-        "log" : {
-          "properties" : {
-            "level" : {
-              "type" : "keyword"
+        },
+        "log": {
+          "properties": {
+            "level": {
+              "type": "keyword"
             }
           }
-        },        
-        "error" : {
-          "properties" : {
-            "message" : {
-              "type" : "text"
-            }
-          }
-        },        
+        },
         "http": {
           "properties": {
             "request": {
               "properties": {
+                "referrer": {
+                  "type": "text"
+                },
                 "method": {
                   "type": "keyword"
                 },
-                "referrer": {
-                  "type" : "text"
-                },
-                "referrer_parsed" : {
-                  "properties" : {
-                    "domain" : {
-                      "type" : "keyword"
+                "user_agent_parsed": {
+                  "properties": {
+                    "patch": {
+                      "type": "keyword"
                     },
-                    "full" : {
-                      "type" : "keyword"
+                    "major": {
+                      "type": "keyword"
                     },
-                    "original" : {
-                      "type" : "keyword"
+                    "minor": {
+                      "type": "keyword"
                     },
-                    "path" : {
-                      "type" : "keyword"
+                    "os": {
+                      "type": "keyword"
                     },
-                    "query" : {
-                      "type" : "keyword"
+                    "name": {
+                      "type": "keyword"
                     },
-                    "scheme" : {
-                      "type" : "keyword"
+                    "os_name": {
+                      "type": "keyword"
                     },
-                    "type" : {
-                      "type" : "keyword"
+                    "device": {
+                      "type": "keyword"
                     }
                   }
                 },
-                "user_agent" : {
-                  "type" : "text"
-                },
-                "user_agent_parsed" : {
-                  "properties" : {
-                    "device" : {
-                      "type" : "keyword"
+                "referrer_parsed": {
+                  "properties": {
+                    "path": {
+                      "type": "keyword"
                     },
-                    "major" : {
-                      "type" : "keyword"
+                    "original": {
+                      "type": "keyword"
                     },
-                    "minor" : {
-                      "type" : "keyword"
+                    "scheme": {
+                      "type": "keyword"
                     },
-                    "name" : {
-                      "type" : "keyword"
+                    "domain": {
+                      "type": "keyword"
                     },
-                    "os" : {
-                      "type" : "keyword"
+                    "query": {
+                      "type": "keyword"
                     },
-                    "os_name" : {
-                      "type" : "keyword"
+                    "type": {
+                      "type": "keyword"
                     },
-                    "patch" : {
-                      "type" : "keyword"
+                    "full": {
+                      "type": "keyword"
                     }
                   }
+                },
+                "user_agent": {
+                  "type": "text"
                 }
               }
             },
@@ -134,23 +119,20 @@
                   "type": "keyword"
                 }
               }
-            }            
+            }
           }
-        },        
+        },
         "source": {
           "properties": {
-            "address": {
-              "type": "keyword"
-            },
-            "ip": {
-              "type": "keyword"
-            },
             "geo": {
               "properties": {
-                "city_name": {
+                "continent_name": {
                   "type": "keyword"
                 },
-                "continent_name": {
+                "region_iso_code": {
+                  "type": "keyword"
+                },
+                "city_name": {
                   "type": "keyword"
                 },
                 "country_iso_code": {
@@ -159,49 +141,70 @@
                 "location": {
                   "type": "geo_point"
                 },
-                "region_iso_code": {
-                  "type": "keyword"
-                },
                 "region_name": {
                   "type": "keyword"
                 }
               }
+            },
+            "address": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "keyword"
             }
           }
         },
-        "url" : {
-          "properties" : {
-            "domain" : {
-              "type" : "keyword"
+        "error": {
+          "properties": {
+            "message": {
+              "type": "text"
+            }
+          }
+        },
+        "list_items": {
+          "properties": {
+            "page_index": {
+              "type": "long"
             },
-            "full" : {
-              "type" : "keyword"
+            "tag": {
+              "type": "keyword"
             },
-            "original" : {
-              "type" : "keyword"
+            "search_query": {
+              "type": "text"
             },
-            "path" : {
-              "type" : "keyword"
+            "page_size": {
+              "type": "long"
+            }
+          }
+        },
+        "url": {
+          "properties": {
+            "path": {
+              "type": "keyword"
             },
-            "query" : {
-              "type" : "keyword"
+            "original": {
+              "type": "keyword"
             },
-            "scheme" : {
-              "type" : "keyword"
+            "scheme": {
+              "type": "keyword"
+            },
+            "domain": {
+              "type": "keyword"
+            },
+            "query": {
+              "type": "keyword"
+            },
+            "full": {
+              "type": "keyword"
             }
           }
         },
         "tags": {
-          "type": "keyword",
-          "normalizer": "keyword_lowercase"
-        },
-        "@timestamp": {
-          "type": "date"
-        },
-        "took": {
-          "type": "long"
+          "normalizer": "keyword_lowercase",
+          "type": "keyword"
         }
       }
     }
-  }
+  },
+  "aliases": {}
 }
