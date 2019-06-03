@@ -45,7 +45,7 @@ export function preparePostJson(p) {
       return {
         id: c.id,
         author: c.author,
-        published_at: c.published_at,
+        published_at: c.published_at.toISOString(),
         content: c.content,
         replies: stripConfidential(c.replies)
       };
