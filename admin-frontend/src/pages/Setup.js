@@ -46,7 +46,7 @@ class Setup extends Component {
           onClick={() => this.props.setupStore.setupElasticsearch()}
           disabled={isLoadingSetup}
           className='btn btn-primary btn-lg'>
-          {isLoadingSetup ? 'Loading...' : 'Setup'}
+          {isLoadingSetup ? 'Loading...' : 'Complete setup'}
         </div>
       </div>
     )

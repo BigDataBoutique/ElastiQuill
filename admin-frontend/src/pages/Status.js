@@ -124,7 +124,12 @@ class Status extends React.Component {
     const allConfigured = _.every(_.values(elasticsearch.setup));
     const error = 'Errors in setup detected: ' + _.keys(elasticsearch.setup)
       .filter(k => ! elasticsearch.setup[k])
-      .map(k => `${k} misconfigured`)
+      .map(k => {
+        if (k === 'blogLogsIndexTemplateUpToDate') {
+          return 'blog-logs template is out-of-date';
+        }
+        return `${k} misconfigured`;
+      })
       .join(', ');
 
     const renderHealth = status => {

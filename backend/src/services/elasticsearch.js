@@ -37,7 +37,7 @@ export async function setup() {
     });
   }
 
-  if (! status.blogLogsIndexTemplate) {
+  if (! status.blogLogsIndexTemplate || ! status.blogLogsIndexTemplateUpToDate) {
     const parsed = JSON.parse(fs.readFileSync(path.join(setupDir, 'blog-logs-index-template.json')).toString('utf-8'));
     parsed.index_patterns = BLOG_LOGS_INDEX_PREFIX + '*';
 
@@ -70,6 +70,13 @@ export async function getStatus() {
     name: BLOG_LOGS_INDEX_TEMPLATE_NAME
   });
 
+  if (status.blogLogsIndexTemplate) {
+    const setupDir = process.env.SETUP_DIR || './_setup';
+    const current = await esClient.indices.getTemplate({ name: BLOG_LOGS_INDEX_TEMPLATE_NAME });
+    const file = JSON.parse(fs.readFileSync(path.join(setupDir, 'blog-logs-index-template.json')).toString('utf-8'));
+    status.blogLogsIndexTemplateUpToDate = mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file);
+  }
+
   try {
     await esClient.ingest.getPipeline({
       id: 'request_log'
@@ -86,4 +93,17 @@ export async function getStatus() {
   }
 
   return status;
+}
+
+function mappingsEqual(m1, m2) {
+  return JSON.stringify(normalizeMapping(m1)) === JSON.stringify(normalizeMapping(m2));
+
+  function normalizeMapping(m) {
+    m = { ...m };
+
+    m.aliases = m.aliases || {};
+    delete m.order;
+    delete m.index_patterns;
+    return m;
+  }
 }
