@@ -1,6 +1,8 @@
 <footer>
+{{#if blogTitle}}
   <p>
-    {{#if title}}{{title}}{{else}}{{blogTitle}}{{/if}}{{#if description}} - {{description}}{{else}} - {{blogDescription}}{{/if}}
+    {{blogTitle}}{{#if blogDescription}}{{blogDescription}}{{/if}}
   </p>
+{{/if}}
   <p>Powered by <a href="https://github.com/BigDataBoutique/ElastiQuill">ElastiQuill</a>, Copyright © 2019 <a href="https://bigdataboutique.com">BigData Boutique</a></p>
 </footer>
