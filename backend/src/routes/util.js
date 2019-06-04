@@ -124,6 +124,7 @@ export function preparePost(p) {
     allow_comments: allowComments,
     reading_time: readTime.minutes > 1 ? readTime.text : null,
     comments_count: p.comments_count ? p.comments_count : countComments(comments),
+    published_at: p.published_at.toISOString(),
     published_at_str: prepareDate(p.published_at),
     url: blogpostUrl(p)
   };
