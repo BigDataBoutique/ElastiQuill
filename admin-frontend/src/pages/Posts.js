@@ -96,28 +96,6 @@ class Posts extends BaseItemsPage {
       return false;
     }
 
-    const renderItem = (title, key) => {
-      if (socialAvailability[key] === 'not_configured') {
-        return false;
-      }
-
-      return (
-        <DropdownItem
-          disabled={socialAvailability[key] === 'not_configured'}
-          onClick={() => {
-            if (socialAvailability[key] === 'ready') {
-              this.props.postsStore.setSocialDialog(key, item);
-            }
-            else {
-              api.redirectToSocialConnect(key);
-            }
-          }}>
-          <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
-          {title}
-        </DropdownItem>
-      )
-    };
-
     const style = {
       marginRight: 10,
       margin: 0,
@@ -129,20 +107,58 @@ class Posts extends BaseItemsPage {
     };
 
     return (
-      <UncontrolledButtonDropdown>
+      <UncontrolledButtonDropdown className='elastiquill-icon-button'>
         <DropdownToggle style={style}>
-          <i style={{ marginRight: 10, fontSize: '18px' }} className='fa fa-share-alt' />
+          <i style={{ marginRight: 10, marginTop: 4, fontSize: '18px' }} className='fa fa-share-alt' />
         </DropdownToggle>
         <DropdownMenu style={{ marginTop: 0, border: '1px solid #aaa' }}>
           <div style={{ paddingLeft: 10 }}>
             Repost on social
           </div>
           {! socialAvailability && <DropdownItem header>Loading...</DropdownItem>}
-          {renderItem('Twitter', 'twitter')}
-          {renderItem('Linkedin', 'linkedin')}
-          {renderItem('Reddit', 'reddit')}
+          {this._renderDropdownItem(item, 'Twitter', 'twitter')}
+          {this._renderDropdownItem(item, 'Linkedin', 'linkedin')}
+          {this._renderDropdownItem(item, 'Medium', 'medium')}
+          {this._renderDropdownItem(item, 'Reddit', 'reddit')}
         </DropdownMenu>
       </UncontrolledButtonDropdown>
+    )
+  }
+
+  _renderDropdownItem(item, title, key) {
+    const { socialAvailability } = this.props.postsStore;
+    if (socialAvailability[key] === 'not_configured') {
+      return false;
+    }
+
+    if (key === 'medium' && _.get(item, 'metadata.medium_crosspost_url')) {
+      return (
+        <DropdownItem disabled={socialAvailability[key] === 'not_configured'}>
+          <a href={_.get(item, 'metadata.medium_crosspost_url')} target='_blank'>
+            <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
+            {title}
+            <i className='fa fa-external-link-alt' style={{ marginLeft: 10 }} />
+          </a>
+        </DropdownItem>
+      )
+    }
+
+    const onClick = () => {
+      if (socialAvailability[key] === 'ready') {
+        this.props.postsStore.setSocialDialog(key, item);
+      }
+      else {
+        api.redirectToSocialConnect(key);
+      }
+    };
+
+    return (
+      <DropdownItem
+        disabled={socialAvailability[key] === 'not_configured'}
+        onClick={onClick}>
+        <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
+        {title}
+      </DropdownItem>
     )
   }
 

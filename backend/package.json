@@ -42,6 +42,7 @@
     "lodash": "4.17.11",
     "markdown-it": "^8.4.2",
     "md5": "^2.2.1",
+    "medium-sdk": "0.0.4",
     "merge-args": "0.2.18",
     "mime-types": "^2.1.24",
     "mock-express-response": "^0.2.2",

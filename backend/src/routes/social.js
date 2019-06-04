@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 
@@ -42,7 +43,7 @@ router.post('/post/reddit/:id', asyncHandler(async (req, res) => {
     throw new Error('Reddit is not connected');
   }  
 
-  const post = await blogPosts.getItemById(req.params.id);
+  const post = await blogPosts.getItemById({ id: req.params.id });
   const link =  config.blog.url + preparePost(post).url;
   try {
     const resp = await social.postToReddit(req.user.connected.reddit, post.title, link, subreddit);
@@ -58,7 +59,7 @@ router.post('/post/reddit/:id', asyncHandler(async (req, res) => {
 }));
 
 router.post('/post/twitter/:id', asyncHandler(async (req, res) => {
-  const post = await blogPosts.getItemById(req.params.id);
+  const post = await blogPosts.getItemById({ id: req.params.id });
   const link =  config.blog.url + preparePost(post).url;
   try {
     const resp = await social.postToTwitter(`${post.title} ${link}`);
@@ -69,6 +70,33 @@ router.post('/post/twitter/:id', asyncHandler(async (req, res) => {
   catch (err) {
     res.json({
       error: err
+    });
+  }
+}));
+
+router.post('/post/medium/:id', asyncHandler(async (req, res) => {
+  const post = await blogPosts.getItemById({ id: req.params.id });
+  if (_.get(post, 'metadata.medium_crosspost_url')) {
+    res.json({
+      error: 'Item is already cross-posted'
+    });
+    return;
+  }
+
+  try {
+    const { url } = await social.postToMedium(req.user.connected.medium, preparePost(post));
+
+    await blogPosts.updateItemPartial(req.params.id, {
+      metadata: {
+        medium_crosspost_url: url
+      }
+    });
+
+    res.json({ url });
+  }
+  catch (err) {
+    res.json({
+      error: err.message
     });
   }
 }));

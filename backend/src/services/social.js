@@ -1,4 +1,5 @@
 import Twitter from 'twitter';
+import medium from 'medium-sdk';
 import request from 'request-promise';
 
 import { config } from '../app';
@@ -7,7 +8,8 @@ export function getAvailability(connected = {}) {
   const res = {
     twitter: !! config.credentials.twitter,
     linkedin: !! config.credentials.linkedin,
-    reddit: !! config.credentials.reddit
+    reddit: !! config.credentials.reddit,
+    medium: !! config.credentials.medium
   };
 
   for (const key in res ) {
@@ -125,6 +127,40 @@ export function postToTwitter(text) {
 
       resolve({
         url: `https://twitter.com/${tweet.user.id_str}/status/${tweet.id_str}`
+      });
+    });
+  });
+}
+
+export async function postToMedium(authData, post) {
+  const client = new medium.MediumClient({
+    clientId: config.credentials.medium['client-id'],
+    clientSecret: config.credentials.medium['client-secret']
+  });
+  client.setAccessToken(authData.token);
+
+  return new Promise((resolve, reject) => {
+    client.getUser((err, user) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      client.createPost({
+        userId: user.id,
+        title: post.title,
+        contentFormat: medium.PostContentFormat.HTML,
+        content: post.content,
+        tags: post.tags,
+        canonicalUrl: config.blog.url + post.url,
+        publishStatus: medium.PostPublishStatus.PUBLIC
+      }, (err, post) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(post);
       });
     });
   });
