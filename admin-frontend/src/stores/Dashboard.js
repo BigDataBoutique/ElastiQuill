@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import BaseStore from "./BaseStore";
 import * as api from '../api';
 
@@ -12,6 +12,9 @@ class Dashboard extends BaseStore {
 
   @observable
   averageVisitsPerDay = null;
+
+  @observable
+  averageVisitorsPerDay = null;
 
   @observable
   mostBusyDayEver = null;
@@ -30,6 +33,9 @@ class Dashboard extends BaseStore {
 
   @observable
   postsCount = null;
+
+  @observable
+  uniqueVisitorsEnabled = false;
 
   @observable
   mostCommentedPosts = [];
@@ -63,6 +69,7 @@ class Dashboard extends BaseStore {
       this.referrerFromDomain = allStats.referrer_from_domain;
       this.postsCount = allStats.posts_count;
       this.averageVisitsPerDay = allStats.avg_visits_per_day;
+      this.averageVisitorsPerDay = allStats.avg_visitors_per_day;
       this.mostBusyDayEver = allStats.most_busy_day;
       this.mostViewedPost = allStats.most_viewed_post;
       this.userAgentOperatingSystem = allStats.user_agent_os;
@@ -74,6 +81,11 @@ class Dashboard extends BaseStore {
     finally {
       this.loaded('stats');    
     }
+  }
+
+  @action
+  toggleUniqueVisitors() {
+    this.uniqueVisitorsEnabled = ! this.uniqueVisitorsEnabled;
   }
 }
 

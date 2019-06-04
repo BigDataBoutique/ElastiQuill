@@ -73,7 +73,13 @@ class StatsOverTimeGraph extends React.Component {
   }
 
   _renderChart() {
-    const { visitsHistogram, viewsHistogram, commentsHistogram, postsHistogram } = this.state;
+    const { commentsHistogram, postsHistogram } = this.state;
+    let { visitsHistogram, viewsHistogram } = this.state;
+
+    if (this.props.uniqueVisitors) {
+      visitsHistogram = this._extractVisitorsHistogram(visitsHistogram);
+      viewsHistogram = this._extractVisitorsHistogram(viewsHistogram);
+    }
 
     const visitsData = this._prepareHistogram(visitsHistogram, true);
     const viewsData = this._prepareHistogram(viewsHistogram, true);
@@ -127,7 +133,7 @@ class StatsOverTimeGraph extends React.Component {
           <LineSeries
             strokeWidth='4px'
             color={VIEWS_COLOR}
-            data={viewsData} />         
+            data={viewsData} />            
         )}          
         <Borders style={{
           bottom: {fill: '#fff'},
@@ -216,6 +222,17 @@ class StatsOverTimeGraph extends React.Component {
     }
 
     return data;
+  }
+
+  _extractVisitorsHistogram(histogram) {
+    if (! histogram) {
+      return [];
+    }
+
+    return histogram.map(it => ({
+      ...it,
+      doc_count: it.visitors.value
+    }));
   }
 
   _normalizeDate(d) {

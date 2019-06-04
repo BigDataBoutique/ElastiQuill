@@ -48,6 +48,9 @@
             }
           }
         },
+        "visitor_id": {
+          "type": "keyword"
+        },
         "http": {
           "properties": {
             "request": {
