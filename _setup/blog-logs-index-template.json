@@ -1,5 +1,5 @@
 {
-  "index_patterns": "blog-logs*",
+  "index_patterns": [],
   "settings": {
     "index": {
       "analysis": {

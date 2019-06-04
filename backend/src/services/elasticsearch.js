@@ -39,7 +39,17 @@ export async function setup() {
 
   if (! status.blogLogsIndexTemplate || ! status.blogLogsIndexTemplateUpToDate) {
     const parsed = JSON.parse(fs.readFileSync(path.join(setupDir, 'blog-logs-index-template.json')).toString('utf-8'));
-    parsed.index_patterns = BLOG_LOGS_INDEX_PREFIX + '*';
+
+    try {
+      const current = await esClient.indices.getTemplate({ name: BLOG_LOGS_INDEX_TEMPLATE_NAME });
+      parsed.index_patterns = updateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns);      
+    }
+    catch (err) {
+      if (err.status != 404) {
+        throw err;
+      }
+      parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
+    }
 
     await esClient.indices.putTemplate({
       name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
@@ -74,7 +84,8 @@ export async function getStatus() {
     const setupDir = process.env.SETUP_DIR || './_setup';
     const current = await esClient.indices.getTemplate({ name: BLOG_LOGS_INDEX_TEMPLATE_NAME });
     const file = JSON.parse(fs.readFileSync(path.join(setupDir, 'blog-logs-index-template.json')).toString('utf-8'));
-    status.blogLogsIndexTemplateUpToDate = mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file);
+    status.blogLogsIndexTemplateUpToDate = mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
+                                           validateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME])
   }
 
   try {
@@ -106,4 +117,32 @@ function mappingsEqual(m1, m2) {
     delete m.index_patterns;
     return m;
   }
+}
+
+function validateIndexPatterns(template) {
+  const p1 = updateIndexPatterns(template.index_patterns).join(',');
+  const p2 = parseIndexPatterns(template.index_patterns).join(',');
+  return p1 === p2;
+}
+
+function parseIndexPatterns(indexPatterns) {
+  let res = [];
+  if (_.isArray(indexPatterns)) {
+    res = indexPatterns.slice();
+  }
+  else if (indexPatterns) {
+    res = [indexPatterns];
+  }
+  return res;
+}
+
+function updateIndexPatterns(indexPatterns) {
+  const p = BLOG_LOGS_INDEX_PREFIX + '*';
+  const patterns = parseIndexPatterns(indexPatterns);
+
+  if (! patterns.includes(p)) {
+    patterns.push(p);
+  }
+  patterns.sort();
+  return patterns;
 }
