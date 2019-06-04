@@ -23,7 +23,8 @@ export const CreatePostArgSchema = Joi.object().keys({
   "metadata": Joi.object().keys({
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
-    "canonical_url": Joi.string().optional().allow('', null)
+    "canonical_url": Joi.string().optional().allow('', null),
+    "medium_crosspost_url": Joi.string().optional().allow('', null)
   }).required(),
   "author": Joi.object().keys({
     "name": Joi.string().required(),
@@ -42,7 +43,8 @@ const UpdatePostArgSchema = Joi.object().keys({
   "metadata": Joi.object().keys({
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
-    "canonical_url": Joi.string().optional().allow('', null)
+    "canonical_url": Joi.string().optional().allow('', null),
+    "medium_crosspost_url": Joi.string().optional().allow('', null)
   }).required(),
   "allow_comments": Joi.boolean().required(),
   "medium_crosspost_url": Joi.string().allow('')
@@ -238,6 +240,18 @@ export async function updateItem(id, type, post) {
   events.emitChange(updatedItem.type, updatedItem);
 
   return updatedItem;
+}
+
+export async function updateItemPartial(id, update) {
+  await esClient.update({
+    id,
+    index: ES_INDEX,
+    type: '_doc',
+    refresh: 'wait_for',
+    body: {
+      doc: update
+    }
+  });
 }
 
 export async function getMoreLikeThis(itemId) {

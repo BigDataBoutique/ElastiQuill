@@ -237,7 +237,9 @@ function initConfig() {
     ['credentials.linkedin.client-id', 'LINKEDIN_CLIENT_ID'],
     ['credentials.linkedin.client-secret', 'LINKEDIN_CLIENT_SECRET'],
     ['credentials.reddit.client-id', 'REDDIT_CLIENT_ID'],
-    ['credentials.reddit.client-secret', 'REDDIT_CLIENT_SECRET']
+    ['credentials.reddit.client-secret', 'REDDIT_CLIENT_SECRET'],
+    ['credentials.medium.client-id', 'MEDIUM_CLIENT_ID'],
+    ['credentials.medium.client-secret', 'MEDIUM_CLIENT_SECRET']    
   ];
 
   envOverrides.forEach(override => {

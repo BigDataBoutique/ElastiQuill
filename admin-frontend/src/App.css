@@ -253,7 +253,7 @@ body {
   cursor: pointer;
 }
 
-.elastiquill-icon-button:hover {
+.elastiquill-icon-button:hover img,.elastiquill-icon-button:hover>button>i {
   opacity: 0.8;
 }
 

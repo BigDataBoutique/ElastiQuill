@@ -115,6 +115,7 @@ class Status extends React.Component {
           {this._renderLabel({ label: 'Twitter', success: social.twitter !== 'not_configured' })}
           {this._renderLabel({ label: 'Reddit', success: social.reddit !== 'not_configured' })}
           {this._renderLabel({ label: 'LinkedIn', success: social.linkedin !== 'not_configured' })}
+          {this._renderLabel({ label: 'Medium', success: social.medium !== 'not_configured' })}
         </div>
       </div>
     )
