@@ -105,6 +105,13 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
               terms: {
                 field: 'read_item.id',
                 size: 1
+              },
+              aggs: {
+                visitors: {
+                  cardinality: {
+                    field: 'visitor_id'
+                  }
+                }
               }
             }
           }
@@ -119,6 +126,13 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
           date_histogram: {
             field: '@timestamp',
             interval
+          },
+          aggs: {
+            visitors: {
+              cardinality: {
+                field: 'visitor_id'
+              }                  
+            }
           }
         },
         views_histogram: {
@@ -132,8 +146,15 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
               date_histogram: {
                 field: '@timestamp',
                 interval
-              }              
-            }            
+              },
+              aggs: {
+                visitors: {
+                  cardinality: {
+                    field: 'visitor_id'
+                  }                  
+                }
+              }      
+            }
           }
         },
         avg_visits_per_day: {
@@ -174,6 +195,13 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
       date_histogram: {
         field: '@timestamp',
         interval: '1d'
+      },
+      aggs: {
+        visitors: {
+          cardinality: {
+            field: 'visitor_id'
+          }                  
+        }
       }
     };
   }
@@ -196,6 +224,7 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
 
   const resp = await esClient.search(query);
   let avg_visits_per_day = 0,
+      avg_visitors_per_day = 0,
       most_busy_day = null,
       most_viewed_post = null,
       visits_by_country = [],
@@ -210,6 +239,7 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
 
   if (resp.aggregations) {
     avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
+    avg_visitors_per_day = _.round(_.get(resp.aggregations, visitsPerDayAgg + '.buckets').map(b => b.visitors.value));
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
     user_agent_os = resp.aggregations.user_agent_os.buckets;
@@ -226,6 +256,7 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
       try {
         most_viewed_post = await blogPosts.getItemById({ id: mostViewedPost.key });
         most_viewed_post.views_count = mostViewedPost.doc_count;
+        most_viewed_post.visitors_count = mostViewedPost.visitors.value;
       }
       catch (err) {
         if (err.statusCode != 404) {
@@ -237,7 +268,8 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
     const largestBucket = _.maxBy(_.get(resp.aggregations, visitsPerDayAgg + '.buckets'), b => b.doc_count);
     most_busy_day = largestBucket ? {
       date: new Date(largestBucket.key),
-      count: largestBucket.doc_count
+      count: largestBucket.doc_count,
+      visitors: largestBucket.visitors
     } : null;
 
     if (resp.aggregations.posts_visits) {
@@ -251,6 +283,7 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
 
   return {
     avg_visits_per_day,
+    avg_visitors_per_day,
     most_viewed_post,
     most_busy_day,
     views_by_date,
@@ -368,12 +401,19 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
       ...(res ? res.locals.logData : {}),      
     };
 
-    if (! excludeUrl && req) {
-      const url = ecsUrl(req.protocol + '://' + req.get('host') + req.originalUrl);
-      for (const key in url) {
-        body[key] = url[key];
+    if (req) {
+      if (tags.includes('visit')) {
+        body.visitor_id = req.visitorId;
+      }
+
+      if (! excludeUrl) {
+        const url = ecsUrl(req.protocol + '://' + req.get('host') + req.originalUrl);
+        for (const key in url) {
+          body[key] = url[key];
+        }
       }
     }
+
 
     if (error) {
       body.error = {

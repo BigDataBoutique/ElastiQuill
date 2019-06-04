@@ -40,6 +40,8 @@ class Dashboard extends React.Component {
       visitsByLocation,
       mostCommentedPosts,
       averageVisitsPerDay,
+      averageVisitorsPerDay,
+      uniqueVisitorsEnabled,
     } = this.props.dashboardStore;
 
     if (beingLoaded.length) {
@@ -52,7 +54,7 @@ class Dashboard extends React.Component {
           <h1 style={{ fontSize: '29px' }}>
             {moment(mostBusyDayEver.date).format('DD/MM/YYYY')}
           </h1>
-          <h6>{mostBusyDayEver.count + ' visits'}</h6>
+          <h6>{(uniqueVisitorsEnabled ? mostBusyDayEver.visitors.value : mostBusyDayEver.count) + ' visits'}</h6>
         </div>
         <h2>Busiest day ever</h2>
       </React.Fragment>
@@ -68,10 +70,13 @@ class Dashboard extends React.Component {
             {this._textEllipsis(mostViewedPost.title, 35)}
           </a>
         </h4>
-        <h6>{mostViewedPost.views_count + ' views'}</h6>
+        <h6>{(uniqueVisitorsEnabled ? mostViewedPost.visitors_count : mostViewedPost.views_count) + ' views'}</h6>
         <h2>Most viewed post</h2>
       </React.Fragment>
     );
+
+    const onToggleUniqueVisitors = () => this.props.dashboardStore.toggleUniqueVisitors();
+    const averagePerDay = uniqueVisitorsEnabled ? averageVisitorsPerDay : averageVisitsPerDay;
 
     return (
       <Fragment>
@@ -79,7 +84,7 @@ class Dashboard extends React.Component {
         <div className='row' style={{ minHeight: '124px', marginBottom: '63px', marginLeft: -5 }}>
           {this._renderTextCard('Total blog posts', postsCount || 0)}
           {this._renderTextCard('Comments on posts', commentsCount || 0)}
-          {this._renderTextCard('Visitors / day (average)', _.round(averageVisitsPerDay, 1) || 0)}
+          {this._renderTextCard('Visitors / day (average)', _.round(averagePerDay, 1) || 0)}
           {mostBusyDayEverCard}
           {mostViewedCard}
           <div className='col-lg-2' />
@@ -87,9 +92,17 @@ class Dashboard extends React.Component {
 
         <div className='row' style={{ marginBottom: '41px' }}>
           <div className='col-12'>
-            <div className='elastiquill-header'>Blog Statistics</div>
+            <div className='elastiquill-header' style={{ display: 'flex', width: '100%' }}>
+              Blog Statistics
+              <div style={{ flex: 1, textAlign: 'right', userSelect: 'none' }}>
+                <div>
+                  <input readOnly checked={uniqueVisitorsEnabled} type='checkbox' onClick={onToggleUniqueVisitors} />
+                  <label onClick={onToggleUniqueVisitors} style={{ cursor: 'pointer', marginLeft: 10 }}>Unique visitors</label>
+                </div>
+              </div>
+            </div>
             <div className='elastiquill-card'>
-              <StatsOverTimeGraph />
+              <StatsOverTimeGraph uniqueVisitors={uniqueVisitorsEnabled} />
             </div>
           </div>
         </div>
