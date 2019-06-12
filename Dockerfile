@@ -1,4 +1,5 @@
 FROM node:10-alpine
+LABEL maintainer="info@bigdataboutique.com"
 
 WORKDIR /app
 COPY . .
