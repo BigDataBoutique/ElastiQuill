@@ -31,7 +31,11 @@ router.get('/all', asyncHandler(async (req, res) => {
   stats.most_viewed_post = preparePost(stats.most_viewed_post);
 
   if (! req.query.item_id) {
-    const { postsCount, postsByDate  } = await blogPosts.getStats({ startDate, interval });
+    const { postsCount, postsByDate  } = await blogPosts.getStats({
+      type: 'post',
+      startDate,
+      interval
+    });
     stats.posts_count = postsCount;
     stats.posts_by_date = postsByDate;
   }
