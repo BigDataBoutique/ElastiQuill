@@ -282,6 +282,72 @@ body {
   width: 100%;    
 }
 
+blockquote {
+  display:block;
+  background: #fff;
+  padding: 1.5rem 2rem 1.5rem 4.5rem;
+  margin: 3rem 0 4rem 0;
+  position: relative;
+  
+  /*Font*/
+  /* font-family: Georgia, serif; */
+  /* font-size: 16px; */
+  line-height: 1.2;
+  color: #666;
+  text-align: justify;
+  
+  border: 0;
+  border-left: 15px solid #ea3798;
+  border-right: 2px solid #ea3798;
+  
+  /*Box Shadow */
+  -moz-box-shadow: 2px 2px 15px #ccc;
+  -webkit-box-shadow: 2px 2px 15px #ccc;
+  box-shadow: 2px 2px 15px #ccc;
+}
+
+blockquote::before{
+  content: "\201C"; /*Unicode for Left Double Quote*/
+  
+  /*Font*/
+  font-family: Georgia, serif;
+  font-size: 6rem;
+  font-weight: bold;
+  color: #999;
+  
+  /*Positioning*/
+  position: absolute;
+  left: 10px;
+  top:5px;
+}
+
+blockquote span.by {
+  margin: 1rem;
+  display: block;
+  color: #999;
+  font-size: 16px;
+}
+
+blockquote::after{
+  content: "";
+}
+
+blockquote a{
+  text-decoration: none;
+  background: #eee;
+  cursor: pointer;
+  padding: 0 3px;
+  color: #ea3798;
+}
+
+blockquote a:hover{
+ color: #666;
+}
+
+blockquote em{
+  font-style: italic;
+}
+
 @media screen and (max-width: 992px) {
   .elastiquill-nav-link {
     margin: 10px;

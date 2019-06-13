@@ -10,8 +10,8 @@ import { hot } from 'react-hot-loader';
 import { reaction } from "mobx";
 import { Provider } from "mobx-react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import PrivateRoute from './components/PrivateRoute';
 
+import PrivateRoute from './components/PrivateRoute';
 import urls from './config/urls';
 import * as pages from './pages';
 import * as stores from './stores';
