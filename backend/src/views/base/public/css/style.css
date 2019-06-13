@@ -299,7 +299,7 @@ main.post-page {
     font-size: 1.6rem;
 }
 
-.post-page .post-content p {
+.post-page .post-content p, .post-page .post-content u {
     font-size: 2rem;
 }
 

@@ -2,7 +2,6 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { toast } from 'react-toastify';
 import React, {Component} from 'react';
-
 import Showdown from 'showdown';
 import TurndownService from 'turndown';
 import MediumEditor from 'medium-editor';
@@ -16,6 +15,7 @@ import './embeds-patched-plugin';
 class TurndownServiceProxy extends TurndownService {
   constructor(...args) {
     super(...args);
+    this.keep('u');
   }
 
   turndown(html) {
@@ -133,6 +133,13 @@ class ContentEditor extends Component {
     });
     $(this.container.current).removeClass('medium-editor-placeholder');
     $(this.container.current).html($(this.container.current).html());
+    $(this.container.current).on('keyup', e => {
+      // space or enter
+      if (e.keyCode !== 13 && e.keyCode !== 32) {
+        return;
+      }
+      $(this.container.current).linkify();
+    });
   }
 
   componentWillUnmount() {

@@ -17,6 +17,8 @@ require('../node_modules/blueimp-file-upload/js/vendor/jquery.ui.widget.js');
 require('../node_modules/blueimp-file-upload/js/jquery.iframe-transport.js');
 require('../node_modules/blueimp-file-upload/js/jquery.fileupload.js');
 require('./lib/jquery-sortable-min.js');
+require('./lib/linkify.min.js');
+require('./lib/linkify-jquery.min.js');
 window.MediumInsert = require('./lib/medium-editor-insert-plugin.min.js').MediumInsert;
 
 localforage.config({

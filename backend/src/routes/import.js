@@ -14,7 +14,10 @@ router.post('/', asyncHandler(async (req, res) => {
 
   let resp;
   try {
-    resp = await request.get(jsonUrl);
+    resp = JSON.parse(await request.get(jsonUrl));
+    if (resp.tags) {
+      resp.tags = resp.tags.map(t => t.key);
+    }
   }
   catch (err) {
     throw new Error('Failed to fetch ' + jsonUrl);
