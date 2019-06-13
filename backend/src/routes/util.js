@@ -105,8 +105,9 @@ export function preparePost(p) {
     header_image_url: p.metadata.header_image_url || DEFAULT_HEADER_IMAGE
   };  
 
-  const content = p.metadata.content_type === 'markdown' ? blogpostMarkdown.render(p.content) : p.content;
-  const excerpt = htmlToText.fromString(content, {
+  const content = p.metadata.content_type === 'markdown' ? blogpostMarkdown.render(p.content) : p.content; 
+  const hasDescription = _.isString(p.description) && _.trim(p.description).length > 0;
+  const excerpt = hasDescription ? p.description : htmlToText.fromString(content, {
     ignoreHref: true,
     ignoreImage: true
   }).substring(0, 200) + '...';

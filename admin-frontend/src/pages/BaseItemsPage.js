@@ -81,13 +81,17 @@ class BaseItemsPage extends Component {
       this.props.history.push(`/stats/${urlPart}/` + item.id);
     };
 
+    const image = item.type === 'post' ? (
+      <img src={imageSrc} style={{ width: '170px', height: '153px', objectFit: 'cover' }} />
+    ) : false;
+
     return (
       <div      
         className='elastiquill-card'
         onClick={onClick}
         style={{ display: 'flex', marginBottom: '24px', cursor: 'pointer' }}>
-        <img src={imageSrc} style={{ width: '170px', height: '153px', objectFit: 'cover' }}/>
-        <div style={{ display: 'flex', flexFlow: 'column', flex: 1, minWidth: '0px', paddingLeft: '33px' }}>
+        {image}
+        <div style={{ display: 'flex', flexFlow: 'column', flex: 1, minWidth: '0px', paddingLeft: image ? '33px' : undefined }}>
           <div style={{ display: 'flex' }}>
             <div style={{ flex: 1, paddingRight: 10 }} className='elastiquill-header-2 elastiquill-text-ellipsis'>{item.title}</div>
             <div style={{ display: 'flex' }}>

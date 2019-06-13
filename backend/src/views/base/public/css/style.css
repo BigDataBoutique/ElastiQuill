@@ -215,6 +215,10 @@ p.header-text {
     order: 3;
 }
 
+.post-content ul {
+    padding-left: 4rem;
+}
+
 .card {
     border: none;
 }
