@@ -25,7 +25,10 @@ export function cachePageHandler(handler) {
       const recordedRes = await recordResponse(handler, req, res, next);
 
       if (! data) {
-        res.status(recordedRes.statusCode).send(recordedRes.body);
+        res
+          .status(recordedRes.statusCode)
+          .set(recordedRes.getHeaders())
+          .send(recordedRes.body);
       }
 
       if (recordedRes.statusCode.toString().startsWith('2')) {
@@ -94,7 +97,11 @@ function recordResponse(handler, req, res, next) {
       chunks.push(args[0]);
     }
 
-    resMock.body = Buffer.concat(chunks).toString('utf8');
+    const bufferChunks = chunks.map(c => {
+      if (_.isString(c)) return Buffer.from(c);
+      return c;
+    });
+    resMock.body = Buffer.concat(bufferChunks).toString('utf8');
     resMock._oldEnd(...args);
   };
 

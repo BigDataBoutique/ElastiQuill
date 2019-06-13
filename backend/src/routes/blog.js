@@ -74,7 +74,7 @@ events.onChange('post', post => clearPageCache(blogpostUrl(post)));
 router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
   const { id, isJson } = parseBlogpostId(req.params.id);
   
-  let post = await blogPosts.getItemById({
+  const post = await blogPosts.getItemById({
     id,
     withComments: true,
     moreLikeThis: true

@@ -407,7 +407,7 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
   };
 }
 
-export async function getStats({ startDate = null, endDate = null, interval = '1d' }) {
+export async function getStats({ startDate = null, endDate = null, type = null, interval = '1d' }) {
   const filters = [];
   if (startDate || endDate) {
     filters.push({
@@ -417,6 +417,12 @@ export async function getStats({ startDate = null, endDate = null, interval = '1
           gte: startDate || null
         }
       }
+    });
+  }
+
+  if (type) {
+    filters.push({
+      term: { type }
     });
   }
 
