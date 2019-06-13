@@ -58,15 +58,15 @@ class BaseForm extends Component {
     };
 
     return (
-      <div style={{ background: 'white', padding: 30 }}>
-        <div style={{ display: 'flex' }}>
+      <div style={{ position: 'relative', background: 'white', padding: 30 }}>
+        <div style={{ position: 'absolute', right: 5, top: 5, cursor: 'pointer' }}>
+          <div onClick={onClickSave} className='btn btn-outline-success btn-sm'>
+            {saveBtnLabel}
+          </div>
+        </div>      
+        <div style={{ paddingTop: 10, display: 'flex' }}>
           <div style={{ flex: 1 }}>
             {this._renderSimpleInput({ prop: 'title', placeholder: 'Title', style: { border: '0px', fontSize: '30px' } })}
-          </div>
-          <div>
-            <div onClick={onClickSave} className='btn btn-outline-success btn-sm'>
-              {saveBtnLabel}
-            </div>
           </div>
         </div>
         {this._renderContentEditor({

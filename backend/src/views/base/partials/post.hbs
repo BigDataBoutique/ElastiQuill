@@ -3,33 +3,33 @@
     <a href="{{this.url}}"><img src="{{this.metadata.header_image_url}}" alt=""></a>
   </div>
   <div class="post-content">
-      <a href="{{this.url}}">
-        <h5 class="post-title">{{this.title}}<br></h5>
+    <a href="{{this.url}}">
+      <h5 class="post-title">{{this.title}}<br></h5>
+    </a>
+    {{#if this.reading_time}}
+    <span class="read">{{this.reading_time}}</span>
+    {{/if}}
+    <div class="post-excerpt">{{{this.excerpt}}}</div>
+    <div class="post-badges">
+      {{# if this.series}}
+      <a href="{{this.series_url}}">
+        <div class="series-badge badge my-4">Series: {{this.series}}</div>
       </a>
-      {{#if this.reading_time}}
-      <span class="read">{{this.reading_time}}</span>
       {{/if}}
-      <div class="post-excerpt">{{{this.excerpt}}}</div>
-      <div class="post-badges">
-        {{# if this.series}}
-        <a href="{{this.series_url}}">
-          <div class="series-badge badge my-4">Series: {{this.series}}</div>
+      {{#each tags}}
+        <a href="{{this.url}}">
+          <div class="tags-badge badge">{{this.key}}</div>
         </a>
-        {{/if}}
-        {{#each tags}}
-          <a href="{{this.url}}">
-            <div class="tags-badge badge">{{this.key}}</div>
-          </a>
-        {{/each}}
+      {{/each}}
+    </div>
+    <div class="post-author__container d-flex justify-content-between">
+      <div class="post-author">
+        <img src="{{this.author.avatar}}" alt="">
+        <span class="author-name">{{this.author.name}}</span>
       </div>
-      <div class="post-author__container d-flex justify-content-between">
-        <div class="post-author">
-          <img src="{{this.author.avatar}}" alt="">
-          <span class="author-name">{{this.author.name}}</span>
-        </div>
-        <time class="post-date" datetime="{{this.published_at}}">
-          {{this.published_at_str}}
-        </time>
-      </div>
+      <time class="post-date" datetime="{{this.published_at}}">
+        {{this.published_at_str}}
+      </time>
+    </div>
   </div>
 </article>
