@@ -191,6 +191,7 @@ class BaseForm extends Component {
             formRenderer={formRenderer}
             beforeSend={beforeSend}
             url={api.uploadImageUrl()}
+            method='POST'
             onLoad={onLoad}
             onError={e => toast.error(e.message)} />
         )}
