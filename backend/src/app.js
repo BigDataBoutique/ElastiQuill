@@ -239,7 +239,8 @@ function initConfig() {
     ['credentials.reddit.client-id', 'REDDIT_CLIENT_ID'],
     ['credentials.reddit.client-secret', 'REDDIT_CLIENT_SECRET'],
     ['credentials.medium.client-id', 'MEDIUM_CLIENT_ID'],
-    ['credentials.medium.client-secret', 'MEDIUM_CLIENT_SECRET']    
+    ['credentials.medium.client-secret', 'MEDIUM_CLIENT_SECRET'],
+    ['credentials.facebook.app-id', 'FACEBOOK_APP_ID'],
   ];
 
   envOverrides.forEach(override => {

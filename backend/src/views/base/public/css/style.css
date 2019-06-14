@@ -739,3 +739,7 @@ footer a {
   font-weight: 400;
   outline: 0;
 }
+
+.share-selected-text-btn > i {
+    color: white;
+}

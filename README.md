@@ -154,6 +154,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` |
 | credentials.medium.client-id | Medium Client ID | `MEDIUM_CLIENT_ID` |
 | credentials.medium.client-secret | Medium Client Secret | `MEDIUM_CLIENT_SECRET` |
+| credentials.facebook.app-id | Facebook App ID. Used to enable sharing selected text to Facebook. | `FACEBOOK_APP_ID` |
 
 ## Running locally
 
