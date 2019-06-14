@@ -232,7 +232,9 @@ function loadTemplate (file, options) {
     // compile template file
     .then(data => {
         // replace entry in template cache with template function
-        var template = GLOBAL.templates[file] = handlebars.compile(data)
+        var template = GLOBAL.templates[file] = handlebars.compile(data, {
+            preventIndent: true
+        })
         // resolve with template
         return template
     })

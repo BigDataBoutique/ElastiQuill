@@ -15,11 +15,13 @@
   <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script type="text/javascript">
-  $(function() {
-    $('time').each(function() {
-      $(this).attr('title', new Date($(this).attr('datetime')).toLocaleString());
-    });
-  })
+    {{#if logData.read_item.id}}
+    window.ELASTIQUILL_ITEM_ID = "{{logData.read_item.id}}";
+    {{/if}}
+    {{#if facebookAppId}}
+    window.ELASTIQUILL_FACEBOOK_APP_ID = "{{facebookAppId}}"
+    {{/if}}    
   </script>
+  <script type="text/javascript" src="/static/base/js/main.js" ></script>
 </body>
 </html>

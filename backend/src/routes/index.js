@@ -91,6 +91,7 @@ router.use(asyncHandler(async (req, res, next) => {
   res.locals.blogRoutePrefix = BLOG_ROUTE_PREFIX;
   res.locals.blogTitle = config.blog['title'];
   res.locals.blogDescription = config.blog['description'];
+  res.locals.facebookAppId = _.get(config, 'credentials.facebook.app-id');
 
   res.locals.sidebarWidgetData = await cache.cacheAndReturn('sidebar-widget-data', async () => {
     const { items, allTags, allSeries } = await blogPosts.getItems({ type: 'post', pageIndex: 0, pageSize: 10 });

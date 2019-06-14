@@ -18,7 +18,8 @@ const ContactMessageArgSchema = Joi.object().keys({
   "name": Joi.string().required(),
   "email": Joi.string().email().required(),
   "subject": Joi.string().required(),
-  "content": Joi.string().required()
+  "content": Joi.string().required(),
+  "recipient": Joi.string().allow(null)
 });
 
 const SendNewCommentNotificationArgSchema = Joi.object().keys({
@@ -53,10 +54,10 @@ export function sendContactMessage(message) {
   }
 
   const msg = {
-    to: config.blog['contact-email'],
+    to: message.recipient || config.blog['contact-email'],
     from: message.email,
     subject: `[Contact] ${message.subject}`,
-    html: `<p>From: ${message.name}</p><div>${message.content}</div>`
+    html: `<p>From: ${message.name}</p><div>${markdown.render(message.content)}</div>`    
   };
   sgMail.send(msg);
 }
