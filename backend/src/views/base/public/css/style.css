@@ -118,7 +118,7 @@ a.nav-login {
 .fresh-post .fresh-post__img img {
     width: 100%;
     min-height: 340px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .fresh-post .fresh-post__img {
@@ -284,7 +284,7 @@ main.post-page {
 
 .post-container {
     max-width: 777px;
-    margin: 4rem auto 0 auto;
+    margin: 6rem auto 0 auto;
     padding: 0 1.5rem;
 }
 
@@ -412,7 +412,7 @@ main.post-page {
 .post-image img{
     width: 100%;
     height: 343px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .posts-widget a {
@@ -694,6 +694,7 @@ footer a {
         height: 242px;
         min-height: 242px;
         max-width: 270px;
+        object-fit: cover;
     }
 
     .fresh-post .fresh-post__img img {
