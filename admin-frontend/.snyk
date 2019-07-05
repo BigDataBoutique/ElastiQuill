@@ -1,0 +1,30 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-450202:
+    - react-fileupload-progress > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > eslint-plugin-import > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > sinon > @sinonjs/samsam > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > sinon > @sinonjs/formatio > @sinonjs/samsam > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - turndown > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-hot-loader > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > babel-plugin-istanbul > istanbul-lib-instrument > @babel/generator > @babel/types > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-select > emotion > babel-plugin-emotion > @babel/helper-module-imports > @babel/types > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > sinon > nise > @sinonjs/formatio > @sinonjs/samsam > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > babel-plugin-istanbul > istanbul-lib-instrument > @babel/traverse > @babel/helper-split-export-declaration > @babel/types > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
+    - react-fileupload-progress > babel-plugin-istanbul > istanbul-lib-instrument > @babel/traverse > @babel/helper-function-name > @babel/template > @babel/types > lodash:
+        patched: '2019-07-05T01:07:12.361Z'
