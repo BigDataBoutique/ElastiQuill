@@ -15,7 +15,7 @@ class Backup extends React.Component {
               <div className='elastiquill-card'>
                 <div>
                   <div style={{ marginBottom: 10 }}>
-                    JSON document with all posts and comments.
+                    JSON document with all posts, comments and content pages.
                   </div>
                   <button
                     onClick={this._onClick.bind(this, api.downloadBackup)}
