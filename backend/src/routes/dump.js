@@ -30,6 +30,9 @@ router.get('/content', asyncHandler(async (req, res) => {
   const posts = await blogPostsService.getAllItems({
     type: 'post',
   });
+  const contentPages = await blogPostsService.getAllItems({
+    type: 'page'
+  });
 
   res.set({
     'Content-Disposition': 'attachment; filename=backup.json',
@@ -38,7 +41,8 @@ router.get('/content', asyncHandler(async (req, res) => {
 
   res.json({
     posts,
-    comments
+    comments,
+    content_pages: contentPages
   })
 }));
 
