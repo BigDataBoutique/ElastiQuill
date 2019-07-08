@@ -16,12 +16,6 @@ import { preparePost, preparePage, preparePostJson, blogpostUrl } from './util';
 import { config } from '../app';
 
 const router = express.Router();
-const rss = new RSS({
-  title: config.blog.title,
-  description: config.blog.description,
-  site_url: config.blog.url,
-  generator: 'elastic-blog-engine'
-});
 
 const PAGE_SIZE = 10;
 
@@ -43,13 +37,23 @@ router.get('/rss', asyncHandler(async (req, res) => {
 
   const recentPosts = items.map(preparePost);
 
+  const rss = new RSS({
+    title: config.blog.title,
+    description: config.blog.description,
+    site_url: config.blog.url,
+    generator: 'elastic-blog-engine'
+  });
+
   res.type('application/rss+xml');
   recentPosts.forEach(post => rss.item({
     title: post.title,
     description: post.description,
     url: url.resolve(config.blog.url, post.url),
-    categories: post.tags,
-    date: new Date(post.published_at)
+    categories: post.tags.map(t => t.key),
+    date: new Date(post.published_at),
+    custom_elements: [
+      { 'image': post.metadata.header_image_url }
+    ]
   }));
   res.send(rss.xml());
 }));
