@@ -87,8 +87,8 @@ export function preparePost(p) {
     p.more_like_this = p.more_like_this.map(preparePost);
   }
 
-  let tags = p.tags;
-  if (tags) {
+  let tags = [];
+  if (p.tags) {
     tags = p.tags.map(key => ({
       key,
       url: tagUrl(key)
