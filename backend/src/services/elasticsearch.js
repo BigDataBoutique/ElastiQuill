@@ -23,17 +23,25 @@ export async function setup() {
   const status = await getStatus();
   const setupDir = process.env.SETUP_DIR || './_setup';
 
+  const clusterStats = await esClient.cluster.stats({
+    nodeId: '_local'
+  });
+  const isES7 = clusterStats.nodes.versions[0].startsWith('7');
+  const includeTypeName = isES7 ? true : undefined; 
+
   if (! status.blogIndex) {
     await esClient.indices.create({
       index: BLOG_INDEX,
-      body: fs.readFileSync(path.join(setupDir, 'blog-index.json')).toString('utf-8')
+      body: fs.readFileSync(path.join(setupDir, 'blog-index.json')).toString('utf-8'),
+      includeTypeName
     });
   }
 
   if (! status.blogCommentsIndex) {
     await esClient.indices.create({
       index: BLOG_COMMENTS_INDEX,
-      body: fs.readFileSync(path.join(setupDir, 'blog-comments-index.json')).toString('utf-8')
+      body: fs.readFileSync(path.join(setupDir, 'blog-comments-index.json')).toString('utf-8'),
+      includeTypeName
     });
   }
 
@@ -53,7 +61,8 @@ export async function setup() {
 
     await esClient.indices.putTemplate({
       name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-      body: JSON.stringify(parsed)
+      body: JSON.stringify(parsed),
+      includeTypeName
     });
   }
 
@@ -110,7 +119,11 @@ function mappingsEqual(m1, m2) {
   return JSON.stringify(normalizeMapping(m1)) === JSON.stringify(normalizeMapping(m2));
 
   function normalizeMapping(m) {
-    m = { ...m };
+    m = _.cloneDeep(m);
+    if (m.mappings._doc) {
+      m.mappings = m.mappings._doc;
+    }
+
 
     m.aliases = m.aliases || {};
     delete m.order;
