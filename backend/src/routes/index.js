@@ -90,6 +90,7 @@ router.use(asyncHandler(async (req, res, next) => {
   res.locals.isLocalhost = IS_LOCALHOST;
   res.locals.blogRoutePrefix = BLOG_ROUTE_PREFIX;
   res.locals.blogTitle = config.blog['title'];
+  res.locals.blogUrl = config.blog['url'];
   res.locals.blogDescription = config.blog['description'];
   res.locals.facebookAppId = _.get(config, 'credentials.facebook.app-id');
 

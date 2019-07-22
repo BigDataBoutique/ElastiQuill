@@ -65,7 +65,8 @@ export const hbs = exphbs({
     head: xs => xs[0],
     tail: xs => xs.slice(1),
     truncateHtml: require('truncate-html'),
-    toLowerCase: s => s.toLowerCase()
+    toLowerCase: s => s.toLowerCase(),
+    encodeURI: encodeURIComponent
   },
   partialDirs: viewPaths.map(p => path.join(p, 'partials')).filter(p => fs.existsSync(p)),
   layoutDirs: viewPaths.map(p => path.join(p, 'layouts')).filter(p => fs.existsSync(p)),

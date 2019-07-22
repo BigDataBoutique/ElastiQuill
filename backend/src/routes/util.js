@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import url from 'url';
 import md5 from 'md5';
 import moment from 'moment';
 import MarkdownIt from 'markdown-it';
@@ -9,6 +10,7 @@ import sanitizeHtml from 'sanitize-html';
 import { config } from '../app';
 import { stripSeriesTag, CONTENT_DESCRIPTION_ID_PREFIX } from '../services/blogPosts';
 
+const BLOG_URL = config.blog['url'];
 const BLOG_ROUTE_PREFIX = config.blog['blog-route-prefix'];
 const COMMENTS_POST_PERIOD = config.blog['comments-post-period'];
 const DEFAULT_HEADER_IMAGE = config.blog['default-header-image'];
@@ -112,6 +114,8 @@ export function preparePost(p) {
     ignoreImage: true
   }).substring(0, 200) + '...';
 
+  const postUrl = blogpostUrl(p);
+
   return {
     ...p,
     tags,
@@ -121,13 +125,14 @@ export function preparePost(p) {
     metadata,
     comments,
     highlight,
+    url: postUrl,
+    full_url: url.resolve(BLOG_URL, postUrl),
     series_url: p.series ? seriesUrl(p.series) : undefined,
     allow_comments: allowComments,
     reading_time: readTime.minutes > 1 ? readTime.text : null,
     comments_count: p.comments_count ? p.comments_count : countComments(comments),
     published_at: new Date(p.published_at).toISOString(),
     published_at_str: prepareDate(p.published_at),
-    url: blogpostUrl(p)
   };
 
   function countComments(comments) {
