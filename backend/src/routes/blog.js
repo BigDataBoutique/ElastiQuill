@@ -120,6 +120,7 @@ router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
     recaptchaClientKey: recaptcha.clientKey(),
     title: post.title,
     description: post.description,
+    metaKeywords: postMetaKeywords(preparedPost),
     post: preparedPost
   });
 })));
@@ -232,6 +233,12 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     return;
   }
 
+  const preparedPost = preparePost(await blogPosts.getItemById({
+    id: postId,
+    withComments: true,
+    moreLikeThis: true
+  }));
+
   res.render('post', {
     sidebarWidgetData: res.locals.sidebarWidgetData,
     comments: {
@@ -240,11 +247,8 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
       values: commentError ? req.body : null
     },
     recaptchaClientKey: recaptcha.clientKey(),
-    post: preparePost(await blogPosts.getItemById({
-      id: postId,
-      withComments: true,
-      moreLikeThis: true
-    }))
+    metaKeywords: postMetaKeywords(preparedPost),
+    post: preparedPost
   });
 }));
 
@@ -329,4 +333,8 @@ function parseBlogpostId(id) {
     id: blogPosts.BLOGPOST_ID_PREFIX + id,
     isJson: false
   };
+}
+
+function postMetaKeywords(preparedPost) {
+  return preparedPost.tags.map(t => t.key).join(',')
 }
