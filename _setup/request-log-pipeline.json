@@ -11,7 +11,8 @@
       "user_agent" : { 
         "field" : "http.request.user_agent",
         "target_field" : "http.request.user_agent_parsed",
-        "properties": [ "os", "name", "os_name", "device" ]
+        "properties": [ "os", "name", "os_name", "device" ],
+        "ignore_missing": true
       }
     }
   ]
