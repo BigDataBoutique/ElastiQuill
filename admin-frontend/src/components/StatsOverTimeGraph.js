@@ -163,12 +163,30 @@ class StatsOverTimeGraph extends React.Component {
 
     return (
       <Crosshair values={crosshairValues}>
-        <div className='elastiquill-card elastiquill-text' style={{ minWidth: 150 }}>
-          <p>{moment(crosshairValues[0].x).format('DD-MM-YYYY')}</p>
-          <p>Visits: {crosshairValues[1].y}</p>
-          {!this.props.item && <p>Post views: {crosshairValues[2].y}</p>}
-          <p>Comments: {crosshairValues[3].y}</p>
-          {!this.props.item && <p>Posts: {crosshairValues[4].y}</p>}
+        <div className='rv-crosshair__inner' style={{ minWidth: '150px', zIndex: 99999 }}>
+          <div className='rv-crosshair__inner__content'>
+            <div>
+              <div className='rv-crosshair__title'>
+                {moment(crosshairValues[0].x).format('DD-MM-YYYY')}
+              </div>
+              <div className='rv-crosshair__item'>
+                Visits: {crosshairValues[1].y}
+              </div>
+              {!this.props.item && (
+                <div className='rv-crosshair__item'>
+                  Post views: {crosshairValues[2].y}
+                </div>
+              )}
+              <div className='rv-crosshair__item'>
+                Comments: {crosshairValues[3].y}
+              </div>
+              {!this.props.item && (
+                <div className='rv-crosshair__item'>
+                  Posts: {crosshairValues[4].y}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </Crosshair>
     )
