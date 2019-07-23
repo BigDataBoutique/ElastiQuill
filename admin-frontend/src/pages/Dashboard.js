@@ -48,13 +48,15 @@ class Dashboard extends React.Component {
       return 'Loading...';
     }
 
+    const visitorsStr = uniqueVisitorsEnabled ? 'visitors' : 'visit';
+
     const mostBusyDayEverCard = mostBusyDayEver && this._renderCard(
       <React.Fragment>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <h1 style={{ fontSize: '29px' }}>
             {moment(mostBusyDayEver.date).format('DD/MM/YYYY')}
           </h1>
-          <h6>{(uniqueVisitorsEnabled ? mostBusyDayEver.visitors.value : mostBusyDayEver.count) + ' visits'}</h6>
+          <h6>{(uniqueVisitorsEnabled ? mostBusyDayEver.visitors.value : mostBusyDayEver.count) + ' ' + visitorsStr}</h6>
         </div>
         <h2>Busiest day ever</h2>
       </React.Fragment>
@@ -84,7 +86,7 @@ class Dashboard extends React.Component {
         <div className='row' style={{ minHeight: '124px', marginBottom: '63px', marginLeft: -5 }}>
           {this._renderTextCard('Total blog posts', postsCount || 0)}
           {this._renderTextCard('Comments on posts', commentsCount || 0)}
-          {this._renderTextCard('Visitors / day (average)', _.round(averagePerDay, 1) || 0)}
+          {this._renderTextCard(`${_.capitalize(visitorsStr)} / day (average)`, _.round(averagePerDay, 1) || 0)}
           {mostBusyDayEverCard}
           {mostViewedCard}
           <div className='col-lg-2' />
