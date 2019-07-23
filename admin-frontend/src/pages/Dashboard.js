@@ -177,7 +177,7 @@ class Dashboard extends React.Component {
       referrerFromDomain
     } = this.props.dashboardStore;
 
-    if (! referrerFromDomain.length) {
+    if (referrerFromDomain.length + referrerType.length === 0) {
       return 'No data';
     }
 

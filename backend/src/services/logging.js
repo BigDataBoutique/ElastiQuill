@@ -490,8 +490,9 @@ function ecsHttp(req, res) {
     if (! sameDomain && ! ['direct', 'internal'].includes(req.referrer.type)) {
       body.http.request.referrer = referrerRaw;
       body.http.request.referrer_parsed = {
+        ...ecsUrl(req.referrer.from).url,
         type: req.referrer.type,
-        ...ecsUrl(req.referrer.from).url
+        domain: req.referrer.from_domain
       };
     }
   }
@@ -503,6 +504,7 @@ function ecsUrl(urlStr) {
   if (! urlStr) return {};
 
   const parsed = url.parse(urlStr);
+
   return {
     url: {
       full: parsed.href,
