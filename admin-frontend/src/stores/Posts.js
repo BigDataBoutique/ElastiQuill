@@ -31,6 +31,12 @@ class Posts extends ItemsStore {
 
   @action
   async postItemToSocial(opts = {}) {
+    if (this.socialDialog === 'hacker-news') {
+      api.postToHackerNews(this.socialItem);
+      this.setSocialDialog(null, null);
+      return;
+    }
+
     try {
       this.loading('postToSocial');
       const { url } = await api.postItemToSocial(this.socialDialog, this.socialItem.id, opts);

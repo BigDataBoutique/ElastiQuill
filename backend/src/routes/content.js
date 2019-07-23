@@ -1,8 +1,10 @@
+import url from 'url';
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 
 import * as blogPosts from '../services/blogPosts';
-import { blogpostUrl, pageUrl, seriesUrl } from './util';
+import { blogpostUrl, pageUrl } from './util';
+import { config } from '../app';
 
 const router = express.Router();
 
@@ -36,7 +38,8 @@ router.get('/:type(post|page)', asyncHandler(async (req, res) => {
   res.json({
     items: items.map(p => ({
       ...p,
-      url: getUrl(p)
+      url: getUrl(p),
+      full_url: url.resolve(config.blog.url, getUrl(p))
     })),
     total_pages: totalPages
   });

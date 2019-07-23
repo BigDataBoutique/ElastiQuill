@@ -128,6 +128,12 @@ export async function postItemToSocial(socialKey, itemId, opts) {
   });
 }
 
+export function postToHackerNews(post) {
+  const shareUrl = `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(post.full_url)}&t=${encodeURIComponent(post.title)}`;
+  const win = window.open(shareUrl, '_blank');
+  win.focus();
+}
+
 export function redirectToSocialConnect(socialKey) {
   window.location.href = '/api/connect/' + socialKey + '?state=' + getJwtToken();
 }
