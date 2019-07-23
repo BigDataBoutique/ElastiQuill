@@ -239,7 +239,7 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
 
   if (resp.aggregations) {
     avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
-    avg_visitors_per_day = _.round(_.get(resp.aggregations, visitsPerDayAgg + '.buckets').map(b => b.visitors.value));
+    avg_visitors_per_day = _.meanBy(_.get(resp.aggregations, visitsPerDayAgg + '.buckets'), _.property('visitors.value'));
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
     user_agent_os = resp.aggregations.user_agent_os.buckets;
