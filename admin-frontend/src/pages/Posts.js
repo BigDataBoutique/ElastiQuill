@@ -74,6 +74,7 @@ class Posts extends BaseItemsPage {
 
   _renderDialog() {
     switch (this.props.postsStore.socialDialog) {
+      case 'hacker-news':
       case 'twitter':
       case 'linkedin':
       case 'medium':
@@ -120,6 +121,7 @@ class Posts extends BaseItemsPage {
           {this._renderDropdownItem(item, 'Linkedin', 'linkedin')}
           {this._renderDropdownItem(item, 'Medium', 'medium')}
           {this._renderDropdownItem(item, 'Reddit', 'reddit')}
+          {this._renderDropdownItem(item, 'Hacker News', 'hacker-news')}
         </DropdownMenu>
       </UncontrolledButtonDropdown>
     )

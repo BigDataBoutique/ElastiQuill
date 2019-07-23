@@ -6,6 +6,7 @@ import { config } from '../app';
 
 export function getAvailability(connected = {}) {
   const res = {
+    'hacker-news': true,
     twitter: !! config.credentials.twitter,
     linkedin: !! config.credentials.linkedin,
     reddit: !! config.credentials.reddit,
@@ -14,7 +15,7 @@ export function getAvailability(connected = {}) {
 
   for (const key in res ) {
     if (res[key]) {
-      if (connected[key] || key === 'twitter') {
+      if (connected[key] || ['twitter', 'hacker-news'].indexOf(key) > -1) {
         res[key] = 'ready';
       }
       else {
