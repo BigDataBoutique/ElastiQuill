@@ -216,6 +216,13 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
           terms: {
             field: 'read_item.id',
             size: 5
+          },
+          aggs: {
+            unique: {
+              cardinality: {
+                field: 'visitor_id'
+              }
+            }
           }
         }
       }
@@ -276,7 +283,9 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
       const postsVisitsBuckets = resp.aggregations.posts_visits.visits.buckets;
       popular_posts = await blogPosts.getItemsByIds(postsVisitsBuckets.map(bucket => bucket.key));
       for (let post of popular_posts) {
-        post.visits_count = _.find(postsVisitsBuckets, ['key', post.id]).doc_count;
+        const bucket = _.find(postsVisitsBuckets, ['key', post.id]);
+        post.visits_count = bucket.doc_count;
+        post.unique_visits_count = bucket.unique.value; 
       }
     }
   }

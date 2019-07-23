@@ -80,6 +80,8 @@ class Dashboard extends React.Component {
     const onToggleUniqueVisitors = () => this.props.dashboardStore.toggleUniqueVisitors();
     const averagePerDay = uniqueVisitorsEnabled ? averageVisitorsPerDay : averageVisitsPerDay;
 
+    const countUnitPair = (count, unit) => <span>({count} {unit}{count > 1 ? 's' : ''})</span>;
+
     return (
       <Fragment>
         <div className='elastiquill-header'>Overview</div>
@@ -135,10 +137,10 @@ class Dashboard extends React.Component {
         <div className='row' style={{ marginTop: 20 }}>
           <div className='col-md-6'>
             {this._renderSection('Most viewed', this._renderPostsList(popularPosts, item => {
-              return <span>({item.visits_count} {item.visits_count > 1 ? 'views' : 'view'})</span>
+              return countUnitPair(uniqueVisitorsEnabled ? item.unique_visits_count : item.visits_count, 'view');
             }))}
             {this._renderSection('Most commented', this._renderPostsList(mostCommentedPosts, item => {
-              return <span>({item.comments_count} {item.comments_count > 1 ? 'comments' : 'comment'})</span>
+              return countUnitPair(item.comments_count, 'comment');
             }))}
           </div>
           <div className='col-md-6'>
