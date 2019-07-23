@@ -2,19 +2,19 @@ import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 import React, {Component} from 'react';
-import copyToClipboard from 'copy-to-clipboard';
 import ReactModal from 'react-modal';
-import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { Button, ButtonGroup } from 'reactstrap';
 
 import defaultItemImage from '../assets/img/default-post-image.jpg';
-import deleteIcon from '../assets/img/delete.svg';
-import editIcon from '../assets/img/edit.svg';
-import newWindowIcon from '../assets/img/newindow.svg';
 import LoggedInLayout from '../components/LoggedInLayout';
 import FAIcon from '../components/FAIcon';
+import HoverIcon from '../components/Icons/HoverIcon';
+import SvgEdit from '../components/Icons/SvgEdit';
+import SvgDelete from '../components/Icons/SvgDelete';
+import SvgNewWindow from '../components/Icons/SvgNewWindow';
 import * as api from '../api';
+
 
 class BaseItemsPage extends Component {
 
@@ -98,16 +98,16 @@ class BaseItemsPage extends Component {
               {this._renderLineItemExtra && this._renderLineItemExtra(item)}
               <div className='elastiquill-icon-button'>
                 <Link to={`/edit/${urlPart}/` + item.id}>
-                  <img src={editIcon} />
+                  <HoverIcon icon={SvgEdit} />
                 </Link>
               </div>
               <div className='elastiquill-icon-button'>
                 <a href={url} target='_blank'>
-                  <img src={newWindowIcon} />
+                  <HoverIcon icon={SvgNewWindow} />
                 </a>
               </div>
               <div onClick={() => this._getStore().setDeleteItemId(item.id)} className='elastiquill-icon-button'>
-                <img src={deleteIcon} />
+                  <HoverIcon icon={SvgDelete} />
               </div>
             </div>
           </div>

@@ -255,6 +255,7 @@ body {
 
 .elastiquill-icon-button:hover img,.elastiquill-icon-button:hover>button>i {
   opacity: 0.8;
+  color: #d9156d;
 }
 
 .elastiquill-text-ellipsis {
