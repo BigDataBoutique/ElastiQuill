@@ -30,7 +30,7 @@ export function getAvailability(connected = {}) {
   return res;
 }
 
-export async function postToLinkedin(authorId, accessToken, title, url, imageUrl) {
+export async function postToLinkedin(authorId, accessToken, title, url, imageUrl, tags) {
   let imageAsset = undefined;
 
   if (imageUrl) {
@@ -75,6 +75,14 @@ export async function postToLinkedin(authorId, accessToken, title, url, imageUrl
     });
   }
 
+  const commentary = [title];
+  if (imageAsset) {
+    commentary.push(url);
+  }
+  if (tags && tags.length) {
+    commentary.push(tags.map(s => '#' + s.replace(/\s/g, '').toLowerCase()).join(' '));
+  }
+
   const postResp = await request({
     method: 'POST',
     url: 'https://api.linkedin.com/v2/ugcPosts?oauth2_access_token=' + accessToken,
@@ -84,7 +92,7 @@ export async function postToLinkedin(authorId, accessToken, title, url, imageUrl
       specificContent: {
         'com.linkedin.ugc.ShareContent': {
           'shareCommentary': {
-            'text': title
+            'text': commentary.join('\n')
           },
           'shareMediaCategory': imageAsset ? 'IMAGE' : 'ARTICLE',
           'media': [

@@ -23,7 +23,7 @@ router.post('/post/linkedin/:id', asyncHandler(async (req, res) => {
   const imgUrl = post.metadata && post.metadata.header_image_url;
   try {
     const { token, profileId } = req.user.connected.linkedin;
-    const resp = await social.postToLinkedin(profileId, token, post.title, link, imgUrl);
+    const resp = await social.postToLinkedin(profileId, token, post.title, link, imgUrl, post.tags);
     res.json({
       url: resp.url
     });
