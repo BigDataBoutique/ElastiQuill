@@ -2,6 +2,7 @@ import _ from 'lodash';
 import url from 'url';
 import moment from 'moment';
 import geohash from 'ngeohash';
+import crawlers from 'crawler-user-agents';
 
 import { esClient, config } from '../app';
 import * as blogPosts from './blogPosts';
@@ -11,6 +12,7 @@ let elasticsearchIsReady = false;
 
 const LOGS_INDICES_PREFIX = config.elasticsearch['blog-logs-index-name'];
 const LOGS_PERIOD = config.elasticsearch['blog-logs-period'];
+const CRAWLER_USER_AGENTS = new Set(_.flatMap(crawlers, _.property('instances')));
 
 export async function getStatus() {
   const resp = await esClient.search({
@@ -43,6 +45,16 @@ export async function getStatus() {
 
 export async function getStats({ startDate, endDate, interval = '1d', type = null, postId = null }) {
   const filters = [];
+  
+  filters.push({
+    bool: {
+      must_not: {
+        term: {
+          'http.request.bot': true
+        }
+      }
+    }
+  });
 
   filters.push({
     terms: {
@@ -471,11 +483,14 @@ function ecsSource(req, res) {
 function ecsHttp(req, res) {
   if (! req || ! res) return {};
 
+  const userAgent = req.get('User-Agent');
+
   const body = {
     http: {
       request: {
         method: req.method.toLowerCase(),
-        user_agent: req.get('User-Agent')
+        user_agent: userAgent,
+        bot: CRAWLER_USER_AGENTS.has(userAgent)
       },
       response: {
         status_code: res.statusCode
