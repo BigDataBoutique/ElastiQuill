@@ -17,7 +17,7 @@ const CreateCommentArgSchema = Joi.object().keys({
   "content": Joi.string().required(),
   "user_host_address": Joi.string().required(),
   "user_agent": Joi.string().required(),
-  "spam": Joi.boolean().required()
+  "spam": Joi.boolean().allow(null).required()
 });
 
 export async function createComment(comment) {
@@ -93,7 +93,13 @@ export async function getComments(postIds) {
           filter: [
             { terms: { post_id: postIds } },
             { term: { approved: true } },
-            { term: { spam: false } },
+            {
+              bool: {
+                must_not: {
+                  term: { spam: true }
+                }
+              }
+            }
           ]
         }
       },
