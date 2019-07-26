@@ -129,7 +129,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
   let commentError = null;
   let validity = null;
   let repliedToComment = null;
-  let isSpam = false;
+  let isSpam = null;
 
   const postId = blogPosts.BLOGPOST_ID_PREFIX + req.params.id;
   const post = preparePost(await blogPosts.getItemById({
@@ -197,7 +197,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     }
   }
 
-  if (! commentError && config.blog['comments-noreply-email']) {
+  if (isSpam !== true && ! commentError && config.blog['comments-noreply-email']) {
     const opAndComment = {
       opEmail: post.author.email,
       opTitle: post.title,
