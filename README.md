@@ -163,6 +163,8 @@ The easiest way is to run via docker-compose:
 ```
 docker-compose up
 ```
+* Please note that before you can create and start the containers for the first time, you might need to create a default docker network:
+`docker network create blog`
 
 You might need to run the following on your machine if Elasticsearch refuses to run: `sysctl -w vm.max_map_count=262144`.
 
