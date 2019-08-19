@@ -205,6 +205,7 @@ function initConfig() {
     ['blog.cache-ttl', 'BLOG_CACHE_TTL', 60],
     ['blog.port', 'PORT', '5000'],
     ['blog.admin-emails', 'BLOG_ADMIN_EMAILS'],
+    ['blog.publisher-emails', 'BLOG_PUBLISHER_EMAILS'],
     ['blog.contact-email', 'CONTACT_FORM_SEND_TO'],
     ['blog.theme-path', 'BLOG_THEME_PATH'],
     ['blog.theme-caching', 'BLOG_THEME_CACHING', true],
@@ -256,6 +257,7 @@ function initConfig() {
   });
 
   config.blog['admin-emails'] = new EmailString(config.blog['admin-emails']);
+  config.blog['publisher-emails'] = new EmailString(config.blog['publisher-emails']);
 
   config.blog['blog-route-prefix'] = _.trimEnd(config.blog['blog-route-prefix'], '/');
   const adminRoute = _.trimEnd(config.blog['admin-route'], '/');

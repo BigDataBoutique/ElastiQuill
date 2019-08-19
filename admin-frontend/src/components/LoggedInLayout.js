@@ -61,7 +61,7 @@ class LoggedInLayout extends Component {
                 <div
                   className={classnames('dropdown-menu', {'show': this.state.userMenuOpen})}>
                   {this.props.appStore.user.company && <strong className='nav-link'>{this.props.appStore.user.company}</strong>}
-                  {this.props.appStore.user.email && <span className='nav-link'>{this.props.appStore.user.email} </span>}
+                  {this.props.appStore.user.authorizedBy && <span className='nav-link'>{this.props.appStore.user.authorizedBy} </span>}
                   <button className='btn btn-link nav-link' onClick={this.handleLogoutClick}><FAIcon
                     icon='power-off'/>Logout
                   </button>
@@ -75,19 +75,7 @@ class LoggedInLayout extends Component {
             <Navbar light expand='lg'>
               <NavbarToggler onClick={() => this.setState({ navbarOpen: ! this.state.navbarOpen })} />
               <Collapse isOpen={!! this.state.navbarOpen} navbar>
-                <Nav navbar>
-                  {[
-                    { label: 'Dashboard', url: urls.dashboard, icon: 'tachometer-alt' },
-                    { label: 'Posts', url: urls.posts, icon: 'pencil-alt' },
-                    { label: 'Content Pages', url: urls.pages, icon: 'file' },
-                    { label: 'Backup', url: urls.backup, icon: 'archive' },
-                    { label: 'Status', url: urls.status, icon: 'notes-medical' },
-                  ].map((item, i) => (
-                    <NavItem key={i}>
-                      <NavLink {...item} />
-                    </NavItem>
-                  ))}
-                </Nav>
+                {this._renderNavbar()}
               </Collapse>
             </Navbar>
           </div>
@@ -109,6 +97,31 @@ class LoggedInLayout extends Component {
 			<a href="https://github.com/BigDataBoutique/ElastiQuill">ElastiQuill</a>, Copyright © 2019 <a href="https://bigdataboutique.com">BigData Boutique</a>
         </footer>
       </Layout>
+    )
+  }
+
+  _renderNavbar() {
+    const items = [
+      { label: 'Dashboard', url: urls.dashboard, icon: 'tachometer-alt' },
+      { label: 'Posts', url: urls.posts, icon: 'pencil-alt' },
+      { label: 'Content Pages', url: urls.pages, icon: 'file' },
+      { label: 'Backup', url: urls.backup, icon: 'archive', roles: ['admin'] },
+      { label: 'Status', url: urls.status, icon: 'notes-medical', roles: ['admin'] },
+    ].filter(it => {
+      if (it.roles) {
+        return it.roles.includes(this.props.appStore.user);
+      }
+      return true; 
+    });
+
+    return (
+      <Nav navbar>
+        {items.map((item, i) => (
+          <NavItem key={i}>
+            <NavLink {...item} />
+          </NavItem>
+        ))}
+      </Nav>
     )
   }
 

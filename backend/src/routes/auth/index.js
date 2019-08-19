@@ -15,9 +15,11 @@ const socialAuthSources = [];
 
 const ADMIN_ROUTE = config.blog['admin-route'];
 const ADMIN_EMAILS = config.blog['admin-emails'];
+const PUBLISHER_EMAILS = config.blog['publisher-emails'];
 const JWT_SECRET = config.blog['jwt-secret'];
 const BLOG_URL = config.blog['url'];
 const AUTH_INFO_TOKEN_COOKIE = 'auth-info-token';
+const VALID_ROLES = ['admin', 'publisher'];
 
 if (ADMIN_EMAILS.isEmpty()) {
   throw new Error('blog.admin-emails configuration variable is not set')
@@ -83,7 +85,7 @@ async function handleRequest(req, res) {
   redirectToFrontend(res);
 
   logging.logAuthAttempt({
-    email: req.user.email,
+    email: req.user.authorizedBy,
     success: true
   }, req, res);
 }
@@ -120,6 +122,21 @@ export function authInfoTokenMiddleware(req, res, next) {
   });
 }
 
+export function updateUserRole(req) {
+  let role = null;
+
+  if (ADMIN_EMAILS.match(req.user.authorizedBy)) {
+    role = 'admin';
+  }
+  else if (PUBLISHER_EMAILS.match(req.user.authorizedBy)) {
+    role = 'publisher';
+  }
+
+  if (role) {
+    req.user.role = role;
+  }
+}
+
 export function updateAuthInfoToken(req, res) {
   let token = req.cookies[AUTH_INFO_TOKEN_COOKIE];
   if (req.user) {
@@ -138,6 +155,22 @@ export function updateAuthInfoToken(req, res) {
   });  
 }
 
+export function restrictRolesMiddleware(...roles) {
+  for (const role of roles) {
+    if (! VALID_ROLES.includes(role)) {
+      throw new Error('Invalid role ' + role);
+    }
+  }
+
+  return (req, res, next) => {
+    if (! roles.includes(req.user.role)) {
+      next(new Error('You are not allowed to access this API.'));
+      return;
+    }
+    next();
+  }
+}
+
 export const passportDefaultCallback = (err, req, res, profile, next) => {
   if (err) {
     return next(err);
@@ -146,12 +179,12 @@ export const passportDefaultCallback = (err, req, res, profile, next) => {
   let user = null;
   const profileEmails = profile.emails.map(em => em.value);
   for (const email of profileEmails) {
-    const foundRule = ADMIN_EMAILS.match(email);
+    const foundRule = ADMIN_EMAILS.match(email) || PUBLISHER_EMAILS.match(email);
     if (foundRule) {
       user = {
         name: profile.displayName ? profile.displayName : profile.username,
         authorizedBy: foundRule,
-        email
+        emails: profileEmails
       };
       break;
     }

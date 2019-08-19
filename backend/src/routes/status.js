@@ -4,6 +4,7 @@ import express from 'express';
 import asyncHandler from 'express-async-handler';
 
 import { config } from '../app';
+import { restrictRolesMiddleware } from '../routes/auth';
 
 import * as emails from '../services/emails';
 import * as social from '../services/social';
@@ -14,6 +15,8 @@ import * as recaptcha from '../services/recaptcha';
 import * as elasticsearch from '../services/elasticsearch';
 
 const router = express.Router();
+
+router.use(restrictRolesMiddleware('admin'));
 
 router.get('/', asyncHandler(async (req, res) => {
   const googleAuth = _.get(config, 'credentials.google.oauth-client-id') &&
