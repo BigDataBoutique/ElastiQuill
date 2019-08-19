@@ -96,19 +96,23 @@ class BaseItemsPage extends Component {
             <div style={{ flex: 1, paddingRight: 10 }} className='elastiquill-header-2 elastiquill-text-ellipsis'>{item.title}</div>
             <div style={{ display: 'flex' }}>
               {this._renderLineItemExtra && this._renderLineItemExtra(item)}
-              <div className='elastiquill-icon-button'>
-                <Link to={`/edit/${urlPart}/` + item.id}>
-                  <HoverIcon icon={SvgEdit} />
-                </Link>
-              </div>
+              {item.is_editable && (
+                <div className='elastiquill-icon-button'>
+                  <Link to={`/edit/${urlPart}/` + item.id}>
+                    <HoverIcon icon={SvgEdit} />
+                  </Link>
+                </div>
+              )}
               <div className='elastiquill-icon-button'>
                 <a href={url} target='_blank'>
                   <HoverIcon icon={SvgNewWindow} />
                 </a>
               </div>
-              <div onClick={() => this._getStore().setDeleteItemId(item.id)} className='elastiquill-icon-button'>
+              {item.is_editable && (
+                <div onClick={() => this._getStore().setDeleteItemId(item.id)} className='elastiquill-icon-button'>
                   <HoverIcon icon={SvgDelete} />
-              </div>
+                </div>
+              )}
             </div>
           </div>
           <div style={{ marginTop: '10px' }} className='elastiquill-text elastiquill-text-ellipsis'>

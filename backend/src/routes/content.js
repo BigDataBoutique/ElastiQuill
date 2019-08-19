@@ -3,7 +3,7 @@ import express from 'express';
 import asyncHandler from 'express-async-handler';
 
 import * as blogPosts from '../services/blogPosts';
-import { blogpostUrl, pageUrl } from './util';
+import { blogpostUrl, pageUrl, isItemEditable } from './util';
 import { config } from '../app';
 
 const router = express.Router();
@@ -39,6 +39,7 @@ router.get('/:type(post|page)', asyncHandler(async (req, res) => {
     items: items.map(p => ({
       ...p,
       url: getUrl(p),
+      is_editable: isItemEditable(p, req.user),
       full_url: url.resolve(config.blog.url, getUrl(p))
     })),
     total_pages: totalPages
@@ -57,7 +58,7 @@ router.post('/:type(post|page)', asyncHandler(async (req, res) => {
       ...req.body,
       "author": {
         "name": req.user.name,
-        "email": req.user.email,
+        "email": req.user.authorizedBy,
         "website": ''
       }
     });
@@ -84,6 +85,12 @@ router.post('/:type(post|page)', asyncHandler(async (req, res) => {
 
 router.delete('/:type(post|page)/:id', asyncHandler(async (req, res) => {
   try {
+    const item = await blogPosts.getItemById({ id: req.params.id });
+    if (! isItemEditable(item, req.user)) {
+      res.sendStatus(400);
+      return;
+    }
+
     await blogPosts.deleteItem(req.params.id);
     res.json({ error: null });
   }
@@ -95,6 +102,12 @@ router.delete('/:type(post|page)/:id', asyncHandler(async (req, res) => {
 
 router.post('/:type(post|page)/:id', asyncHandler(async (req, res) => {
   try {
+    const item = await blogPosts.getItemById({ id: req.params.id });
+    if (! isItemEditable(item, req.user)) {
+      res.sendStatus(400);
+      return;
+    }
+
     await blogPosts.updateItem(req.params.id, req.params.type, req.body);
     res.json({ error: null });
   }

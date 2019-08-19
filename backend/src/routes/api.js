@@ -10,7 +10,7 @@ import importRoute from './import';
 import status from './status';
 import setup from './setup';
 import dump from './dump';
-import auth, { updateAuthInfoToken } from './auth';
+import auth, { updateAuthInfoToken, updateUserRole } from './auth';
 
 import * as loggingService from '../services/logging';
 import * as elasticsearch from '../services/elasticsearch';
@@ -25,6 +25,7 @@ router.use((req, res, next) => {
 });
 
 router.use((req, res, next) => {
+  updateUserRole(req);
   updateAuthInfoToken(req, res);
   next();
 });

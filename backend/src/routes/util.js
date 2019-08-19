@@ -20,6 +20,18 @@ const blogpostMarkdown = new MarkdownIt({
 });
 const commentMarkdown = new MarkdownIt();
 
+export function isItemEditable(item, user) {
+  if (user.role === 'admin') {
+    return true;
+  }
+
+  if (user.role === 'publisher') {
+    return user.emails.includes(item.author.email);
+  }
+
+  return false;
+}
+
 export function preparePage(p) {
   if (! p) return null;
   

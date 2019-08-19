@@ -59,7 +59,7 @@ class App extends BaseStore {
   @action
   setUser = (user) => {
     if (user) {
-      user.avatarUrl = api.userAvatarUrl(user.email);
+      user.avatarUrl = api.userAvatarUrl(user.authorizedBy);
     }
 
     this.user = user;
