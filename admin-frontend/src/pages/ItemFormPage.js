@@ -62,9 +62,11 @@ class ItemFormPage extends Component {
             blogpostId={blogpostId}
             isNew={this._isNew()}
             isFormSaving={this.store.isFormSaving}
+            isFormAutosaving={this.store.isFormAutosaving}
             isFormModalOpen={this.store.isFormModalOpen}
             setFormModalOpen={open => this.store.setFormModalOpen(open)}
-            onSubmit={this._onSubmit.bind(this)}
+            submit={this._onSubmit.bind(this)}
+            autosave={this._onAutosave.bind(this)}
             item={this.store.currentItem} />
         )}
       </div>
@@ -85,16 +87,27 @@ class ItemFormPage extends Component {
     return this.props.match.params.type;
   }
 
+  async _onAutosave(formValues) {
+    this.store.setFormAutosaving(true);
+    try {
+      await this.updateItem(this.store.currentItem.id, formValues);
+      this.store.setCurrentItem(formValues);
+    }
+    catch (err) {
+      console.log(err);
+    }
+    finally {
+      this.store.setFormAutosaving(false);
+    }
+  }
+
   async _onSubmit(formValues) {
     const store = this.store;
-    let save = this._isNew() ? this.createItem : this.updateItem.bind(this, store.currentItem.id);
+    const save = this._isNew() ? this.createItem : this.updateItem.bind(this, store.currentItem.id);
 
     this.store.setFormSaving(true);
     try {
-      const resp = await save({
-        ...formValues,
-        ///private_viewing_key: null // TODO auto generate UUID
-      });
+      const resp = await save(formValues);
 
       if (this._isNew()) {
         this.props.history.replace('/edit/'+this._getType()+'/' + resp.id);
@@ -102,6 +115,7 @@ class ItemFormPage extends Component {
 
       toast.success('Changes saved');
       this.store.setFormModalOpen(false);
+      this.store.setCurrentItem(formValues);
     }
     catch (err) {
       console.log(err);

@@ -223,6 +223,13 @@ export function tagUrl(tag) {
   return BLOG_ROUTE_PREFIX === '/' ? url : BLOG_ROUTE_PREFIX + url;
 }
 
+export class PageNotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.status = 404;
+  }
+}
+
 function avatarUrl(email) {
   return `https://www.gravatar.com/avatar/${md5(email)}?size=100&default=identicon`;
 }

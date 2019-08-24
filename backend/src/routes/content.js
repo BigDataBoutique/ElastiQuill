@@ -35,13 +35,23 @@ router.get('/:type(post|page)', asyncHandler(async (req, res) => {
     case 'page': getUrl = pageUrl; break; 
   }
 
+  const processedItems = items
+    .filter(it => {
+      if (req.user.role === 'admin' || it.is_published) {
+        return true;
+      }
+      return req.user.emails.includes(it.author.email);
+    })
+    .map(it => ({
+      ...it,
+      url: getUrl(it),
+      is_editable: isItemEditable(it, req.user),
+      full_url: url.resolve(config.blog.url, getUrl(it)),
+      draft: req.user.emails.includes(it.author.email) ? it.draft : null
+    }));
+
   res.json({
-    items: items.map(p => ({
-      ...p,
-      url: getUrl(p),
-      is_editable: isItemEditable(p, req.user),
-      full_url: url.resolve(config.blog.url, getUrl(p))
-    })),
+    items: processedItems,
     total_pages: totalPages
   });
 }));

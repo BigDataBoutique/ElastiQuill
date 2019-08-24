@@ -10,7 +10,17 @@ export function logout() {
 // Post
 
 export async function createPost(values) {
-  return await createItem('/api/content/post', values);
+  return await createItem('/api/content/post', _.pick(values, [
+    'title',
+    'content',
+    'description',
+    'tags',
+    'series',
+    'metadata',
+    'allow_comments',
+    'is_published',
+    'draft'
+  ]));
 }
 
 export async function deletePost(id) {
@@ -25,7 +35,9 @@ export async function updatePost(id, post) {
     'tags',
     'series',
     'metadata',
-    'allow_comments'
+    'allow_comments',
+    'is_published',
+    'draft'
   ]));
 }
 

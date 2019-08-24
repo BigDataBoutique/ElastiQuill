@@ -5,9 +5,6 @@
         "allow_comments": {
           "type": "boolean"
         },
-        "medium_crosspost_url": {
-          "type": "keyword"
-        },
         "author": {
           "properties": {
             "name": {
@@ -21,6 +18,10 @@
             }
           }
         },
+        "draft" : {
+          "type": "object",
+          "enabled": false
+        },
         "content": {
           "type": "text"
         },
@@ -33,10 +34,6 @@
         },
         "last_edited_at": {
           "type": "date"
-        },
-        "private_viewing_key": {
-          "type": "object",
-          "enabled": false
         },
         "published_at": {
           "type": "date"
@@ -54,6 +51,10 @@
         },
         "title": {
           "type": "text"
+        },
+        "is_published": {
+          "type": "boolean",
+          "doc_values": false
         }
       }
     }

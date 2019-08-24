@@ -31,6 +31,9 @@ export default class ItemsStore extends BaseStore {
   isFormSaving = false;
 
   @observable
+  isFormAutosaving = false;
+
+  @observable
   isFormModalOpen = false;
 
   @observable
@@ -71,6 +74,11 @@ export default class ItemsStore extends BaseStore {
   @action
   setFormSaving(isSaving) {
     this.isFormSaving = isSaving;
+  }
+
+  @action
+  setFormAutosaving(isAutosaving) {
+    this.isFormAutosaving = isAutosaving;
   }
 
   @action

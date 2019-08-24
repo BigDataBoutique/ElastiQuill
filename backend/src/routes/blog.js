@@ -12,7 +12,7 @@ import * as akismet from '../services/akismet';
 import * as emails from '../services/emails';
 import * as events from '../services/events';
 import { cachePageHandler, cacheAndReturn, clearPageCache } from '../services/cache';
-import { preparePost, preparePage, preparePostJson, blogpostUrl } from './util';
+import { preparePost, preparePage, preparePostJson, blogpostUrl, PageNotFoundError } from './util';
 import { config } from '../app';
 
 const router = express.Router();
@@ -78,7 +78,7 @@ events.onChange('post', post => clearPageCache(blogpostUrl(post)));
 router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
   const { id, isJson } = parseBlogpostId(req.params.id);
   
-  const post = await blogPosts.getItemById({
+  let post = await blogPosts.getItemById({
     id,
     withComments: true,
     moreLikeThis: true
@@ -89,16 +89,17 @@ router.get(BLOGPOST_ROUTE, cachePageHandler(asyncHandler(async (req, res) => {
     return;
   }
 
-  if (! _.isEmpty(post.private_viewing_key)) {
-    if (post.private_viewing_key !== req.query.secret) {
-      res.status(404).render('error', {
-        message: 'Post not found',
-        error: {
-          status: 404
-        }
-      });
-      return;
+  if (! _.isEmpty(req.query.secret)) {
+    if (post.draft) {
+      post = _.merge(post, post.draft);
     }
+
+    if (post.metadata.private_viewing_key !== req.query.secret) {
+      throw new PageNotFoundError();
+    }
+  }
+  else if (! post.is_published) {
+    throw new PageNotFoundError();
   }
 
   if (isJson) {
