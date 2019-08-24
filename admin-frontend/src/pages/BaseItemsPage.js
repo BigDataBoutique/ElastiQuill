@@ -69,10 +69,9 @@ class BaseItemsPage extends Component {
   }
 
   _renderLineItem(item) {
-    const url = `${item.url}${_.isEmpty(item.private_viewing_key) ? '' : '?secret=' + item.private_viewing_key}`
+    const url = `${item.url}${_.isEmpty(item.metadata.private_viewing_key) ? '' : '?secret=' + item.metadata.private_viewing_key}`
     const urlPart = this._getUrlPart();
-
-    let imageSrc = item.metadata.header_image_url || defaultItemImage;
+    const imageSrc = _.get(item, 'draft.metadata.header_image_url', item.metadata.header_image_url) || defaultItemImage;
 
     const onClick = ev => {
       if ($(ev.target).closest('.elastiquill-icon-button').length) {
@@ -93,7 +92,7 @@ class BaseItemsPage extends Component {
         {image}
         <div style={{ display: 'flex', flexFlow: 'column', flex: 1, minWidth: '0px', paddingLeft: image ? '33px' : undefined }}>
           <div style={{ display: 'flex' }}>
-            <div style={{ flex: 1, paddingRight: 10 }} className='elastiquill-header-2 elastiquill-text-ellipsis'>{item.title}</div>
+            {this._renderItemTitle(item)}
             <div style={{ display: 'flex' }}>
               {this._renderLineItemExtra && this._renderLineItemExtra(item)}
               {item.is_editable && (
@@ -116,7 +115,7 @@ class BaseItemsPage extends Component {
             </div>
           </div>
           <div style={{ marginTop: '10px' }} className='elastiquill-text elastiquill-text-ellipsis'>
-            {item.description || item.content}
+            {item.description || _.get(item, 'draft.content', item.content)}
           </div>
           <div style={{ marginTop: '16px' }}>
             {item.series && <div style={{ marginRight: 10 }} className='elastiquill-series'>{item.series}</div>}
@@ -138,6 +137,22 @@ class BaseItemsPage extends Component {
             </div>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  _renderItemTitle(item) {
+    const badge = label => (
+      <span
+        className='badge badge-secondary'
+        style={{ fontSize: 12, marginLeft: 5, position: 'relative', top: -3 }}>{label}</span>
+    );
+
+    return (
+      <div style={{ flex: 1, paddingRight: 10 }} className='elastiquill-header-2 elastiquill-text-ellipsis'>
+        {_.get(item, 'draft.title', item.title)}
+        {item.draft && badge('Draft')}
+        {item.is_published === false && badge('Not published')}
       </div>
     )
   }

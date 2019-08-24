@@ -134,7 +134,7 @@ class ContentPageForm extends BaseForm {
       }
     }
 
-    this.props.onSubmit(this.state.formValues);
+    this.props.submit(this.state.formValues);
   }
 }
 

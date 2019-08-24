@@ -18,6 +18,8 @@ router.post('/', asyncHandler(async (req, res) => {
     if (resp.tags) {
       resp.tags = resp.tags.map(t => t.key);
     }
+    resp.is_published = true;
+    _.set(resp, 'metadata.canonical_url', url);
   }
   catch (err) {
     throw new Error('Failed to fetch ' + jsonUrl);
@@ -32,8 +34,7 @@ router.post('/', asyncHandler(async (req, res) => {
     throw result.error;
   }
 
-  const createPostArgs = _.set(result.value, 'metadata.canonical_url', url);
-  const postId = await blogPosts.createItem('post', createPostArgs);
+  const postId = await blogPosts.createItem('post', result.value);
 
   res.json({
     post_id: postId

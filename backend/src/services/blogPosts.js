@@ -11,9 +11,9 @@ export const CONTENT_DESCRIPTION_ID_PREFIX = 'content:description:';
 
 const ES_INDEX = config.elasticsearch['blog-index-name'];
 const SERIES_REGEXP_STR = '\{.*\}';
-const SERIES_REGEXP = new RegExp(SERIES_REGEXP_STR);
 const SLUG_MAX_LENGTH = 100;
 
+// Posts
 export const CreatePostArgSchema = Joi.object().keys({
   "title": Joi.string().required(),
   "content": Joi.string().allow(''),
@@ -24,7 +24,8 @@ export const CreatePostArgSchema = Joi.object().keys({
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
     "canonical_url": Joi.string().optional().allow('', null),
-    "medium_crosspost_url": Joi.string().optional().allow('', null)
+    "medium_crosspost_url": Joi.string().optional().allow('', null),
+    "private_viewing_key": Joi.string().optional().allow(null),
   }).required(),
   "author": Joi.object().keys({
     "name": Joi.string().required(),
@@ -32,6 +33,18 @@ export const CreatePostArgSchema = Joi.object().keys({
     "website": Joi.string().allow('', null),
   }).required(),
   "allow_comments": Joi.boolean().required(),
+  "draft": Joi.object().keys({
+    "title": Joi.string(),
+    "content": Joi.string().allow(''),
+    "description": Joi.string().allow(''),
+    "tags": Joi.array().items(Joi.string()),
+    "series": Joi.string().allow(null),
+    "allow_comments": Joi.boolean().required(),
+    "metadata": Joi.object().keys({
+      "header_image_url": Joi.string().optional().allow('', null),
+    }).optional(),
+  }).optional().allow(null),
+  "is_published": Joi.boolean().required(),
 });
 
 const UpdatePostArgSchema = Joi.object().keys({
@@ -44,12 +57,25 @@ const UpdatePostArgSchema = Joi.object().keys({
     "content_type": Joi.string().optional().allow('', null),
     "header_image_url": Joi.string().optional().allow('', null),
     "canonical_url": Joi.string().optional().allow('', null),
-    "medium_crosspost_url": Joi.string().optional().allow('', null)
+    "medium_crosspost_url": Joi.string().optional().allow('', null),
+    "private_viewing_key": Joi.string().optional().allow(null),
   }).required(),
   "allow_comments": Joi.boolean().required(),
-  "medium_crosspost_url": Joi.string().allow('')
+  "draft": Joi.object().keys({
+    "title": Joi.string(),
+    "content": Joi.string().allow(''),
+    "description": Joi.string().allow(''),
+    "tags": Joi.array().items(Joi.string()),
+    "series": Joi.string().allow(null),
+    "allow_comments": Joi.boolean().required(),
+    "metadata": Joi.object().keys({
+      "header_image_url": Joi.string().optional().allow('', null),
+    }).optional(),
+  }).optional().allow(null),
+  "is_published": Joi.boolean().required(),
 });
 
+// Content pages
 const CreateContentPageArgSchema = Joi.object().keys({
   "title": Joi.string().required(),
   "content": Joi.string().allow(''),
@@ -355,7 +381,9 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
 
   if (! includePrivatePosts) {
     query.body.query.bool.must_not = {
-      exists: { field: 'private_viewing_key' }
+      term: {
+        is_published: false
+      }
     };
   }
 
@@ -462,6 +490,15 @@ export async function getAllTags() {
     index: ES_INDEX,
     ignore_unavailable: true,
     body: {
+      query: {
+        bool: {
+          must_not: {
+            term: {
+              is_published: false
+            }
+          }
+        }
+      },
       aggs: {
         tags: {
           terms: { field: 'tags', exclude: SERIES_REGEXP_STR, size: 50 }

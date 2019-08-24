@@ -39,7 +39,7 @@ class BaseForm extends Component {
       }
     };
 
-    let saveBtnLabel = this.props.isNew ? 'Create' : 'Save changes';
+    let saveBtnLabel = this.props.isNew ? 'Create' : 'Publish changes';
     if (this._renderModal && this.props.isNew) {
       saveBtnLabel = 'Ready to publish?';
     }
@@ -47,22 +47,26 @@ class BaseForm extends Component {
     if (this.props.isFormSaving) {
       saveBtnLabel = 'Saving...';
     }
+    else if (this.props.isFormAutosaving) {
+      saveBtnLabel = 'Saving to draft...';
+    }
 
     const onClickSave = () => {
       if (this._renderModal) {
         this.props.setFormModalOpen(true);
       }
       else {
-        this.props.onSubmit(this.state.formValues);        
+        this.props.submit(this.state.formValues);        
       }
     };
 
     return (
       <div style={{ position: 'relative', background: 'white', padding: 30 }}>
         <div style={{ position: 'absolute', right: 5, top: 5, cursor: 'pointer' }}>
-          <div onClick={onClickSave} className='btn btn-outline-success btn-sm'>
-            {saveBtnLabel}
-          </div>
+          <button
+            disabled={this.props.isFormAutosaving}
+            onClick={onClickSave}
+            className='btn btn-outline-success btn-sm'>{saveBtnLabel}</button>
         </div>      
         <div style={{ paddingTop: 10, display: 'flex' }}>
           <div style={{ flex: 1 }}>
@@ -384,7 +388,7 @@ class BaseForm extends Component {
     return item.content_type;
   }
 
-  _submit() {
+  _submit(opts) {
     this.setState({
       showErrors: true
     }, () => {
@@ -393,7 +397,7 @@ class BaseForm extends Component {
         return;
       }
 
-      this.setState({ isSaving: true }, this._onSubmit.bind(this));
+      this.setState({ isSaving: true }, this._onSubmit.bind(this, opts));
     });
   }
 }

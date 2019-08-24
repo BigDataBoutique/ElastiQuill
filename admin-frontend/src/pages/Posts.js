@@ -87,6 +87,10 @@ class Posts extends BaseItemsPage {
   }
 
   _renderLineItemExtra(item) {
+    if (! item.is_published) {
+      return false;
+    }
+
     const { socialAvailability } = this.props.postsStore;
     if (! socialAvailability) {
       return false;
