@@ -8,6 +8,7 @@ import { Button, ButtonGroup } from 'reactstrap';
 
 import defaultItemImage from '../assets/img/default-post-image.jpg';
 import LoggedInLayout from '../components/LoggedInLayout';
+import ConfirmModal from '../components/ConfirmModal';
 import FAIcon from '../components/FAIcon';
 import HoverIcon from '../components/Icons/HoverIcon';
 import SvgEdit from '../components/Icons/SvgEdit';
@@ -175,40 +176,16 @@ class BaseItemsPage extends Component {
   }
 
   _renderDeleteItemModal(store) {
-    const customStyles = {
-      content: {
-        top    : '40%',
-        left   : '30%',
-        right  : '30%',
-        bottom : '40%'
-      }
-    };
-
-    const onRequestClose = () => {
-      store.setDeleteItemId(null);
-    };
-
     return (
-      <ReactModal
-        style={customStyles}
+      <ConfirmModal
+        label='Are you sure you want to delete selected item?'
         isOpen={store.deleteItemId !== null}
-        onRequestClose={onRequestClose}>
-        <div>
-          <p>Are you sure you want to delete selected item?</p>
-          <div style={{ textAlign: 'right' }}>
-            <Button
-              disabled={store.isItemDeleting}
-              onClick={() => this._onDeleteItem()}
-              style={{ marginRight: 5 }}
-              color='danger'>
-              {store.isItemDeleting ? 'Loading...' : 'Delete' }
-            </Button>
-            <Button
-              disabled={store.isItemDeleting}
-              onClick={onRequestClose}>Cancel</Button>
-          </div>
-        </div>
-      </ReactModal>
+        onRequestClose={() => store.setDeleteItemId(null)}
+        onSubmitClicked={() => this._onDeleteItem()}
+        isDisabled={store.isItemDeleting} 
+        submitLabel={store.isItemDeleting ? 'Loading...' : 'Delete'}
+        submitColor='danger'
+      />
     )
   }
 }

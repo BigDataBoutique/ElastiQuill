@@ -11,22 +11,16 @@ import CommentsList from '../components/CommentsList';
 class ItemStatsPage extends Component {
   constructor(props) {
     super(props);
-    const { id, type } = props.match.params;
-    props.statsStore.loadStats(type, id);
-    props.statsStore.loadRecentComments(id);
+    this._loadData();
   }
 
   render() {
-    const {
-      item,
-      recentComments,
-      visitsByLocation,
-      visitsHistogramData
-    } = this.props.statsStore;
+    const { item, comments, isLoading } = this.props.statsStore;
+    const { type } = this.props.match.params;
 
     const breadcrumbs = [{
-      label: this._getType() === 'post' ? 'Posts' : 'Content Pages',
-      url: this._getType() === 'post' ? '/posts' : '/pages'
+      label: type === 'post' ? 'Posts' : 'Content Pages',
+      url: type === 'post' ? '/posts' : '/pages'
     }];
 
     return (
@@ -41,13 +35,20 @@ class ItemStatsPage extends Component {
               </div>
             </div>
           </div>
-          {this._getType() === 'post' && (
+          {type === 'post' && (
             <Fragment>
               <div className='elastiquill-header'>Comments</div>
               <div className='row'>
                 <div className='col-12'>
                   <div className='elastiquill-card'>
-                    <CommentsList comments={recentComments} />
+                    {isLoading ? 'Loading...' : (
+                      <CommentsList
+                        treeView
+                        showButtons
+                        hidePostLink
+                        requestReload={this._loadData.bind(this)}
+                        comments={comments || []} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -58,8 +59,9 @@ class ItemStatsPage extends Component {
     )
   }
 
-  _getType() {
-    return this.props.match.params.type;
+  _loadData() {
+    const { id, type } = this.props.match.params;
+    this.props.statsStore.loadData(type, id);
   }
 }
 

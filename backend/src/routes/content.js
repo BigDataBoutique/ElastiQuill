@@ -2,8 +2,9 @@ import url from 'url';
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 
+import * as comments from '../services/comments';
 import * as blogPosts from '../services/blogPosts';
-import { blogpostUrl, pageUrl, isItemEditable } from './util';
+import { blogpostUrl, pageUrl, isItemEditable, preparePost, prepareComments } from './util';
 import { config } from '../app';
 
 const router = express.Router();
@@ -54,6 +55,20 @@ router.get('/:type(post|page)', asyncHandler(async (req, res) => {
     items: processedItems,
     total_pages: totalPages
   });
+}));
+
+router.get('/post/:postId/comment', asyncHandler(async (req, res) => {
+  const data = await comments.getComments({
+    postIds: [req.params.postId],
+    disableFiltering: true
+  });
+
+  const post = await blogPosts.getItemById({ id: req.params.postId });
+  const prepared = preparePost(post);
+
+  res.json(prepareComments(data, false, null, c => {
+    c.url = prepared.url + '#' + c.comment_id
+  }));
 }));
 
 router.get('/:type(post|page)/:id', asyncHandler(async (req, res) => {
@@ -131,6 +146,37 @@ router.post('/:type(post|page)/:id', asyncHandler(async (req, res) => {
       console.error(err);
       res.status(500).json({ error: 'Server error' });
     }
+  }
+}));
+
+router.delete('/comment/:path', asyncHandler(async (req, res) => {
+  try {
+    await comments.deleteComment(req.params.path.split(','));
+    res.json({
+      error: null
+    });
+  }
+  catch (err) {
+    res.json({
+      error: err.message
+    });
+  }
+}));
+
+router.post('/comment/:path', asyncHandler(async (req, res) => {
+  try {
+    await comments.updateComment(req.params.path.split(','), {
+      spam: req.body.spam,
+      approved: ! req.body.spam
+    });
+    res.json({
+      error: null
+    });
+  }
+  catch (err) {
+    res.json({
+      error: err.message
+    });
   }
 }));
 

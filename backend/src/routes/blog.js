@@ -1,9 +1,7 @@
 import _ from 'lodash';
 import RSS from 'rss';
 import url from 'url';
-import path from 'path';
 import express from 'express';
-import request from 'request-promise-native';
 import asyncHandler from 'express-async-handler';
 import * as recaptcha from '../services/recaptcha';
 import * as blogPosts from '../services/blogPosts';
@@ -167,7 +165,7 @@ router.post(BLOGPOST_ROUTE, asyncHandler(async (req, res) => {
     }
 
     const resp = await comments.createComment({
-      recipient_path: _.isEmpty(req.body.recipient_path) ? null : req.body.recipient_path,
+      recipient_comment_id: _.isEmpty(req.body.recipient_comment_id) ? null : req.body.recipient_comment_id,
       post_id: blogPosts.BLOGPOST_ID_PREFIX + req.params.id,
       author: {
         name: req.body.author,

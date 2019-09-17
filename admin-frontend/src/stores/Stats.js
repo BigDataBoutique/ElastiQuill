@@ -8,29 +8,19 @@ class Stats extends BaseStore {
   item = null;
 
   @observable
-  recentComments = [];
-
-  @observable
-  visitsByLocation = [];
-
-  @observable
-  visitsHistogramData = [];
-
+  comments = null;
+  
   @action
-  async loadStats(itemType, id) {
+  async loadData(itemType, id) {
     this.loading('stats');
     try {
       if (itemType === 'post') {
         this.item = await api.loadPostById(id);
+        this.comments = await api.loadComments(id);
       }
       else {
         this.item = await api.loadContentPageById(id);
       }
-
-      const visitsData = await api.loadItemStats(itemType, id);
-      this.visitsHistogramData = visitsData.visits_by_date;
-      this.visitsByLocation = visitsData.visits_by_location;
-
     }
     catch (err) {
       console.log(err);
@@ -38,19 +28,6 @@ class Stats extends BaseStore {
     finally {
       this.loaded('stats');
     }
-  }
-
-  @action
-  async loadRecentComments(id) {
-    try {
-      this.loading('comments');
-      const commentsData = await api.loadCommentsStats(id);
-      this.recentComments = commentsData.recent_comments;
-    }
-    catch (err) {
-      console.error(err);
-    }
-    this.loaded('comments');
   }
 }
 

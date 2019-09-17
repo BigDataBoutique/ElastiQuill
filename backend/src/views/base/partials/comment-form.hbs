@@ -29,14 +29,14 @@
     <div class="form-group my-3">
       <div class="g-recaptcha" data-sitekey="{{recaptchaClientKey}}"></div>
     </div>
-    <input id="recipient-hidden-input" type="hidden" name='recipient_path'>
+    <input id="recipient-hidden-input" type="hidden" name='recipient_comment_id'>
     <button type="submit" class="btn my-3 submit-comment">Submit</button>
     <button style="display: none;" type="button" class="btn my-3 cancel-comment" onclick="onClickReply()">Cancel</button>
   </form>
 </div>
 
 <script type="text/javascript">
-    window.COMMENTS_RECIPIENT_PATH = '{{{comments.values.recipient_path}}}';
+    window.COMMENTS_RECIPIENT_COMMENT_ID = '{{{comments.values.recipient_comment_id}}}';
     window.COMMENTS_ERROR = '{{{comments.error}}}';
 </script>
 <script src="/static/base/js/comments.js"></script>

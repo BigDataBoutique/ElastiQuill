@@ -109,7 +109,7 @@ class LoggedInLayout extends Component {
       { label: 'Status', url: urls.status, icon: 'notes-medical', roles: ['admin'] },
     ].filter(it => {
       if (it.roles) {
-        return it.roles.includes(this.props.appStore.user);
+        return it.roles.includes(this.props.appStore.user.role);
       }
       return true; 
     });
