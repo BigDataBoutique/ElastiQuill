@@ -154,10 +154,13 @@ export function preparePost(p) {
   }
 }
 
-export function prepareComments(comments, allowComments, parentComment = null) {
+export function prepareComments(comments, allowComments, parentComment = null, cb = null) {
   return comments.map(prepareComment).map((c, i) => {
     c.allow_comments = allowComments;
-    c.replies = prepareComments(c.replies || [], allowComments, c);
+    c.replies = prepareComments(c.replies || [], allowComments, c, cb);
+    if (cb) {
+      cb(c);
+    }
     return c;
   });
 }

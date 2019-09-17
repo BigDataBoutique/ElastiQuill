@@ -329,6 +329,10 @@ main.post-page {
     margin-top: 5rem;
 }
 
+.comments-widget__form .alert {
+    margin: 3rem 0rem;
+}
+
 .submit-comment {
     border-radius: 6px;
 }

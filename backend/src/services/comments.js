@@ -7,7 +7,7 @@ import { esClient, config } from '../app';
 const ES_INDEX = config.elasticsearch['blog-comments-index-name'];
 
 const CreateCommentArgSchema = Joi.object().keys({
-  "recipient_path": Joi.string().required().allow(null),
+  "recipient_comment_id": Joi.string().required().allow(null),
   "post_id": Joi.string().required(),
   "author": Joi.object().keys({
     "name": Joi.string().required(),
@@ -20,14 +20,19 @@ const CreateCommentArgSchema = Joi.object().keys({
   "spam": Joi.boolean().allow(null).required()
 });
 
+const UpdateCommentArgSchema = Joi.object().keys({
+  spam: Joi.boolean().required(),
+  approved: Joi.boolean().required()
+});
+
 export async function createComment(comment) {
   const result = Joi.validate(comment, CreateCommentArgSchema);
   if (result.error) {
     throw result.error;
   }
 
-  const recipientId = comment.recipient_path;
-  delete comment.recipient_path;
+  const recipientCommentId = comment.recipient_comment_id;
+  delete comment.recipient_comment_id;
 
   const body = {
     ...comment,
@@ -37,24 +42,19 @@ export async function createComment(comment) {
     published_at: new Date().toISOString()
   };
 
-  if (recipientId) {
-    var [documentId, ...repliesIndices] = JSON.parse(recipientId);
+  if (recipientCommentId) {
     const resp = await esClient.get({
       index: ES_INDEX,
       type: '_doc',
-      id: documentId
+      id: recipientCommentId
     });
 
-    let res = resp._source;
-    for (var i of repliesIndices) {
-      res = res.replies[i];
-    }
-    res.replies = res.replies || [];
-    res.replies.push(body);
+    resp._source.replies = resp._source.replies || [];
+    resp._source.replies.push(body);
 
     await esClient.update({
       index: ES_INDEX,
-      id: documentId,
+      id: recipientCommentId,
       type: '_doc',
       refresh: 'wait_for',
       body: {
@@ -64,7 +64,7 @@ export async function createComment(comment) {
 
     return {
       newComment: body,
-      repliedToComment: res
+      repliedToComment: resp._source
     };
   }
   else {
@@ -82,27 +82,34 @@ export async function createComment(comment) {
   }
 }
 
-export async function getComments(postIds) {
-  let resp = await esClient.search({
+export async function getComments({ postIds, disableFiltering }) {
+  let query = { match_all: {} };
+  if (postIds || ! disableFiltering) {
+    const filters = [];
+
+    if (postIds) {
+      filters.push({ terms: { post_id: postIds } });
+    }
+    if (! disableFiltering) {
+      filters.push({ term: { approved: true } });
+      filters.push({
+        bool: {
+          must_not: {
+            term: { spam: true }
+          }
+        }
+      });
+    }
+
+    query = { bool: { filter: filters } }
+  }
+
+  const resp = await esClient.search({
     index: ES_INDEX,
-    scroll: '10s',
     ignore_unavailable: true,
     body: {
-      query: {
-        bool: {
-          filter: [
-            { terms: { post_id: postIds } },
-            { term: { approved: true } },
-            {
-              bool: {
-                must_not: {
-                  term: { spam: true }
-                }
-              }
-            }
-          ]
-        }
-      },
+      size: 50,
+      query,
       sort: [
         {
           published_at: { order: 'asc' }
@@ -111,25 +118,19 @@ export async function getComments(postIds) {
     }
   });
 
-  let allComments = [];
-
-  while (resp.hits.hits.length) {
-    allComments = allComments.concat(resp.hits.hits);
-    resp = await esClient.scroll({
-      scroll: '10s',
-      scrollId: resp._scroll_id
-    });
-  }
-
-  return filterNotApproved(allComments.map(h => ({
+  return processComments(resp.hits.hits.map(h => ({
     ...h._source,
     id: h._id
   })));
 
-  function filterNotApproved(comments) {
-    return comments.filter(c => c.approved).map(c => ({
+  function processComments(comments) {
+    if (! disableFiltering) {
+      comments = comments.filter(c => c.approved);
+    }
+
+    return comments.map(c => ({
       ...c,
-      replies: filterNotApproved(c.replies || [])
+      replies: processComments(c.replies || [])
     }));
   }
 }
@@ -151,12 +152,67 @@ export async function deletePostComments(id) {
   });
 }
 
-export async function deleteComment(id) {
-  return await esClient.delete({
-    id,
+export async function updateComment(path, partial) {
+  const result = Joi.validate(partial, UpdateCommentArgSchema);
+  if (result.error) {
+    throw result.error;
+  }
+
+  const rootComment = await esClient.get({
     index: ES_INDEX,
-    type: '_doc',
-    refresh: 'wait_for'
+    id: path[0]
+  });
+
+  let comment = rootComment._source;
+  path.slice(1).forEach(replyId => {
+    comment = _.find(comment.replies, ['comment_id', replyId]);
+  });
+
+  _.assign(comment, partial);
+
+  await esClient.update({
+    index: ES_INDEX,
+    id: path[0],
+    refresh: 'wait_for',
+    body: {
+      doc: rootComment._source
+    }
+  });
+}
+
+export async function deleteComment(path) {
+  if (path.length === 1) {
+    await esClient.delete({
+      index: ES_INDEX,
+      refresh: 'wait_for',
+      id: path[0]
+    });
+    return;
+  }
+
+  const rootComment = await esClient.get({
+    index: ES_INDEX,
+    id: path[0]
+  });
+
+  let comment = rootComment._source;
+  for (let i = 1; i < path.length; ++i) {
+    if (i === path.length - 1) {
+      comment.replies = comment.replies.filter(c => c.comment_id !== path[i]);
+      comment = _.find(comment.replies, ['comment_id', path[i]]);
+    }
+    else {
+      comment = _.find(comment.replies, ['comment_id', path[i]]);
+    }
+  }
+
+  await esClient.update({
+    index: ES_INDEX,
+    id: path[0],
+    refresh: 'wait_for',
+    body: {
+      doc: rootComment._source
+    }
   });
 }
 
@@ -255,15 +311,21 @@ export async function getAllComments() {
     scroll: '10s',
     ignore_unavailable: true,
     body: {
+      size: 100,
       query: {
         match_all: {}
-      }
+      },
+      sort: [
+        {
+          'published_at': { order: 'desc' }
+        }
+      ]
     }
   });
 
-  const items = [];
+  let items = [];
   while (resp.hits.hits.length) {
-    resp.hits.hits.forEach(hit => items.push(hit));
+    items = items.concat(resp.hits.hits);
     resp = await esClient.scroll({
       scroll: '10s',
       scrollId: resp._scroll_id

@@ -123,7 +123,9 @@ export async function getItemById({ id, withComments = false, moreLikeThis = fal
   const item = prepareHit(resp);
 
   if (withComments) {
-    item.comments = await commentsService.getComments([ id ]);
+    item.comments = await commentsService.getComments({
+      postIds: [ id ]
+    });
   }
 
   if (moreLikeThis) {
@@ -148,7 +150,9 @@ export async function getItemsByIds(ids, withComments = false) {
   const docs = resp.docs.filter(d => d.found).map(prepareHit);
 
   if (withComments) {
-    const comments = await commentsService.getComments(docs.map(d => d.id));
+    const comments = await commentsService.getComments({
+      postIds: docs.map(d => d.id)
+    });
     return docs.map(d => ({
       ...d,
       comments: comments.filter(c => c.post_id === d.id)
@@ -414,9 +418,6 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
 
   const resp = await esClient.search(query);
   const items = resp.hits.hits.map(prepareHit);
-
-  const comments = await commentsService.getComments(items.map(p => p.id));
-  items.forEach(item => item.comments = comments.filter(c => c.post_id === item.id));
 
   let allSeries = [];
   if (resp.aggregations) {

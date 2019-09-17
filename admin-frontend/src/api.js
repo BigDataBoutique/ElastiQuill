@@ -49,6 +49,21 @@ export async function loadPosts(pageIndex, searchQuery) {
   return await authFetchJson(`/api/content/post?page_index=${pageIndex}&query=${searchQuery}`);
 }
 
+// Comments
+export async function loadComments(postId) {
+  return await authFetchJson(`/api/content/post/${postId}/comment`);
+}
+
+export async function deleteComment(path) {
+  return await deleteItem(`/api/content/comment/${path.join(',')}`);
+}
+
+export async function updateCommentIsSpam(path, isSpam) {
+  return await updateItem(`/api/content/comment/${path.join(',')}`, {
+    spam: isSpam
+  });
+}
+
 // Content Page
 
 export async function createContentPage(values) {

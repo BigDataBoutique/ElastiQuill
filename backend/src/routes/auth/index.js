@@ -26,6 +26,7 @@ if (ADMIN_EMAILS.isEmpty()) {
 }
 
 router.get('/whoami', passport.authenticate('jwt', { session: false }), function (req, res) {
+  updateUserRole(req);
   res.json(req.user);
 });
 
