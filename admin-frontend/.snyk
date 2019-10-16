@@ -28,3 +28,8 @@ patch:
         patched: '2019-07-05T01:07:12.361Z'
     - react-fileupload-progress > babel-plugin-istanbul > istanbul-lib-instrument > @babel/traverse > @babel/helper-function-name > @babel/template > @babel/types > lodash:
         patched: '2019-07-05T01:07:12.361Z'
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - snyk > proxy-agent > https-proxy-agent:
+        patched: '2019-10-16T15:28:09.407Z'
+    - snyk > proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-16T15:28:09.407Z'
