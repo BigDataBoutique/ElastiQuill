@@ -68,3 +68,5 @@ patch:
         patched: '2019-10-16T15:28:16.107Z'
     - '@google-cloud/storage > @google-cloud/common > google-auth-library > gcp-metadata > gaxios > https-proxy-agent':
         patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:51:10.044Z'
