@@ -49,3 +49,22 @@ patch:
         patched: '2019-07-05T23:03:26.426Z'
     - snyk > @snyk/dep-graph > graphlib > lodash:
         patched: '2019-07-05T23:03:26.426Z'
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - snyk > proxy-agent > https-proxy-agent:
+        patched: '2019-10-16T15:28:16.107Z'
+    - snyk > proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > gcs-resumable-upload > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > gcs-resumable-upload > google-auth-library > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > @google-cloud/common > google-auth-library > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > gcs-resumable-upload > google-auth-library > gcp-metadata > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > gcs-resumable-upload > google-auth-library > gtoken > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > @google-cloud/common > google-auth-library > gtoken > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
+    - '@google-cloud/storage > @google-cloud/common > google-auth-library > gcp-metadata > gaxios > https-proxy-agent':
+        patched: '2019-10-16T15:28:16.107Z'
