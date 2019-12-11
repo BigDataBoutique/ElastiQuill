@@ -24,7 +24,7 @@
     "cookie": "^0.4.0",
     "copy-to-clipboard": "^3.2.0",
     "flag-icon-css": "^3.3.0",
-    "handlebars": "^4.4.5",
+    "handlebars": "^4.5.3",
     "i18n-iso-countries": "^4.2.0",
     "jquery": "^3.4.1",
     "jquery-ui": "^1.12.1",
@@ -53,7 +53,7 @@
     "react-vis": "^1.11.7",
     "reactstrap": "^8.0.1",
     "showdown": "^1.9.1",
-    "snyk": "^1.235.1",
+    "snyk": "^1.258.2",
     "turndown": "^5.0.3",
     "typeface-nunito-sans": "0.0.72",
     "uuid": "^3.3.2"
