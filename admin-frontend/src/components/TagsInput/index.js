@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
-import ReactTags from 'react-tag-autocomplete';
+import React, { Component } from "react";
+import ReactTags from "react-tag-autocomplete";
 
-import * as api from '../../api';
-import './style.css';
+import * as api from "../../api";
+import "./style.css";
 
 class TagsInputContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tags: []
+      tags: [],
     };
 
     api.loadAllTags().then(({ tags }) => this.setState({ tags }));
@@ -18,11 +18,11 @@ class TagsInputContainer extends Component {
     const value = this.props.value || [];
     const tags = value.map(val => ({
       id: val,
-      name: val
+      name: val,
     }));
 
     const suggestions = this.state.tags.map(tag => ({
-      name: tag
+      name: tag,
     }));
 
     const handleAddition = tag => {
@@ -44,8 +44,9 @@ class TagsInputContainer extends Component {
         handleDelete={handleDelete}
         handleAddition={handleAddition}
         value={this.props.value}
-        onChange={this.props.onChange} />
-    )
+        onChange={this.props.onChange}
+      />
+    );
   }
 }
 

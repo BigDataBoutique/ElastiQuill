@@ -1,9 +1,8 @@
-import _ from 'lodash';
-import $ from 'jquery';
-import ls from 'local-storage';
-import cookie from 'cookie';
+import $ from "jquery";
+import ls from "local-storage";
+import cookie from "cookie";
 
-const JWT_TOKEN_KEY = 'jwt-token';
+const JWT_TOKEN_KEY = "jwt-token";
 
 let unathorizedHandler = null;
 
@@ -12,14 +11,14 @@ export function setUnauthorizedHandler(handler) {
 }
 
 export const authFetch = async (url, opts = {}) => {
-  opts.credentials = 'include';
+  opts.credentials = "include";
 
-  if (! opts.headers) {
-    opts.headers = {}
+  if (!opts.headers) {
+    opts.headers = {};
   }
 
   if (getJwtToken()) {
-    opts.headers['Authorization'] = 'Bearer ' + getJwtToken();
+    opts.headers["Authorization"] = "Bearer " + getJwtToken();
   }
 
   const resp = await fetch(url, opts);
@@ -36,7 +35,7 @@ export const authFetchJson = async (url, opts = {}) => {
   if (data.error) {
     throw new Error(data.error);
   }
-  
+
   return data;
 };
 
@@ -45,14 +44,13 @@ export function getJwtToken() {
   if (jwt) {
     ls.set(JWT_TOKEN_KEY, jwt);
     return jwt;
-  }
-  else {
+  } else {
     return ls.get(JWT_TOKEN_KEY);
   }
 }
 
 export function cleanJwtToken() {
-  ls.set(JWT_TOKEN_KEY, '');
+  ls.set(JWT_TOKEN_KEY, "");
 }
 
 $(() => {

@@ -1,7 +1,6 @@
-import { Storage } from '@google-cloud/storage';
+import { Storage } from "@google-cloud/storage";
 
 export default class MulterGcsStorage {
-
   constructor(options) {
     this.options = options;
     this.storage = new Storage(options);
@@ -23,15 +22,17 @@ export default class MulterGcsStorage {
 
         const streamOpts = {
           metadata: {
-            contentType
-          }
+            contentType,
+          },
         };
-        
-        file.stream.pipe(this.bucket.file(filename).createWriteStream(streamOpts))
-          .on('error', (err) => cb(err))
-          .on('finish', (file) => cb(null, {
+
+        file.stream
+          .pipe(this.bucket.file(filename).createWriteStream(streamOpts))
+          .on("error", err => cb(err))
+          .on("finish", () =>
+            cb(null, {
               path: `https://${this.options.bucket}.storage.googleapis.com/${filename}`,
-              filename: filename
+              filename: filename,
             })
           );
       });
@@ -39,6 +40,6 @@ export default class MulterGcsStorage {
   }
 
   _removeFile() {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 }

@@ -1,5 +1,6 @@
-import React from 'react';
-import moment from 'moment';
+import _ from "lodash";
+import React from "react";
+import moment from "moment";
 import {
   FlexibleXYPlot,
   XAxis,
@@ -10,26 +11,26 @@ import {
   LineSeries,
   MarkSeries,
   DiscreteColorLegend,
-  Crosshair
-} from 'react-vis';
-import 'react-vis/dist/style.css';
+  Crosshair,
+} from "react-vis";
+import "react-vis/dist/style.css";
 
-import * as api from '../api';
+import * as api from "../api";
 
-const VISITS_COLOR = '#2196f3';
-const VIEWS_COLOR = '#000dc8';
-const POSTS_COLOR = '#d9156d';
+const VISITS_COLOR = "#2196f3";
+const VIEWS_COLOR = "#000dc8";
+const POSTS_COLOR = "#d9156d";
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 class StatsOverTimeGraph extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      dateRange: 'weeks',
+      dateRange: "weeks",
       visitsHistogram: null,
       commentsHistogram: null,
       postsHistogram: null,
-      hoveredValue: null
+      hoveredValue: null,
     };
   }
 
@@ -38,38 +39,47 @@ class StatsOverTimeGraph extends React.Component {
   }
 
   render() {
-    const onChange = ev => this.setState({
-      dateRange: ev.target.value
-    }, this._loadStats.bind(this));
+    const onChange = ev =>
+      this.setState(
+        {
+          dateRange: ev.target.value,
+        },
+        this._loadStats.bind(this)
+      );
 
     const legendItems = [
-      { title: 'All visits', strokeWidth: 4,  color: VISITS_COLOR },
+      { title: "All visits", strokeWidth: 4, color: VISITS_COLOR },
     ];
 
-    if (! this.props.item) {
-      legendItems.push({ title: 'Post views', strokeWidth: 4,  color: VIEWS_COLOR });
-      legendItems.push({ title: 'Posts', strokeWidth: 4,  color: POSTS_COLOR });
+    if (!this.props.item) {
+      legendItems.push({
+        title: "Post views",
+        strokeWidth: 4,
+        color: VIEWS_COLOR,
+      });
+      legendItems.push({ title: "Posts", strokeWidth: 4, color: POSTS_COLOR });
     }
 
     return (
-      <div className='row' style={{ paddingTop: 35 }}>
-        <div className='col-md-10' style={{ marginTop: -8 }}>
+      <div className="row" style={{ paddingTop: 35 }}>
+        <div className="col-md-10" style={{ marginTop: -8 }}>
           {this._renderChart()}
         </div>
-        <div className='col-md-2'>
+        <div className="col-md-2">
           <select
             style={{ marginBottom: 34 }}
-            className='elastiquill-select'
+            className="elastiquill-select"
             value={this.state.dateRange}
-            onChange={onChange}>
-            <option value='weeks'>Last week</option>
-            <option value='months'>Last month</option>
-            <option value='years'>Last year</option>
+            onChange={onChange}
+          >
+            <option value="weeks">Last week</option>
+            <option value="months">Last month</option>
+            <option value="years">Last year</option>
           </select>
           <DiscreteColorLegend items={legendItems} />
         </div>
-      </div>      
-    )
+      </div>
+    );
   }
 
   _renderChart() {
@@ -92,96 +102,101 @@ class StatsOverTimeGraph extends React.Component {
     const xDomainEnd = _.last(dummyData).x.getTime();
     const xDomainStart = _.first(dummyData).x.getTime();
 
-    const datasets = [visitsData, commentsData, postsData];
     const onNearestX = (value, { index }) => {
       const values = [];
 
       values.push(dummyData[index]);
-      values.push(_.find(visitsData, ['x', value.x]) || { y: 0 });
-      values.push(_.find(viewsData, ['x', value.x]) || { y: 0 });
-      values.push(_.find(commentsData, ['x', value.x]) || { y: 0 });
-      values.push(_.find(postsData, ['x', value.x]) || { y: 0 });
+      values.push(_.find(visitsData, ["x", value.x]) || { y: 0 });
+      values.push(_.find(viewsData, ["x", value.x]) || { y: 0 });
+      values.push(_.find(commentsData, ["x", value.x]) || { y: 0 });
+      values.push(_.find(postsData, ["x", value.x]) || { y: 0 });
 
       this.setState({
-        crosshairValues: values
+        crosshairValues: values,
       });
     };
 
     const xyPlotOptions = {
-      yDomain: (visitsData.length + viewsData.length) ? undefined : [0, 10]
+      yDomain: visitsData.length + viewsData.length ? undefined : [0, 10],
     };
 
     return (
       <FlexibleXYPlot
         {...xyPlotOptions}
-        xType='time'
+        xType="time"
         yBaseValue={0}
-        xDomain={[ xDomainStart, xDomainEnd ]}
+        xDomain={[xDomainStart, xDomainEnd]}
         height={300}
-        onMouseLeave={() => this.setState({ crosshairValues: null })}>
+        onMouseLeave={() => this.setState({ crosshairValues: null })}
+      >
         <VerticalGridLines />
-        <HorizontalGridLines />      
+        <HorizontalGridLines />
         <MarkSeries
           onNearestX={onNearestX}
-          color='transparent'
-          data={dummyData} />
-        <LineSeries
-          strokeWidth='4px'
-          color={VISITS_COLOR}
-          data={visitsData} />
+          color="transparent"
+          data={dummyData}
+        />
+        <LineSeries strokeWidth="4px" color={VISITS_COLOR} data={visitsData} />
         {!this.props.item && (
-          <LineSeries
-            strokeWidth='4px'
-            color={VIEWS_COLOR}
-            data={viewsData} />            
-        )}          
-        <Borders style={{
-          bottom: {fill: '#fff'},
-          left: {fill: '#fff'},
-          right: {fill: '#fff'},
-          top: {fill: '#fff'}
-        }}/>
+          <LineSeries strokeWidth="4px" color={VIEWS_COLOR} data={viewsData} />
+        )}
+        <Borders
+          style={{
+            bottom: { fill: "#fff" },
+            left: { fill: "#fff" },
+            right: { fill: "#fff" },
+            top: { fill: "#fff" },
+          }}
+        />
         <XAxis
-          tickTotal={Math.min(7, Math.ceil((xDomainEnd - xDomainStart) / interval ))}
-          tickFormat={x => moment(x).format('DD-MM-YYYY')} />
-        <YAxis  />
+          tickTotal={Math.min(
+            7,
+            Math.ceil((xDomainEnd - xDomainStart) / interval)
+          )}
+          tickFormat={x => moment(x).format("DD-MM-YYYY")}
+        />
+        <YAxis />
         {!this.props.item && (
           <MarkSeries
             color={POSTS_COLOR}
-            data={postsData.map(item => ({ ...item, y: 0 }))} />
+            data={postsData.map(item => ({ ...item, y: 0 }))}
+          />
         )}
         {this._renderCrosshair()}
       </FlexibleXYPlot>
-    )
+    );
   }
 
   _renderCrosshair() {
     const { crosshairValues } = this.state;
-    if (! crosshairValues) {
+    if (!crosshairValues) {
       return false;
     }
 
     return (
       <Crosshair values={crosshairValues}>
-        <div className='rv-crosshair__inner' style={{ minWidth: '150px', zIndex: 99999 }}>
-          <div className='rv-crosshair__inner__content'>
+        <div
+          className="rv-crosshair__inner"
+          style={{ minWidth: "150px", zIndex: 99999 }}
+        >
+          <div className="rv-crosshair__inner__content">
             <div>
-              <div className='rv-crosshair__title'>
-                {moment(crosshairValues[0].x).format('DD-MM-YYYY')}
+              <div className="rv-crosshair__title">
+                {moment(crosshairValues[0].x).format("DD-MM-YYYY")}
               </div>
-              <div className='rv-crosshair__item'>
+              <div className="rv-crosshair__item">
                 Visits: {crosshairValues[1].y}
               </div>
               {!this.props.item && (
-                <div className='rv-crosshair__item'>
+                <div className="rv-crosshair__item">
                   Post views: {crosshairValues[2].y}
                 </div>
               )}
-              <div className='rv-crosshair__item'>
+              <div className="rv-crosshair__item">
                 Comments: {crosshairValues[3].y}
               </div>
               {!this.props.item && (
-                <div className='rv-crosshair__item'>
+                <div className="rv-crosshair__item">
                   Posts: {crosshairValues[4].y}
                 </div>
               )}
@@ -189,7 +204,7 @@ class StatsOverTimeGraph extends React.Component {
           </div>
         </div>
       </Crosshair>
-    )
+    );
   }
 
   _generateDummySeriesData() {
@@ -198,17 +213,20 @@ class StatsOverTimeGraph extends React.Component {
     const { name } = this._getInterval();
     const data = [];
 
-    if (name === '1d') {
-      for (let i = startDate.getTime() + ONE_DAY; i <= today.getTime(); i += ONE_DAY) {
+    if (name === "1d") {
+      for (
+        let i = startDate.getTime() + ONE_DAY;
+        i <= today.getTime();
+        i += ONE_DAY
+      ) {
         data.push({ x: new Date(i), y: 0 });
       }
-    }
-    else {
+    } else {
       startDate.setDate(1);
       today.setDate(1);
       let date = moment(startDate);
       while (date.toDate().getTime() < today.getTime()) {
-        date.add(1, 'months');
+        date.add(1, "months");
         data.push({ x: date.toDate(), y: 0 });
       }
     }
@@ -217,16 +235,16 @@ class StatsOverTimeGraph extends React.Component {
   }
 
   _prepareHistogram(histogram, addZeros) {
-    if (! histogram) {
+    if (!histogram) {
       return [];
     }
 
     let data = histogram.map(item => ({
       x: this._normalizeDate(new Date(item.key)),
-      y: item.doc_count
+      y: item.doc_count,
     }));
 
-    if (! addZeros) {
+    if (!addZeros) {
       return data.filter(item => item.y > 0);
     }
 
@@ -234,7 +252,7 @@ class StatsOverTimeGraph extends React.Component {
       const { interval } = this._getInterval();
       const zeroItem = {
         x: new Date(_.first(data).x.getTime() - interval),
-        y: 0
+        y: 0,
       };
       data = [zeroItem].concat(data);
     }
@@ -243,33 +261,35 @@ class StatsOverTimeGraph extends React.Component {
   }
 
   _extractVisitorsHistogram(histogram) {
-    if (! histogram) {
+    if (!histogram) {
       return [];
     }
 
     return histogram.map(it => ({
       ...it,
-      doc_count: it.visitors.value
+      doc_count: it.visitors.value,
     }));
   }
 
   _normalizeDate(d) {
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0)
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
   }
 
   _getStartDate() {
-    return moment().subtract(1, this.state.dateRange).toDate();
+    return moment()
+      .subtract(1, this.state.dateRange)
+      .toDate();
   }
 
   _getInterval() {
     const { dateRange } = this.state;
 
-    let name = '1d';
+    let name = "1d";
     let interval = ONE_DAY;
 
-    if (dateRange === 'years') {
+    if (dateRange === "years") {
       interval *= 30;
-      name = '1M';
+      name = "1M";
     }
     return { name, interval };
   }
@@ -284,22 +304,24 @@ class StatsOverTimeGraph extends React.Component {
       const { name: intervalName } = this._getInterval();
 
       if (item) {
-        results = await api.loadItemStats(item.type, item.id, startDate, intervalName);
-      }
-      else {
+        results = await api.loadItemStats(
+          item.type,
+          item.id,
+          startDate,
+          intervalName
+        );
+      } else {
         results = await api.loadAllStats(startDate, intervalName);
       }
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
-    }
-    finally {
+    } finally {
       if (results) {
         this.setState({
           viewsHistogram: results.views_by_date,
           visitsHistogram: results.visits_by_date,
           commentsHistogram: results.comments_by_date,
-          postsHistogram: results.posts_by_date
+          postsHistogram: results.posts_by_date,
         });
       }
     }

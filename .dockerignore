@@ -1,0 +1,5 @@
+admin-frontend/node_modules
+backend/node_modules
+.git
+.dockerignore
+Dockerfile

@@ -1,25 +1,28 @@
-import fs from 'fs';
-import _ from 'lodash';
-import path from 'path';
-import AWS from 'aws-sdk';
-import uuid from 'uuid/v1';
-import multer from 'multer';
-import mime from 'mime-types';
-import multerS3 from 'multer-s3';
-import { Storage as GCSStorage } from '@google-cloud/storage';
-import MulterGcsStorage from '../lib/multer-gcs-storage';
+import fs from "fs";
+import _ from "lodash";
+import path from "path";
+import AWS from "aws-sdk";
+import uuid from "uuid/v1";
+import multer from "multer";
+import mime from "mime-types";
+import multerS3 from "multer-s3";
+import { Storage as GCSStorage } from "@google-cloud/storage";
+import MulterGcsStorage from "../lib/multer-gcs-storage";
 
-import { config } from '../app';
+import { config } from "../app";
 
 let configuredStorageName = null;
 let errors = {};
 
-const BUCKET_PREFIX = _.get(config, 'blog.uploads-bucket-prefix');
-const GCS_BUCKET = _.get(config, 'credentials.google.gcs-bucket');
-const GCS_KEYFILE = _.get(config, 'credentials.google.gcs-keyfile');
-const S3_BUCKET = _.get(config, 'credentials.aws.s3-bucket');
-const AWS_ACCESS_KEY_ID = _.get(config, 'credentials.aws.access-key-id');
-const AWS_SECRET_ACCESS_KEY = _.get(config, 'credentials.aws.secret-access-key');
+const BUCKET_PREFIX = _.get(config, "blog.uploads-bucket-prefix");
+const GCS_BUCKET = _.get(config, "credentials.google.gcs-bucket");
+const GCS_KEYFILE = _.get(config, "credentials.google.gcs-keyfile");
+const S3_BUCKET = _.get(config, "credentials.aws.s3-bucket");
+const AWS_ACCESS_KEY_ID = _.get(config, "credentials.aws.access-key-id");
+const AWS_SECRET_ACCESS_KEY = _.get(
+  config,
+  "credentials.aws.secret-access-key"
+);
 
 const GCS_AVAILABLE = GCS_BUCKET && GCS_KEYFILE;
 const S3_AVAILABLE = S3_BUCKET && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY;
@@ -27,7 +30,7 @@ const S3_AVAILABLE = S3_BUCKET && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY;
 export function getStatus() {
   return {
     backend: configuredStorageName,
-    errors
+    errors,
   };
 }
 
@@ -43,8 +46,8 @@ export function getUploadHandler(storageOpts) {
     .catch(err => console.log(`Failed to configure storage: ${err.message}`));
 
   return async (req, res, next) => {
-    if (! uploadHandler) {
-      next(new Error('Storage for file upload is not configured.'));
+    if (!uploadHandler) {
+      next(new Error("Storage for file upload is not configured."));
       return;
     }
 
@@ -56,26 +59,24 @@ async function getStorage(opts) {
   if (GCS_AVAILABLE) {
     try {
       const storage = await getGCSStorage(opts);
-      configuredStorageName = 'gcs';
+      configuredStorageName = "gcs";
       return storage;
-    }
-    catch (err) {
-      errors['gcs'] = err.message;
+    } catch (err) {
+      errors["gcs"] = err.message;
 
-      if (! S3_AVAILABLE) {
+      if (!S3_AVAILABLE) {
         throw err;
       }
     }
   }
-  
+
   if (S3_AVAILABLE) {
     try {
       const storage = await getS3Storage(opts);
-      configuredStorageName = 's3';
+      configuredStorageName = "s3";
       return storage;
-    }
-    catch (err) {
-      errors['s3'] = err.message;
+    } catch (err) {
+      errors["s3"] = err.message;
       throw err;
     }
   }
@@ -88,25 +89,31 @@ async function getGCSStorage(opts) {
   try {
     const parsed = JSON.parse(fs.readFileSync(GCS_KEYFILE).toString());
     projectId = parsed.project_id;
-  }
-  catch (err) {
+  } catch (err) {
     throw new Error(`Failed to read GCS keyfile ${GCS_KEYFILE}`);
   }
 
   const gcsStorage = new GCSStorage({
     projectId,
-    keyFilename: GCS_KEYFILE
+    keyFilename: GCS_KEYFILE,
   });
 
   let results = null;
   try {
     results = await gcsStorage.bucket(GCS_BUCKET).iam.getPolicy();
-  } catch (ignored) {}
+  } catch (ignored) {
+    // Ignored
+  }
 
   if (results !== null) {
-    const found = _.find(results[0].bindings, ['role', 'roles/storage.objectViewer']);
-    if (!found || !found.members.includes('allUsers')) {
-      throw new Error(`Bucket ${GCS_BUCKET} is not configured for public access.`)
+    const found = _.find(results[0].bindings, [
+      "role",
+      "roles/storage.objectViewer",
+    ]);
+    if (!found || !found.members.includes("allUsers")) {
+      throw new Error(
+        `Bucket ${GCS_BUCKET} is not configured for public access.`
+      );
     }
   }
 
@@ -115,27 +122,26 @@ async function getGCSStorage(opts) {
     bucket: GCS_BUCKET,
     keyFilename: GCS_KEYFILE,
     filename: getFilename.bind(this, opts),
-    contentType: getContentType.bind(this, opts)
+    contentType: getContentType.bind(this, opts),
   });
 }
 
 async function getS3Storage(opts) {
   const s3 = new AWS.S3({
-    apiVersion: '2006-03-01',
+    apiVersion: "2006-03-01",
     credentials: new AWS.Credentials({
       accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY
-    })
+      secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    }),
   });
 
   return new multerS3({
     s3,
-    acl: 'public-read',
+    acl: "public-read",
     bucket: S3_BUCKET,
-    key: getFilename.bind(this, opts)
-  });  
+    key: getFilename.bind(this, opts),
+  });
 }
-
 
 async function getFilename(opts, req, file, cb) {
   const extName = path.extname(file.originalname);
@@ -143,14 +149,13 @@ async function getFilename(opts, req, file, cb) {
   if (opts.filenamePrefix) {
     try {
       filenamePrefix = await opts.filenamePrefix(req, file);
-    }
-    catch (err) {
+    } catch (err) {
       cb(err);
       return;
     }
   }
 
-  filenamePrefix = filenamePrefix || '';
+  filenamePrefix = filenamePrefix || "";
   cb(null, `${BUCKET_PREFIX}${filenamePrefix}${uuid()}${extName}`);
 }
 

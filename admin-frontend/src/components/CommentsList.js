@@ -1,9 +1,9 @@
-import React from 'react';
-import { Badge } from 'reactstrap';
-import { toast } from 'react-toastify';
+import React from "react";
+import { Badge } from "reactstrap";
+import { toast } from "react-toastify";
 
-import ConfirmModal from './ConfirmModal';
-import * as api from '../api';
+import ConfirmModal from "./ConfirmModal";
+import * as api from "../api";
 
 export default class CommentsList extends React.Component {
   constructor(props) {
@@ -11,14 +11,14 @@ export default class CommentsList extends React.Component {
     this.state = {
       spamModalComment: null,
       deleteModalComment: null,
-      isLoading: false
+      isLoading: false,
     };
   }
 
   render() {
     const { comments } = this.props;
-    if (! comments.length) {
-      return 'No comments';
+    if (!comments.length) {
+      return "No comments";
     }
 
     return (
@@ -31,7 +31,7 @@ export default class CommentsList extends React.Component {
         {this._renderSpamModal()}
         {this._renderDeleteModal()}
       </div>
-    )
+    );
   }
 
   _renderComment(comment, isLast, parentPath = []) {
@@ -40,15 +40,16 @@ export default class CommentsList extends React.Component {
 
     return (
       <React.Fragment>
-        <div style={{ display: 'flex', flexFlow: 'row' }}>
+        <div style={{ display: "flex", flexFlow: "row" }}>
           <img
             style={{ width: 64, height: 64, marginRight: 10 }}
-            src={comment.author.avatar} />
+            src={comment.author.avatar}
+          />
           <div style={{ flex: 1 }}>
             <div>
               {comment.author.name}
-              <div style={{ float: 'right' }}>
-                <a target='_blank' href={comment.url}>
+              <div style={{ float: "right" }}>
+                <a target="_blank" href={comment.url}>
                   {new Date(comment.published_at).toLocaleString()}
                 </a>
                 {this._renderCommentButtons(comment)}
@@ -58,22 +59,29 @@ export default class CommentsList extends React.Component {
           </div>
         </div>
         {isRoot && !this.props.hidePostLink && (
-        <div style={{ marginTop: 10 }}>
-          Commented on post <a target='_blank' href={comment.post_url}>"{comment.post_title}"</a>
-        </div>
+          <div style={{ marginTop: 10 }}>
+            Commented on post{" "}
+            <a target="_blank" href={comment.post_url}>
+              {`"${comment.post_title}"`}
+            </a>
+          </div>
         )}
         {this.props.treeView && comment.replies.length > 0 && (
-        <div style={{ marginTop: 20 }}>
-          {comment.replies.map((reply, i) => (
-            <div key={reply.comment_id} style={{ marginLeft: 20 }}>
-              {this._renderComment(reply, i + 1 === comment.replies.length, comment.path)}
-            </div>
-          ))}
-        </div>
+          <div style={{ marginTop: 20 }}>
+            {comment.replies.map((reply, i) => (
+              <div key={reply.comment_id} style={{ marginLeft: 20 }}>
+                {this._renderComment(
+                  reply,
+                  i + 1 === comment.replies.length,
+                  comment.path
+                )}
+              </div>
+            ))}
+          </div>
         )}
-        {! isLast && <hr />}
+        {!isLast && <hr />}
       </React.Fragment>
-    )
+    );
   }
 
   _renderSpamModal() {
@@ -83,17 +91,15 @@ export default class CommentsList extends React.Component {
 
         this.setState({ isLoading: true });
         await api.updateCommentIsSpam(comment.path, false);
-        toast.success('Comment published');
+        toast.success("Comment published");
         this.props.requestReload();
-      }
-      catch (err) {
-        toast.error('Failed to publish the comment');
+      } catch (err) {
+        toast.error("Failed to publish the comment");
         console.log(err);
-      }
-      finally {
+      } finally {
         this.setState({
           spamModalComment: null,
-          isLoading: false
+          isLoading: false,
         });
       }
     };
@@ -102,17 +108,17 @@ export default class CommentsList extends React.Component {
 
     return (
       <ConfirmModal
-        label='Are you sure you want to publish selected comment?'
+        label="Are you sure you want to publish selected comment?"
         isOpen={this.state.spamModalComment !== null}
         onSubmitClicked={onSubmitClicked}
         onRequestClose={onRequestClose}
-        isDisabled={this.state.isLoading} 
-        submitLabel='Publish'
-        submitColor='primary'
+        isDisabled={this.state.isLoading}
+        submitLabel="Publish"
+        submitColor="primary"
       />
-    )
+    );
   }
-  
+
   _renderDeleteModal() {
     const onSubmitClicked = async () => {
       try {
@@ -120,17 +126,15 @@ export default class CommentsList extends React.Component {
 
         this.setState({ isLoading: true });
         await api.deleteComment(comment.path);
-        toast.success('Comment is deleted');
+        toast.success("Comment is deleted");
         this.props.requestReload();
-      }
-      catch (err) {
-        toast.error('Failed to remove the comment');
+      } catch (err) {
+        toast.error("Failed to remove the comment");
         console.log(err);
-      }
-      finally {
+      } finally {
         this.setState({
           deleteModalComment: null,
-          isLoading: false
+          isLoading: false,
         });
       }
     };
@@ -139,41 +143,51 @@ export default class CommentsList extends React.Component {
 
     return (
       <ConfirmModal
-        label='Are you sure you want to delete this comment?'
+        label="Are you sure you want to delete this comment?"
         isOpen={this.state.deleteModalComment !== null}
         onSubmitClicked={onSubmitClicked}
         onRequestClose={onRequestClose}
-        isDisabled={this.state.isLoading} 
-        submitLabel={this.state.isLoading ? 'Deleting...' : 'Delete'}
-        submitColor='danger'
+        isDisabled={this.state.isLoading}
+        submitLabel={this.state.isLoading ? "Deleting..." : "Delete"}
+        submitColor="danger"
       />
-    )
+    );
   }
 
   _renderCommentButtons(comment) {
-    if (! this.props.showButtons) {
+    if (!this.props.showButtons) {
       return false;
     }
 
-    const onSpamToggle = () => this.setState({
-      spamModalComment: comment
-    });
+    const onSpamToggle = () =>
+      this.setState({
+        spamModalComment: comment,
+      });
 
-    const onDeleteComment = () => this.setState({
-      deleteModalComment: comment
-    });
+    const onDeleteComment = () =>
+      this.setState({
+        deleteModalComment: comment,
+      });
 
     return (
-      <div style={{ textAlign: 'right' }}>
+      <div style={{ textAlign: "right" }}>
         {comment.spam && (
-          <Badge color='dark' onClick={onSpamToggle} style={{ cursor: 'pointer' }}>
+          <Badge
+            color="dark"
+            onClick={onSpamToggle}
+            style={{ cursor: "pointer" }}
+          >
             Marked as spam
           </Badge>
         )}
-        <Badge color='danger' onClick={onDeleteComment} style={{ cursor: 'pointer', marginLeft: 5 }}>
-          <i className='fas fa-trash-alt' />
+        <Badge
+          color="danger"
+          onClick={onDeleteComment}
+          style={{ cursor: "pointer", marginLeft: 5 }}
+        >
+          <i className="fas fa-trash-alt" />
         </Badge>
       </div>
-    )
+    );
   }
 }

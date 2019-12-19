@@ -1,12 +1,11 @@
-import { action } from 'mobx';
-import ItemsStore from './ItemsStore';
-import * as api from '../api';
+import { action } from "mobx";
+import ItemsStore from "./ItemsStore";
+import * as api from "../api";
 
 class Pages extends ItemsStore {
-
   @action
   async loadPage(pageIndex) {
-    await this._loadPage(pageIndex, 'Pages', api.loadContentPages);
+    await this._loadPage(pageIndex, "Pages", api.loadContentPages);
   }
 }
 

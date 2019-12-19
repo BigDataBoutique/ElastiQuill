@@ -1,77 +1,84 @@
-import Twitter from 'twitter';
-import medium from 'medium-sdk';
-import request from 'request-promise';
+import Twitter from "twitter";
+import medium from "medium-sdk";
+import request from "request-promise";
 
-import { config } from '../app';
+import { config } from "../app";
 
 export function getAvailability(connected = {}) {
   const res = {
-    'hacker-news': true,
-    twitter: !! config.credentials.twitter,
-    linkedin: !! config.credentials.linkedin,
-    reddit: !! config.credentials.reddit,
-    medium: !! config.credentials.medium
+    "hacker-news": true,
+    twitter: !!config.credentials.twitter,
+    linkedin: !!config.credentials.linkedin,
+    reddit: !!config.credentials.reddit,
+    medium: !!config.credentials.medium,
   };
 
-  for (const key in res ) {
+  for (const key in res) {
     if (res[key]) {
-      if (connected[key] || ['twitter', 'hacker-news'].indexOf(key) > -1) {
-        res[key] = 'ready';
+      if (connected[key] || ["twitter", "hacker-news"].indexOf(key) > -1) {
+        res[key] = "ready";
+      } else {
+        res[key] = "not_connected";
       }
-      else {
-        res[key] = 'not_connected';
-      }
-    }
-    else {
-      res[key] = 'not_configured';
+    } else {
+      res[key] = "not_configured";
     }
   }
 
   return res;
 }
 
-export async function postToLinkedin(authorId, accessToken, title, url, imageUrl, tags) {
+export async function postToLinkedin(
+  authorId,
+  accessToken,
+  title,
+  url,
+  imageUrl,
+  tags
+) {
   let imageAsset = undefined;
 
   if (imageUrl) {
     const imageBinary = await request({
-      method: 'GET',
+      method: "GET",
       url: imageUrl,
-      encoding: null
+      encoding: null,
     });
 
     const resp = await request({
-      method: 'POST',
-      url: 'https://api.linkedin.com/v2/assets?action=registerUpload&oauth2_access_token=' + accessToken,
+      method: "POST",
+      url:
+        "https://api.linkedin.com/v2/assets?action=registerUpload&oauth2_access_token=" +
+        accessToken,
       body: JSON.stringify({
-        "registerUploadRequest": {
-          "recipes": [
-            "urn:li:digitalmediaRecipe:feedshare-image"
-          ],
-          "owner": "urn:li:person:" + authorId,
-          "serviceRelationships": [
+        registerUploadRequest: {
+          recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
+          owner: "urn:li:person:" + authorId,
+          serviceRelationships: [
             {
-              "relationshipType": "OWNER",
-              "identifier": "urn:li:userGeneratedContent"
-            }
-          ]
-        }
-      })
+              relationshipType: "OWNER",
+              identifier: "urn:li:userGeneratedContent",
+            },
+          ],
+        },
+      }),
     });
-    
+
     const { value } = JSON.parse(resp);
     imageAsset = value.asset;
 
-    const { uploadUrl } = value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'];
+    const { uploadUrl } = value.uploadMechanism[
+      "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
+    ];
 
     await request({
-      method: 'POST',
+      method: "POST",
       url: uploadUrl,
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: "Bearer " + accessToken,
       },
       body: imageBinary,
-      encoding: null
+      encoding: null,
     });
   }
 
@@ -80,38 +87,41 @@ export async function postToLinkedin(authorId, accessToken, title, url, imageUrl
     commentary.push(url);
   }
   if (tags && tags.length) {
-    commentary.push(tags.map(s => '#' + s.replace(/\s/g, '').toLowerCase()).join(' '));
+    commentary.push(
+      tags.map(s => "#" + s.replace(/\s/g, "").toLowerCase()).join(" ")
+    );
   }
 
-  const postResp = await request({
-    method: 'POST',
-    url: 'https://api.linkedin.com/v2/ugcPosts?oauth2_access_token=' + accessToken,
+  await request({
+    method: "POST",
+    url:
+      "https://api.linkedin.com/v2/ugcPosts?oauth2_access_token=" + accessToken,
     body: JSON.stringify({
-      author: 'urn:li:person:' + authorId,
-      lifecycleState: 'PUBLISHED',
+      author: "urn:li:person:" + authorId,
+      lifecycleState: "PUBLISHED",
       specificContent: {
-        'com.linkedin.ugc.ShareContent': {
-          'shareCommentary': {
-            'text': commentary.join('\n')
+        "com.linkedin.ugc.ShareContent": {
+          shareCommentary: {
+            text: commentary.join("\n"),
           },
-          'shareMediaCategory': imageAsset ? 'IMAGE' : 'ARTICLE',
-          'media': [
+          shareMediaCategory: imageAsset ? "IMAGE" : "ARTICLE",
+          media: [
             {
-              'status': 'READY',
-              'originalUrl': url,
-              'media': imageAsset
-            }
-          ]
-        }
+              status: "READY",
+              originalUrl: url,
+              media: imageAsset,
+            },
+          ],
+        },
       },
-      'visibility': {
-        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-      }
+      visibility: {
+        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+      },
     }),
     headers: {
-      'X-Restli-Protocol-Version': '2.0.0',
-      'Content-Type': 'application/json'
-    }
+      "X-Restli-Protocol-Version": "2.0.0",
+      "Content-Type": "application/json",
+    },
   });
 
   return { url: null };
@@ -120,31 +130,35 @@ export async function postToLinkedin(authorId, accessToken, title, url, imageUrl
 export function postToTwitter(text) {
   return new Promise((resolve, reject) => {
     const twitterClient = new Twitter({
-      consumer_key: config.credentials.twitter['consumer-key'],
-      consumer_secret: config.credentials.twitter['consumer-secret'],
-      access_token_key: config.credentials.twitter['access-token-key'],
-      access_token_secret: config.credentials.twitter['access-token-secret']
+      consumer_key: config.credentials.twitter["consumer-key"],
+      consumer_secret: config.credentials.twitter["consumer-secret"],
+      access_token_key: config.credentials.twitter["access-token-key"],
+      access_token_secret: config.credentials.twitter["access-token-secret"],
     });
 
-    twitterClient.post('statuses/update', {
-      status: text
-    }, (errors, tweet) => {
-      if (errors) {
-        reject(errors[0].message);
-        return;
+    twitterClient.post(
+      "statuses/update",
+      {
+        status: text,
+      },
+      (errors, tweet) => {
+        if (errors) {
+          reject(errors[0].message);
+          return;
+        }
+
+        resolve({
+          url: `https://twitter.com/${tweet.user.id_str}/status/${tweet.id_str}`,
+        });
       }
-
-      resolve({
-        url: `https://twitter.com/${tweet.user.id_str}/status/${tweet.id_str}`
-      });
-    });
+    );
   });
 }
 
 export async function postToMedium(authData, post) {
   const client = new medium.MediumClient({
-    clientId: config.credentials.medium['client-id'],
-    clientSecret: config.credentials.medium['client-secret']
+    clientId: config.credentials.medium["client-id"],
+    clientSecret: config.credentials.medium["client-secret"],
   });
   client.setAccessToken(authData.token);
 
@@ -155,22 +169,25 @@ export async function postToMedium(authData, post) {
         return;
       }
 
-      client.createPost({
-        userId: user.id,
-        title: post.title,
-        contentFormat: medium.PostContentFormat.HTML,
-        content: post.content,
-        tags: post.tags,
-        canonicalUrl: config.blog.url + post.url,
-        publishStatus: medium.PostPublishStatus.PUBLIC
-      }, (err, post) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+      client.createPost(
+        {
+          userId: user.id,
+          title: post.title,
+          contentFormat: medium.PostContentFormat.HTML,
+          content: post.content,
+          tags: post.tags,
+          canonicalUrl: config.blog.url + post.url,
+          publishStatus: medium.PostPublishStatus.PUBLIC,
+        },
+        (err, post) => {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-        resolve(post);
-      });
+          resolve(post);
+        }
+      );
     });
   });
 }
@@ -178,32 +195,32 @@ export async function postToMedium(authData, post) {
 export async function postToReddit(authData, title, url, subreddit) {
   if (new Date().getTime() > authData.expiresAt - 10000) {
     authData = await fetchRedditAccessToken({
-      refreshToken: authData.refreshToken
+      refreshToken: authData.refreshToken,
     });
   }
 
   const submitResp = await request({
-    method: 'POST',
-    url: 'https://oauth.reddit.com/api/submit',
+    method: "POST",
+    url: "https://oauth.reddit.com/api/submit",
     auth: {
-      bearer: authData.token
+      bearer: authData.token,
     },
     headers: {
-      'User-Agent': 'elastiquill'
+      "User-Agent": "elastiquill",
     },
     form: {
-      api_type: 'json',
+      api_type: "json",
       title: title,
       url: url,
       sr: subreddit,
-      kind: 'link'
-    }
+      kind: "link",
+    },
   });
 
   const parsed = JSON.parse(submitResp);
-  if (! parsed.json.errors.length) {
+  if (!parsed.json.errors.length) {
     return {
-      url: parsed.json.data.url
+      url: parsed.json.data.url,
     };
   }
 
@@ -211,29 +228,31 @@ export async function postToReddit(authData, title, url, subreddit) {
 }
 
 export async function fetchRedditAccessToken({ code, callback, refreshToken }) {
-  const form = refreshToken ? ({
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken
-  }) : ({
-    grant_type: 'authorization_code',
-    code: code,
-    redirect_uri: callback
-  });
+  const form = refreshToken
+    ? {
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      }
+    : {
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: callback,
+      };
 
   const resp = await request({
     form,
-    method: 'POST',
-    url: 'https://www.reddit.com/api/v1/access_token',
+    method: "POST",
+    url: "https://www.reddit.com/api/v1/access_token",
     auth: {
-      user: config.credentials.reddit['client-id'],
-      pass: config.credentials.reddit['client-secret']
-    }
+      user: config.credentials.reddit["client-id"],
+      pass: config.credentials.reddit["client-secret"],
+    },
   });
 
   const parsed = JSON.parse(resp);
   return {
     expiresAt: new Date().getTime() + parsed.expires_in * 1000,
     token: parsed.access_token,
-    refreshToken: parsed.refresh_token ? parsed.refresh_token : refreshToken
+    refreshToken: parsed.refresh_token ? parsed.refresh_token : refreshToken,
   };
 }

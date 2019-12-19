@@ -10,7 +10,9 @@
     "production": "ADMIN_FRONTEND_PATH=../../admin-frontend/build CONFIG_PATH=../../config.yml SETUP_DIR=../_setup NODE_ENV=production babel-node ./src/server",
     "build": "webpack --config webpack.config.js",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "prettier-check": "prettier --check src/** webpack.config.js",
+    "lint": "eslint --cache --ext js src"
   },
   "repository": {
     "type": "git",
@@ -77,8 +79,16 @@
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.3",
     "copy-webpack-plugin": "^5.0.3",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-plugin-jest": "^23.1.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.17.0",
     "nodemon": "^1.19.1",
+    "prettier": "^1.19.1",
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6",
     "webpack-node-externals": "^1.7.2"

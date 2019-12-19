@@ -1,14 +1,13 @@
-import { observable, action } from 'mobx';
+import { observable, action } from "mobx";
 import BaseStore from "./BaseStore";
-import * as api from '../api';
+import * as api from "../api";
 
 class Dashboard extends BaseStore {
-
   @observable
   visitsByLocation = [];
 
   @observable
-  visitsByCountry = [];  
+  visitsByCountry = [];
 
   @observable
   averageVisitsPerDay = null;
@@ -50,10 +49,10 @@ class Dashboard extends BaseStore {
   userAgentOperatingSystem = [];
 
   @observable
-  userAgentName = [];  
+  userAgentName = [];
 
   async loadStats() {
-    this.loading('stats');
+    this.loading("stats");
 
     try {
       const commentsData = await api.loadCommentsStats();
@@ -74,18 +73,16 @@ class Dashboard extends BaseStore {
       this.mostViewedPost = allStats.most_viewed_post;
       this.userAgentOperatingSystem = allStats.user_agent_os;
       this.userAgentName = allStats.user_agent_name;
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
-    }
-    finally {
-      this.loaded('stats');    
+    } finally {
+      this.loaded("stats");
     }
   }
 
   @action
   toggleUniqueVisitors() {
-    this.uniqueVisitorsEnabled = ! this.uniqueVisitorsEnabled;
+    this.uniqueVisitorsEnabled = !this.uniqueVisitorsEnabled;
   }
 }
 

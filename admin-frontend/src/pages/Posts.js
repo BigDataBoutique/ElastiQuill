@@ -1,22 +1,22 @@
-import _ from 'lodash';
-import React, {Component} from 'react';
-import {inject, observer} from "mobx-react";
-import classnames from "classnames";
-import { Link } from "react-router-dom";
-import { ListGroup, ListGroupItem } from 'reactstrap';
-import { InputGroup, InputGroupAddon, Input, Button, ButtonGroup } from 'reactstrap';
-import { UncontrolledButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import _ from "lodash";
+import React from "react";
+import { inject, observer } from "mobx-react";
+import { InputGroup, InputGroupAddon, Input, Button } from "reactstrap";
+import {
+  UncontrolledButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from "reactstrap";
 
-import FAIcon from '../components/FAIcon';
-import LoggedInLayout from "../components/LoggedInLayout";
+import FAIcon from "../components/FAIcon";
 import ImportPostModal from "../components/ImportPostModal";
 import RedditShareDialog from "../components/RedditShareDialog";
 import ConfirmSocialDialog from "../components/ConfirmSocialDialog";
 import BaseItemsPage from "./BaseItemsPage";
-import urls from "../config/urls";
-import * as api from '../api';
+import * as api from "../api";
 
-@inject('postsStore')
+@inject("postsStore")
 @observer
 class Posts extends BaseItemsPage {
   componentDidMount() {
@@ -27,59 +27,71 @@ class Posts extends BaseItemsPage {
   render() {
     return (
       <div>
-        {this._renderContent({
-          title: 'Posts',
-          newItem: 'Create a new post',
-          noItems: 'No posts created yet',
-          urlPart: this._getUrlPart()
-        }, this.props.postsStore)}
+        {this._renderContent(
+          {
+            title: "Posts",
+            newItem: "Create a new post",
+            noItems: "No posts created yet",
+            urlPart: this._getUrlPart(),
+          },
+          this.props.postsStore
+        )}
         {this._renderDialog()}
         <ImportPostModal
           key={this.props.postsStore.importModalOpen}
           isOpen={this.props.postsStore.importModalOpen}
-          isLoading={this.props.postsStore.beingLoaded.includes('importPost')}
-          onRequestImport={(...args) => this.props.postsStore.importPost(...args)}
-          onRequestClose={() => this.props.postsStore.setImportModalOpen(false)} />
+          isLoading={this.props.postsStore.beingLoaded.includes("importPost")}
+          onRequestImport={(...args) =>
+            this.props.postsStore.importPost(...args)
+          }
+          onRequestClose={() => this.props.postsStore.setImportModalOpen(false)}
+        />
       </div>
-    )
+    );
   }
 
   _renderNav() {
     return (
-      <div className='elastiquill-nav-submenu-extra'>
-        <div style={{ display: 'flex' }}>
+      <div className="elastiquill-nav-submenu-extra">
+        <div style={{ display: "flex" }}>
           <Button
-            color='link'
+            color="link"
             style={{ minWidth: 150, marginRight: 5 }}
-            onClick={() => this.props.postsStore.setImportModalOpen(true)}>
-            <FAIcon icon='cloud-download-alt' style={{ marginRight: '12px' }} />
+            onClick={() => this.props.postsStore.setImportModalOpen(true)}
+          >
+            <FAIcon icon="cloud-download-alt" style={{ marginRight: "12px" }} />
             Import post
           </Button>
           <InputGroup>
             <Input
               value={this.props.postsStore.searchQuery}
-              onChange={ev => this.props.postsStore.setSearchQuery(ev.target.value)}
-              onKeyPress={ev => ev.charCode === 13 && this.props.postsStore.loadPage(0)}
-              style={{ height: '100%' }} />
-            <InputGroupAddon addonType='append'>
+              onChange={ev =>
+                this.props.postsStore.setSearchQuery(ev.target.value)
+              }
+              onKeyPress={ev =>
+                ev.charCode === 13 && this.props.postsStore.loadPage(0)
+              }
+              style={{ height: "100%" }}
+            />
+            <InputGroupAddon addonType="append">
               <Button onClick={() => this.props.postsStore.loadPage(0)}>
-                <FAIcon icon='search' />
+                <FAIcon icon="search" />
               </Button>
             </InputGroupAddon>
           </InputGroup>
         </div>
       </div>
-    )
+    );
   }
 
   _renderDialog() {
     switch (this.props.postsStore.socialDialog) {
-      case 'hacker-news':
-      case 'twitter':
-      case 'linkedin':
-      case 'medium':
+      case "hacker-news":
+      case "twitter":
+      case "linkedin":
+      case "medium":
         return <ConfirmSocialDialog postsStore={this.props.postsStore} />;
-      case 'reddit':
+      case "reddit":
         return <RedditShareDialog postsStore={this.props.postsStore} />;
       default:
         return false;
@@ -87,16 +99,19 @@ class Posts extends BaseItemsPage {
   }
 
   _renderLineItemExtra(item) {
-    if (! item.is_published) {
+    if (!item.is_published) {
       return false;
     }
 
     const { socialAvailability } = this.props.postsStore;
-    if (! socialAvailability) {
+    if (!socialAvailability) {
       return false;
     }
 
-    const allNotConfigured = _.every(_.values(socialAvailability), val => val === 'not_configured');
+    const allNotConfigured = _.every(
+      _.values(socialAvailability),
+      val => val === "not_configured"
+    );
     if (allNotConfigured) {
       return false;
     }
@@ -107,69 +122,75 @@ class Posts extends BaseItemsPage {
       padding: 0,
       background: 0,
       border: 0,
-      boxShadow: 'none',
-      color: '#c3c4c3'
+      boxShadow: "none",
+      color: "#c3c4c3",
     };
 
     return (
-      <UncontrolledButtonDropdown className='elastiquill-icon-button'>
+      <UncontrolledButtonDropdown className="elastiquill-icon-button">
         <DropdownToggle style={style}>
-          <i style={{ marginRight: 10, marginTop: 4, fontSize: '18px' }} className='fa fa-share-alt' />
+          <i
+            style={{ marginRight: 10, marginTop: 4, fontSize: "18px" }}
+            className="fa fa-share-alt"
+          />
         </DropdownToggle>
-        <DropdownMenu style={{ marginTop: 0, border: '1px solid #aaa' }}>
-          <div style={{ paddingLeft: 10 }}>
-            Repost on social
-          </div>
-          {! socialAvailability && <DropdownItem header>Loading...</DropdownItem>}
-          {this._renderDropdownItem(item, 'Twitter', 'twitter')}
-          {this._renderDropdownItem(item, 'Linkedin', 'linkedin')}
-          {this._renderDropdownItem(item, 'Medium', 'medium')}
-          {this._renderDropdownItem(item, 'Reddit', 'reddit')}
-          {this._renderDropdownItem(item, 'Hacker News', 'hacker-news')}
+        <DropdownMenu style={{ marginTop: 0, border: "1px solid #aaa" }}>
+          <div style={{ paddingLeft: 10 }}>Repost on social</div>
+          {!socialAvailability && (
+            <DropdownItem header>Loading...</DropdownItem>
+          )}
+          {this._renderDropdownItem(item, "Twitter", "twitter")}
+          {this._renderDropdownItem(item, "Linkedin", "linkedin")}
+          {this._renderDropdownItem(item, "Medium", "medium")}
+          {this._renderDropdownItem(item, "Reddit", "reddit")}
+          {this._renderDropdownItem(item, "Hacker News", "hacker-news")}
         </DropdownMenu>
       </UncontrolledButtonDropdown>
-    )
+    );
   }
 
   _renderDropdownItem(item, title, key) {
     const { socialAvailability } = this.props.postsStore;
-    if (socialAvailability[key] === 'not_configured') {
+    if (socialAvailability[key] === "not_configured") {
       return false;
     }
 
-    if (key === 'medium' && _.get(item, 'metadata.medium_crosspost_url')) {
+    if (key === "medium" && _.get(item, "metadata.medium_crosspost_url")) {
       return (
-        <DropdownItem disabled={socialAvailability[key] === 'not_configured'}>
-          <a href={_.get(item, 'metadata.medium_crosspost_url')} target='_blank'>
+        <DropdownItem disabled={socialAvailability[key] === "not_configured"}>
+          <a
+            href={_.get(item, "metadata.medium_crosspost_url")}
+            target="_blank"
+          >
             <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
             {title}
-            <i className='fa fa-external-link-alt' style={{ marginLeft: 10 }} />
+            <i className="fa fa-external-link-alt" style={{ marginLeft: 10 }} />
           </a>
         </DropdownItem>
-      )
+      );
     }
 
     const onClick = () => {
-      if (socialAvailability[key] === 'ready') {
+      if (socialAvailability[key] === "ready") {
         this.props.postsStore.setSocialDialog(key, item);
-      }
-      else {
+      } else {
         api.redirectToSocialConnect(key);
       }
     };
 
     return (
       <DropdownItem
-        disabled={socialAvailability[key] === 'not_configured'}
-        onClick={onClick}>
+        disabled={socialAvailability[key] === "not_configured"}
+        onClick={onClick}
+      >
         <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
         {title}
       </DropdownItem>
-    )
+    );
   }
 
   _getUrlPart() {
-    return 'post';
+    return "post";
   }
 
   _getStore() {
@@ -182,11 +203,9 @@ class Posts extends BaseItemsPage {
       await api.deletePost(this.props.postsStore.deleteItemId);
       this.props.postsStore.loadPage(0);
       this.props.postsStore.setDeleteItemId(null);
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
-    }
-    finally {
+    } finally {
       this.props.postsStore.setItemDeleting(false);
     }
   }
