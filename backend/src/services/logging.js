@@ -1,264 +1,275 @@
-import _ from 'lodash';
-import url from 'url';
-import moment from 'moment';
-import geohash from 'ngeohash';
-import crawlers from 'crawler-user-agents';
+import _ from "lodash";
+import url from "url";
+import moment from "moment";
+import geohash from "ngeohash";
+import crawlers from "crawler-user-agents";
 
-import { esClient, config } from '../app';
-import * as blogPosts from './blogPosts';
-import * as elasticsearch from './elasticsearch';
+import { esClient, config } from "../app";
+import * as blogPosts from "./blogPosts";
+import * as elasticsearch from "./elasticsearch";
 
 let elasticsearchIsReady = false;
 
-const LOGS_INDICES_PREFIX = config.elasticsearch['blog-logs-index-name'];
-const LOGS_PERIOD = config.elasticsearch['blog-logs-period'];
-const CRAWLER_USER_AGENTS = new Set(_.flatMap(crawlers, _.property('instances')));
+const LOGS_INDICES_PREFIX = config.elasticsearch["blog-logs-index-name"];
+const LOGS_PERIOD = config.elasticsearch["blog-logs-period"];
+const CRAWLER_USER_AGENTS = new Set(
+  _.flatMap(crawlers, _.property("instances"))
+);
 
 export async function getStatus() {
   const resp = await esClient.search({
-    index: LOGS_INDICES_PREFIX + '*',
+    index: LOGS_INDICES_PREFIX + "*",
     body: {
       aggs: {
         log_levels: {
-          terms: { field: 'log.level' }
-        }
-      }
-    }
+          terms: { field: "log.level" },
+        },
+      },
+    },
   });
 
   let logLevel = null;
 
   if (resp.aggregations && resp.aggregations.log_levels) {
     const logLevels = resp.aggregations.log_levels.buckets.map(b => b.key);
-    if (logLevels.includes('error')) {
-      logLevel = 'error';
-    }
-    else if (logLevels.includes('warn')) {
-      logLevel = 'warn';
+    if (logLevels.includes("error")) {
+      logLevel = "error";
+    } else if (logLevels.includes("warn")) {
+      logLevel = "warn";
     }
   }
 
-  return { 
-    logLevel
-  }
+  return {
+    logLevel,
+  };
 }
 
-export async function getStats({ startDate, endDate, interval = '1d', type = null, postId = null }) {
+export async function getStats({
+  startDate,
+  endDate,
+  interval = "1d",
+  type = null,
+  postId = null,
+}) {
   const filters = [];
-  
+
   filters.push({
     bool: {
       must_not: {
         term: {
-          'http.request.bot': true
-        }
-      }
-    }
+          "http.request.bot": true,
+        },
+      },
+    },
   });
 
   filters.push({
     terms: {
-      tags: postId ? ['read_item'] : ['list_items', 'read_item', 'visit']
-    }
+      tags: postId ? ["read_item"] : ["list_items", "read_item", "visit"],
+    },
   });
 
   if (type) {
     filters.push({
       term: {
-        'read_item.type': type
-      }
-    })
+        "read_item.type": type,
+      },
+    });
   }
 
   if (postId) {
     filters.push({
       term: {
-        'read_item.id': postId
-      }
+        "read_item.id": postId,
+      },
     });
   }
 
   if (startDate || endDate) {
     filters.push({
       range: {
-        '@timestamp': {
+        "@timestamp": {
           lte: endDate || null,
-          gte: startDate || null
-        }
-      }
+          gte: startDate || null,
+        },
+      },
     });
   }
 
-  const visitsPerDayAgg = interval === '1d' ? 'visits_histogram' : 'visits_per_day';
+  const visitsPerDayAgg =
+    interval === "1d" ? "visits_histogram" : "visits_per_day";
 
   const query = {
-    index: LOGS_INDICES_PREFIX + '*',
+    index: LOGS_INDICES_PREFIX + "*",
     body: {
       query: {
         bool: {
-          filter: filters
-        }
+          filter: filters,
+        },
       },
       aggs: {
         visits_by_location: {
           geohash_grid: {
-            field : 'source.geo.location',
-            precision : 3
-          }
+            field: "source.geo.location",
+            precision: 3,
+          },
         },
         posts: {
           filter: {
             term: {
-              'read_item.type': 'post'
-            }
+              "read_item.type": "post",
+            },
           },
           aggs: {
             by_views: {
               terms: {
-                field: 'read_item.id',
-                size: 1
+                field: "read_item.id",
+                size: 1,
               },
               aggs: {
                 visitors: {
                   cardinality: {
-                    field: 'visitor_id'
-                  }
-                }
-              }
-            }
-          }
+                    field: "visitor_id",
+                  },
+                },
+              },
+            },
+          },
         },
         visits_by_country: {
           terms: {
-            field: 'source.geo.country_iso_code',
-            size: 10
-          }
+            field: "source.geo.country_iso_code",
+            size: 10,
+          },
         },
         visits_histogram: {
           date_histogram: {
-            field: '@timestamp',
-            interval
+            field: "@timestamp",
+            interval,
           },
           aggs: {
             visitors: {
               cardinality: {
-                field: 'visitor_id'
-              }                  
-            }
-          }
+                field: "visitor_id",
+              },
+            },
+          },
         },
         views_histogram: {
           filter: {
             term: {
-              'read_item.type': 'post'
-            }
+              "read_item.type": "post",
+            },
           },
           aggs: {
             views: {
               date_histogram: {
-                field: '@timestamp',
-                interval
+                field: "@timestamp",
+                interval,
               },
               aggs: {
                 visitors: {
                   cardinality: {
-                    field: 'visitor_id'
-                  }                  
-                }
-              }      
-            }
-          }
+                    field: "visitor_id",
+                  },
+                },
+              },
+            },
+          },
         },
         avg_visits_per_day: {
           avg_bucket: {
-            buckets_path: visitsPerDayAgg + '>_count'
-          }
+            buckets_path: visitsPerDayAgg + ">_count",
+          },
         },
         referrer_type: {
           terms: {
-            field: 'http.request.referrer_parsed.type',
-            size: 5
-          }
+            field: "http.request.referrer_parsed.type",
+            size: 5,
+          },
         },
         referrer_from_domain: {
           terms: {
-            field: 'http.request.referrer_parsed.domain',
-            size: 5
-          }
+            field: "http.request.referrer_parsed.domain",
+            size: 5,
+          },
         },
         user_agent_os: {
           terms: {
-            field: 'http.request.user_agent_parsed.os_name',
-            size: 5
-          }
+            field: "http.request.user_agent_parsed.os_name",
+            size: 5,
+          },
         },
         user_agent_name: {
           terms: {
-            field: 'http.request.user_agent_parsed.name',
-            size: 5
-          }
-        }
-      }
-    }
+            field: "http.request.user_agent_parsed.name",
+            size: 5,
+          },
+        },
+      },
+    },
   };
 
-  if (interval !== '1d') {
+  if (interval !== "1d") {
     query.body.aggs.visits_per_day = {
       date_histogram: {
-        field: '@timestamp',
-        interval: '1d'
+        field: "@timestamp",
+        interval: "1d",
       },
       aggs: {
         visitors: {
           cardinality: {
-            field: 'visitor_id'
-          }                  
-        }
-      }
+            field: "visitor_id",
+          },
+        },
+      },
     };
   }
 
-  if (! postId) {
+  if (!postId) {
     query.body.aggs.posts_visits = {
       filter: {
-        term: { 'read_item.type': 'post' }
+        term: { "read_item.type": "post" },
       },
       aggs: {
         visits: {
           terms: {
-            field: 'read_item.id',
-            size: 5
+            field: "read_item.id",
+            size: 5,
           },
           aggs: {
             unique: {
               cardinality: {
-                field: 'visitor_id'
-              }
-            }
-          }
-        }
-      }
+                field: "visitor_id",
+              },
+            },
+          },
+        },
+      },
     };
   }
 
   const resp = await esClient.search(query);
   let avg_visits_per_day = 0,
-      avg_visitors_per_day = 0,
-      most_busy_day = null,
-      most_viewed_post = null,
-      visits_by_country = [],
-      visits_by_date = [],
-      views_by_date = [],
-      visits_by_location = [],
-      popular_posts = [],
-      referrer_type = [],
-      referrer_from_domain = [],
-      user_agent_os = [],
-      user_agent_name = [];
+    avg_visitors_per_day = 0,
+    most_busy_day = null,
+    most_viewed_post = null,
+    visits_by_country = [],
+    visits_by_date = [],
+    views_by_date = [],
+    visits_by_location = [],
+    popular_posts = [],
+    referrer_type = [],
+    referrer_from_domain = [],
+    user_agent_os = [],
+    user_agent_name = [];
 
   if (resp.aggregations) {
     avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
-    avg_visitors_per_day = _.meanBy(_.get(resp.aggregations, visitsPerDayAgg + '.buckets'), _.property('visitors.value'));
+    avg_visitors_per_day = _.meanBy(
+      _.get(resp.aggregations, visitsPerDayAgg + ".buckets"),
+      _.property("visitors.value")
+    );
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
     user_agent_os = resp.aggregations.user_agent_os.buckets;
@@ -266,38 +277,48 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
     visits_by_date = resp.aggregations.visits_histogram.buckets;
     views_by_date = resp.aggregations.views_histogram.views.buckets;
     visits_by_country = resp.aggregations.visits_by_country.buckets;
-    visits_by_location = resp.aggregations.visits_by_location.buckets.map(bucket => ({
-      location: geohash.decode_bbox(bucket.key),
-      visits: bucket.doc_count
-    }));
+    visits_by_location = resp.aggregations.visits_by_location.buckets.map(
+      bucket => ({
+        location: geohash.decode_bbox(bucket.key),
+        visits: bucket.doc_count,
+      })
+    );
 
     for (const mostViewedPost of resp.aggregations.posts.by_views.buckets) {
       try {
-        most_viewed_post = await blogPosts.getItemById({ id: mostViewedPost.key });
+        most_viewed_post = await blogPosts.getItemById({
+          id: mostViewedPost.key,
+        });
         most_viewed_post.views_count = mostViewedPost.doc_count;
         most_viewed_post.visitors_count = mostViewedPost.visitors.value;
-      }
-      catch (err) {
+      } catch (err) {
         if (err.statusCode != 404) {
           throw err;
-        }        
+        }
       }
     }
 
-    const largestBucket = _.maxBy(_.get(resp.aggregations, visitsPerDayAgg + '.buckets'), b => b.doc_count);
-    most_busy_day = largestBucket ? {
-      date: new Date(largestBucket.key),
-      count: largestBucket.doc_count,
-      visitors: largestBucket.visitors
-    } : null;
+    const largestBucket = _.maxBy(
+      _.get(resp.aggregations, visitsPerDayAgg + ".buckets"),
+      b => b.doc_count
+    );
+    most_busy_day = largestBucket
+      ? {
+          date: new Date(largestBucket.key),
+          count: largestBucket.doc_count,
+          visitors: largestBucket.visitors,
+        }
+      : null;
 
     if (resp.aggregations.posts_visits) {
       const postsVisitsBuckets = resp.aggregations.posts_visits.visits.buckets;
-      popular_posts = await blogPosts.getItemsByIds(postsVisitsBuckets.map(bucket => bucket.key));
+      popular_posts = await blogPosts.getItemsByIds(
+        postsVisitsBuckets.map(bucket => bucket.key)
+      );
       for (let post of popular_posts) {
-        const bucket = _.find(postsVisitsBuckets, ['key', post.id]);
+        const bucket = _.find(postsVisitsBuckets, ["key", post.id]);
         post.visits_count = bucket.doc_count;
-        post.unique_visits_count = bucket.unique.value; 
+        post.unique_visits_count = bucket.unique.value;
       }
     }
   }
@@ -315,32 +336,32 @@ export async function getStats({ startDate, endDate, interval = '1d', type = nul
     referrer_type,
     referrer_from_domain,
     user_agent_os,
-    user_agent_name
+    user_agent_name,
   };
 }
 
 export async function* allLogsGenerator() {
   let resp = await esClient.search({
-    index: LOGS_INDICES_PREFIX + '*',
-    scroll: '10s',
+    index: LOGS_INDICES_PREFIX + "*",
+    scroll: "10s",
     ignore_unavailable: true,
     body: {
       query: {
-        match_all: {}
+        match_all: {},
       },
       sort: [
         {
-          '@timestamp': { order: 'desc' }
-        }
-      ]
-    }
+          "@timestamp": { order: "desc" },
+        },
+      ],
+    },
   });
 
   while (resp.hits.hits.length) {
     yield resp.hits.hits;
     resp = await esClient.scroll({
-      scroll: '10s',
-      scrollId: resp._scroll_id
+      scroll: "10s",
+      scrollId: resp._scroll_id,
     });
   }
 }
@@ -348,27 +369,29 @@ export async function* allLogsGenerator() {
 function logIndexName() {
   let formatStr = null;
   switch (LOGS_PERIOD) {
-    case 'daily':
-      formatStr = 'YYYY.MM.DD';
+    case "daily":
+      formatStr = "YYYY.MM.DD";
       break;
-    case 'monthly':
-      formatStr = 'YYYY.MM';
+    case "monthly":
+      formatStr = "YYYY.MM";
       break;
     default:
-      throw new Error('Invalid configuration blog-logs-period: ' + LOGS_PERIOD);
+      throw new Error("Invalid configuration blog-logs-period: " + LOGS_PERIOD);
   }
 
-  return LOGS_INDICES_PREFIX + '-' + moment().format(formatStr);
+  return LOGS_INDICES_PREFIX + "-" + moment().format(formatStr);
 }
 
 export async function logAuthAttempt(params, req, res) {
   const { email, success } = params;
   await log({
-    req, res, email,
+    req,
+    res,
+    email,
     authMethod: res.locals.authAttemptBackend,
-    status: success ? 'success' : 'failure',
+    status: success ? "success" : "failure",
     excludeUrl: true,
-    tags: ['auth']
+    tags: ["auth"],
   });
 }
 
@@ -378,39 +401,55 @@ export async function logVisit(req, res, took) {
     return;
   }
 
-  await log({ req, res, took, tags: ['visit'] });
+  await log({ req, res, took, tags: ["visit"] });
 }
 
 export async function logError(errorScope, error, req, res) {
-  console.error('logError', error);
+  console.error("logError", error);
 
   await log({
-    req, res, error,
-    tags: [ errorScope, 'error' ].filter(_.identity)
+    req,
+    res,
+    error,
+    tags: [errorScope, "error"].filter(_.identity),
   });
 }
 
-async function log({ req, res, email, status, took, authMethod, excludeUrl = false, error = null, tags = [] }) {
+async function log({
+  req,
+  res,
+  email,
+  status,
+  took,
+  authMethod,
+  excludeUrl = false,
+  error = null,
+  tags = [],
+}) {
   try {
-    if (! elasticsearchIsReady) {
+    if (!elasticsearchIsReady) {
       elasticsearchIsReady = await elasticsearch.isReady();
-      if (! elasticsearchIsReady) {
+      if (!elasticsearchIsReady) {
         // skip logs if elasticsearch is not configured
         return;
       }
     }
 
     // Avoid logging clouds load-balancer healthchecks
-    if (req && req.get('User-Agent') && req.get('User-Agent').startsWith('GoogleHC/')) {
+    if (
+      req &&
+      req.get("User-Agent") &&
+      req.get("User-Agent").startsWith("GoogleHC/")
+    ) {
       return;
     }
 
     const body = {
-      'ecs.version': '1.0.0',
-      '@timestamp': new Date().toISOString(),
+      "ecs.version": "1.0.0",
+      "@timestamp": new Date().toISOString(),
       tags: tags,
       log: {
-        level: error ? 'error' : 'info',
+        level: error ? "error" : "info",
       },
       ...ecsSource(req, res),
       ...ecsHttp(req, res),
@@ -419,26 +458,27 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
       email,
       status,
       auth_method: authMethod,
-      ...(res ? res.locals.logData : {}),      
+      ...(res ? res.locals.logData : {}),
     };
 
     if (req) {
-      if (tags.includes('visit')) {
+      if (tags.includes("visit")) {
         body.visitor_id = req.visitorId;
       }
 
-      if (! excludeUrl) {
-        const url = ecsUrl(req.protocol + '://' + req.get('host') + req.originalUrl);
+      if (!excludeUrl) {
+        const url = ecsUrl(
+          req.protocol + "://" + req.get("host") + req.originalUrl
+        );
         for (const key in url) {
           body[key] = url[key];
         }
       }
     }
 
-
     if (error) {
       body.error = {
-        message: error.stack
+        message: error.stack,
       };
     }
 
@@ -448,66 +488,66 @@ async function log({ req, res, email, status, took, authMethod, excludeUrl = fal
 
     await esClient.index({
       index: logIndexName(),
-      type: '_doc',
-      pipeline: (req && res) ? 'request_log' : null,
-      body
+      type: "_doc",
+      pipeline: req && res ? "request_log" : null,
+      body,
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
   }
 }
 
 function ecsSource(req, res) {
-  if (! req || ! res) return {};
+  if (!req || !res) return {};
 
   let ip = null;
 
-  if (req.headers['x-forwarded-for']) {
-    ip = req.headers['x-forwarded-for'].split(',').map(s => s.trim())[0];
+  if (req.headers["x-forwarded-for"]) {
+    ip = req.headers["x-forwarded-for"].split(",").map(s => s.trim())[0];
   }
 
-  if (! ip || ! ip.length) {
-    ip = req.connection.remoteAddress || 
-         req.socket.remoteAddress ||
-        (req.connection.socket ? req.connection.socket.remoteAddress : null);
+  if (!ip || !ip.length) {
+    ip =
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      (req.connection.socket ? req.connection.socket.remoteAddress : null);
   }
 
   return {
     source: {
-      ip
-    }
-  }
+      ip,
+    },
+  };
 }
 
 function ecsHttp(req, res) {
-  if (! req || ! res) return {};
+  if (!req || !res) return {};
 
-  const userAgent = req.get('User-Agent');
+  const userAgent = req.get("User-Agent");
 
   const body = {
     http: {
       request: {
         method: req.method.toLowerCase(),
         user_agent: userAgent,
-        bot: CRAWLER_USER_AGENTS.has(userAgent)
+        bot: CRAWLER_USER_AGENTS.has(userAgent),
       },
       response: {
-        status_code: res.statusCode
-      }
-    }
+        status_code: res.statusCode,
+      },
+    },
   };
 
   if (req.referrer) {
-    const referrerRaw = req.header('referrer') || '';
+    const referrerRaw = req.header("referrer") || "";
     const sameDomain = referrerRaw.startsWith(config.blog.url);
 
-    if (! sameDomain && ! ['direct', 'internal'].includes(req.referrer.type)) {
+    if (!sameDomain && !["direct", "internal"].includes(req.referrer.type)) {
       body.http.request.referrer = referrerRaw;
       body.http.request.referrer_parsed = {
         ...ecsUrl(req.referrer.from).url,
         type: req.referrer.type,
-        domain: req.referrer.from_domain
+        domain: req.referrer.from_domain,
       };
     }
   }
@@ -516,7 +556,7 @@ function ecsHttp(req, res) {
 }
 
 function ecsUrl(urlStr) {
-  if (! urlStr) return {};
+  if (!urlStr) return {};
 
   const parsed = url.parse(urlStr);
 
@@ -524,7 +564,7 @@ function ecsUrl(urlStr) {
     url: {
       full: parsed.href,
       path: parsed.pathname,
-      query: parsed.query
-    }
+      query: parsed.query,
+    },
   };
 }

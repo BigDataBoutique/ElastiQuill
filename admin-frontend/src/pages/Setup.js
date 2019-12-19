@@ -1,10 +1,9 @@
-import _ from 'lodash';
-import React, {Component} from 'react';
-import {inject, observer} from "mobx-react";
+import React, { Component } from "react";
+import { inject, observer } from "mobx-react";
 
 import LoggedInLayout from "../components/LoggedInLayout";
 
-@inject('setupStore')
+@inject("setupStore")
 @observer
 class Setup extends Component {
   componentDidMount() {
@@ -13,12 +12,10 @@ class Setup extends Component {
 
   render() {
     return (
-      <LoggedInLayout pageTitle='Elasticsearch setup'>
-        <div className='elastiquill-content'>
-          <div className='row'>
-            <div className='col-12'>
-              {this._renderContent()}
-            </div>
+      <LoggedInLayout pageTitle="Elasticsearch setup">
+        <div className="elastiquill-content">
+          <div className="row">
+            <div className="col-12">{this._renderContent()}</div>
           </div>
         </div>
       </LoggedInLayout>
@@ -27,29 +24,31 @@ class Setup extends Component {
 
   _renderContent() {
     if (this.props.setupStore.isLoading) {
-      return 'Loading...';
+      return "Loading...";
     }
 
-    if (this.props.setupStore.status === 'ready') {
+    if (this.props.setupStore.status === "ready") {
       return (
-        <div className='alert alert-success'>
+        <div className="alert alert-success">
           Elasticsearch setup is completed.
         </div>
-      )
+      );
     }
 
-    const isLoadingSetup = this.props.setupStore.beingLoaded.indexOf('setup') > -1;
+    const isLoadingSetup =
+      this.props.setupStore.beingLoaded.indexOf("setup") > -1;
 
     return (
       <div>
         <div
           onClick={() => this.props.setupStore.setupElasticsearch()}
           disabled={isLoadingSetup}
-          className='btn btn-primary btn-lg'>
-          {isLoadingSetup ? 'Loading...' : 'Complete setup'}
+          className="btn btn-primary btn-lg"
+        >
+          {isLoadingSetup ? "Loading..." : "Complete setup"}
         </div>
       </div>
-    )
+    );
   }
 }
 

@@ -1,8 +1,7 @@
-import { action, computed, observable } from 'mobx';
-import BaseStore from './BaseStore';
+import { action, observable } from "mobx";
+import BaseStore from "./BaseStore";
 
 export default class ItemsStore extends BaseStore {
-
   @observable
   items = [];
 
@@ -13,7 +12,7 @@ export default class ItemsStore extends BaseStore {
   deleteItemId = null;
 
   @observable
-  searchQuery = '';
+  searchQuery = "";
 
   @observable
   pageIndex = 0;
@@ -96,11 +95,9 @@ export default class ItemsStore extends BaseStore {
       this.items = resp.items;
       this.totalPages = resp.total_pages;
       this.pageIndex = pageIndex;
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
-    }
-    finally {
+    } finally {
       this.loaded(name);
     }
   }
@@ -110,13 +107,11 @@ export default class ItemsStore extends BaseStore {
     this.loading(name);
 
     try {
-      this.currentItem = await func(id)
-    }
-    catch (err) {
+      this.currentItem = await func(id);
+    } catch (err) {
       console.log(err);
-    }
-    finally {
+    } finally {
       this.loaded(name);
     }
-  }  
+  }
 }

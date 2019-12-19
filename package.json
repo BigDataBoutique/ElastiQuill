@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "scripts": {
+    "prettier-check": "./scripts/prettier-check.sh",
+    "lint": "./scripts/lint.sh"
+  }
+}

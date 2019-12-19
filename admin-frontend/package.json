@@ -9,7 +9,9 @@
     "build": "webpack --mode production",
     "start": "webpack-dev-server --mode development --open --port 4000 --host localhost",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "prettier-check": "prettier --check src/** webpack.config.js",
+    "lint": "eslint --cache --ext js src"
   },
   "repository": {
     "type": "git",
@@ -66,8 +68,15 @@
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@neutrinojs/compile-loader": "^9.0.0-beta.1",
     "@neutrinojs/react": "^9.0.0-beta.1",
+    "babel-eslint": "^10.0.3",
     "css-url-relative-plugin": "^1.0.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-plugin-jest": "^23.1.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "neutrino": "^9.0.0-beta.1",
+    "prettier": "^1.19.1",
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2"

@@ -1,101 +1,98 @@
-import $ from 'jquery';
+import $ from "jquery";
 
-; (function ($, window, document, undefined) {
+(function($, window) {
+  "use strict";
 
-    'use strict';
-
-    /** Default values */
-    var pluginName = 'mediumInsert',
-        addonName = 'AddHr', // first char is uppercase
-        defaults = {
-            label: '<span>---</span>'
-        };
-
-    /**
-     * Custom Addon object
-     *
-     * Sets options, variables and calls init() function
-     *
-     * @constructor
-     * @param {DOM} el - DOM element to init the plugin on
-     * @param {object} options - Options to override defaults
-     * @return {void}
-     */
-
-    function AddHr (el, options) {
-        this.el = el;
-        this.$el = $(el);
-        this.templates = window.MediumInsert.Templates;
-        this.core = this.$el.data('plugin_'+ pluginName);
-
-        this.options = $.extend(true, {}, defaults, options);
-
-        this._defaults = defaults;
-        this._name = pluginName;
-
-        this.init();
-    }
-
-    /**
-     * Initialization
-     *
-     * @return {void}
-     */
-
-    AddHr.prototype.init = function () {
-        this.events();
+  /** Default values */
+  var pluginName = "mediumInsert",
+    addonName = "AddHr", // first char is uppercase
+    defaults = {
+      label: "<span>---</span>",
     };
 
-    /**
-     * Event listeners
-     *
-     * @return {void}
-     */
+  /**
+   * Custom Addon object
+   *
+   * Sets options, variables and calls init() function
+   *
+   * @constructor
+   * @param {DOM} el - DOM element to init the plugin on
+   * @param {object} options - Options to override defaults
+   * @return {void}
+   */
 
-    AddHr.prototype.events = function () {
+  function AddHr(el, options) {
+    this.el = el;
+    this.$el = $(el);
+    this.templates = window.MediumInsert.Templates;
+    this.core = this.$el.data("plugin_" + pluginName);
 
-    };
+    this.options = $.extend(true, {}, defaults, options);
 
-    /**
-     * Get the Core object
-     *
-     * @return {object} Core object
-     */
-    AddHr.prototype.getCore = function () {
-        return this.core;
-    };
+    this._defaults = defaults;
+    this._name = pluginName;
 
-    /**
-     * Add custom content
-     *
-     * This function is called when user click on the addon's icon
-     *
-     * @return {void}
-     */
+    this.init();
+  }
 
-    AddHr.prototype.add = function () {
-        var $place = this.$el.find('.medium-insert-active'),
-            domImage,
-            that;
+  /**
+   * Initialization
+   *
+   * @return {void}
+   */
 
-        // Hide editor's placeholder
-        $place.click();
+  AddHr.prototype.init = function() {
+    this.events();
+  };
 
-        $place.replaceWith('<hr/>');
-        this.core.hideButtons();
-        $('.medium-insert-buttons').remove();
-        this.core.triggerInput();
-    };
+  /**
+   * Event listeners
+   *
+   * @return {void}
+   */
 
+  AddHr.prototype.events = function() {};
 
-    /** Addon initialization */
+  /**
+   * Get the Core object
+   *
+   * @return {object} Core object
+   */
+  AddHr.prototype.getCore = function() {
+    return this.core;
+  };
 
-    $.fn[pluginName + addonName] = function (options) {
-        return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName + addonName)) {
-                $.data(this, 'plugin_' + pluginName + addonName, new AddHr(this, options));
-            }
-        });
-    };
+  /**
+   * Add custom content
+   *
+   * This function is called when user click on the addon's icon
+   *
+   * @return {void}
+   */
 
+  AddHr.prototype.add = function() {
+    var $place = this.$el.find(".medium-insert-active");
+
+    // Hide editor's placeholder
+    $place.click();
+
+    $place.replaceWith("<hr/>");
+    this.core.hideButtons();
+    $(".medium-insert-buttons").remove();
+    this.core.triggerInput();
+  };
+
+  /** Addon initialization */
+
+  $.fn[pluginName + addonName] = function(options) {
+    return this.each(function() {
+      if (!$.data(this, "plugin_" + pluginName + addonName)) {
+        $.data(
+          this,
+          "plugin_" + pluginName + addonName,
+          new AddHr(this, options)
+        );
+      }
+    });
+  };
 })($, window, document);

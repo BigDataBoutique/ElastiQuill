@@ -1,13 +1,12 @@
-import { action, computed, observable } from 'mobx';
-import localforage from 'localforage';
-import * as api from '../api';
-import { authFetch } from '../util';
+import { action, computed, observable } from "mobx";
+import localforage from "localforage";
+import * as api from "../api";
+import { authFetch } from "../util";
 import BaseStore from "./BaseStore";
 
-import { cleanJwtToken, setUnauthorizedHandler } from '../util';
+import { cleanJwtToken, setUnauthorizedHandler } from "../util";
 
 class App extends BaseStore {
-
   @observable
   loginErrors = [];
 
@@ -18,13 +17,13 @@ class App extends BaseStore {
   socialAuthSources = [];
 
   async loadSession() {
-    this.loading('loadSession');
+    this.loading("loadSession");
 
     try {
-      const resp = await authFetch('/api/auth/whoami', {
+      const resp = await authFetch("/api/auth/whoami", {
         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
+          "Content-Type": "application/json; charset=utf-8",
+        },
       });
 
       if (resp.status == 401) {
@@ -43,12 +42,12 @@ class App extends BaseStore {
       console.log(err);
     }
 
-    if (location.hash == '#error') {
-      this.showError(null, 'Failed to authenticate.');
-      location.hash = '';
+    if (location.hash == "#error") {
+      this.showError(null, "Failed to authenticate.");
+      location.hash = "";
     }
 
-    this.loaded('loadSession');
+    this.loaded("loadSession");
   }
 
   @computed
@@ -57,22 +56,22 @@ class App extends BaseStore {
   }
 
   @action
-  setUser = (user) => {
+  setUser = user => {
     if (user) {
       user.avatarUrl = api.userAvatarUrl(user.authorizedBy);
     }
 
     this.user = user;
-    localforage.setItem('user', user);
+    localforage.setItem("user", user);
   };
 
   @action
-  setSocialAuthSources = (sources) => {
+  setSocialAuthSources = sources => {
     this.socialAuthSources = sources;
   };
 
   @action
-  addLoginError = (err) => {
+  addLoginError = err => {
     this.loginErrors.push(err);
   };
 
@@ -85,12 +84,12 @@ class App extends BaseStore {
     try {
       this.clearLoginErrors();
 
-      const response = await authFetch('/api/auth/local', {
-        method: 'POST',
-        body: JSON.stringify({username, password}),
+      const response = await authFetch("/api/auth/local", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
+          "Content-Type": "application/json; charset=utf-8",
+        },
       });
 
       if (response.status === 401) {

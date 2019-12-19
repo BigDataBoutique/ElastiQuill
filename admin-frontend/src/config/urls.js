@@ -1,14 +1,14 @@
 export default {
-  defaultUrl: '/dashboard',
+  defaultUrl: "/dashboard",
 
-  backup: '/backup',
-  login: '/login',
-  newItem: '/new/:type',
-  editItem: '/edit/:type/:id',
-  statsItem: '/stats/:type/:id',
-  pages: '/pages',
-  posts: '/posts',
-  dashboard: '/dashboard',
-  setup: '/setup',
-  status: '/status'
+  backup: "/backup",
+  login: "/login",
+  newItem: "/new/:type",
+  editItem: "/edit/:type/:id",
+  statsItem: "/stats/:type/:id",
+  pages: "/pages",
+  posts: "/posts",
+  dashboard: "/dashboard",
+  setup: "/setup",
+  status: "/status",
 };

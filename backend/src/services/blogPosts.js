@@ -1,130 +1,196 @@
-import _ from 'lodash';
-import Joi from 'joi';
-import uid from 'uid';
-import slugify from 'slugify';
-import { esClient, config } from '../app';
-import * as events from './events';
-import * as commentsService from './comments';
+import _ from "lodash";
+import Joi from "joi";
+import uid from "uid";
+import slugify from "slugify";
+import { esClient, config } from "../app";
+import * as events from "./events";
+import * as commentsService from "./comments";
 
-export const BLOGPOST_ID_PREFIX = 'blogpost-';
-export const CONTENT_DESCRIPTION_ID_PREFIX = 'content:description:';
+export const BLOGPOST_ID_PREFIX = "blogpost-";
+export const CONTENT_DESCRIPTION_ID_PREFIX = "content:description:";
 
-const ES_INDEX = config.elasticsearch['blog-index-name'];
-const SERIES_REGEXP_STR = '\{.*\}';
+const ES_INDEX = config.elasticsearch["blog-index-name"];
+const SERIES_REGEXP_STR = "{.*}";
 const SLUG_MAX_LENGTH = 100;
 
 // Posts
 export const CreatePostArgSchema = Joi.object().keys({
-  "title": Joi.string().required(),
-  "content": Joi.string().allow(''),
-  "description": Joi.string().allow(''),
-  "tags": Joi.array().items(Joi.string()),
-  "series": Joi.string().allow(null),
-  "metadata": Joi.object().keys({
-    "content_type": Joi.string().optional().allow('', null),
-    "header_image_url": Joi.string().optional().allow('', null),
-    "canonical_url": Joi.string().optional().allow('', null),
-    "medium_crosspost_url": Joi.string().optional().allow('', null),
-    "private_viewing_key": Joi.string().optional().allow(null),
-  }).required(),
-  "author": Joi.object().keys({
-    "name": Joi.string().required(),
-    "email": Joi.string().email().required(),
-    "website": Joi.string().allow('', null),
-  }).required(),
-  "allow_comments": Joi.boolean().required(),
-  "draft": Joi.object().keys({
-    "title": Joi.string(),
-    "content": Joi.string().allow(''),
-    "description": Joi.string().allow(''),
-    "tags": Joi.array().items(Joi.string()),
-    "series": Joi.string().allow(null),
-    "allow_comments": Joi.boolean().required(),
-    "metadata": Joi.object().keys({
-      "header_image_url": Joi.string().optional().allow('', null),
-    }).optional(),
-  }).optional().allow(null),
-  "is_published": Joi.boolean().required(),
+  title: Joi.string().required(),
+  content: Joi.string().allow(""),
+  description: Joi.string().allow(""),
+  tags: Joi.array().items(Joi.string()),
+  series: Joi.string().allow(null),
+  metadata: Joi.object()
+    .keys({
+      content_type: Joi.string()
+        .optional()
+        .allow("", null),
+      header_image_url: Joi.string()
+        .optional()
+        .allow("", null),
+      canonical_url: Joi.string()
+        .optional()
+        .allow("", null),
+      medium_crosspost_url: Joi.string()
+        .optional()
+        .allow("", null),
+      private_viewing_key: Joi.string()
+        .optional()
+        .allow(null),
+    })
+    .required(),
+  author: Joi.object()
+    .keys({
+      name: Joi.string().required(),
+      email: Joi.string()
+        .email()
+        .required(),
+      website: Joi.string().allow("", null),
+    })
+    .required(),
+  allow_comments: Joi.boolean().required(),
+  draft: Joi.object()
+    .keys({
+      title: Joi.string(),
+      content: Joi.string().allow(""),
+      description: Joi.string().allow(""),
+      tags: Joi.array().items(Joi.string()),
+      series: Joi.string().allow(null),
+      allow_comments: Joi.boolean().required(),
+      metadata: Joi.object()
+        .keys({
+          header_image_url: Joi.string()
+            .optional()
+            .allow("", null),
+        })
+        .optional(),
+    })
+    .optional()
+    .allow(null),
+  is_published: Joi.boolean().required(),
 });
 
 const UpdatePostArgSchema = Joi.object().keys({
-  "title": Joi.string(),
-  "content": Joi.string().allow(''),
-  "description": Joi.string().allow(''),
-  "tags": Joi.array().items(Joi.string()),
-  "series": Joi.string().allow(null),
-  "metadata": Joi.object().keys({
-    "content_type": Joi.string().optional().allow('', null),
-    "header_image_url": Joi.string().optional().allow('', null),
-    "canonical_url": Joi.string().optional().allow('', null),
-    "medium_crosspost_url": Joi.string().optional().allow('', null),
-    "private_viewing_key": Joi.string().optional().allow(null),
-  }).required(),
-  "allow_comments": Joi.boolean().required(),
-  "draft": Joi.object().keys({
-    "title": Joi.string(),
-    "content": Joi.string().allow(''),
-    "description": Joi.string().allow(''),
-    "tags": Joi.array().items(Joi.string()),
-    "series": Joi.string().allow(null),
-    "allow_comments": Joi.boolean().required(),
-    "metadata": Joi.object().keys({
-      "header_image_url": Joi.string().optional().allow('', null),
-    }).optional(),
-  }).optional().allow(null),
-  "is_published": Joi.boolean().required(),
+  title: Joi.string(),
+  content: Joi.string().allow(""),
+  description: Joi.string().allow(""),
+  tags: Joi.array().items(Joi.string()),
+  series: Joi.string().allow(null),
+  metadata: Joi.object()
+    .keys({
+      content_type: Joi.string()
+        .optional()
+        .allow("", null),
+      header_image_url: Joi.string()
+        .optional()
+        .allow("", null),
+      canonical_url: Joi.string()
+        .optional()
+        .allow("", null),
+      medium_crosspost_url: Joi.string()
+        .optional()
+        .allow("", null),
+      private_viewing_key: Joi.string()
+        .optional()
+        .allow(null),
+    })
+    .required(),
+  allow_comments: Joi.boolean().required(),
+  draft: Joi.object()
+    .keys({
+      title: Joi.string(),
+      content: Joi.string().allow(""),
+      description: Joi.string().allow(""),
+      tags: Joi.array().items(Joi.string()),
+      series: Joi.string().allow(null),
+      allow_comments: Joi.boolean().required(),
+      metadata: Joi.object()
+        .keys({
+          header_image_url: Joi.string()
+            .optional()
+            .allow("", null),
+        })
+        .optional(),
+    })
+    .optional()
+    .allow(null),
+  is_published: Joi.boolean().required(),
 });
 
 // Content pages
 const CreateContentPageArgSchema = Joi.object().keys({
-  "title": Joi.string().required(),
-  "content": Joi.string().allow(''),
-  "description": Joi.string().allow(''),
-  "metadata": Joi.object().keys({
-    "is_embed": Joi.boolean().optional(),
-    "is_tag_description": Joi.boolean().optional(),
-    "content_type": Joi.string().optional().allow('', null),
-    "header_image_url": Joi.string().optional().allow('', null),
-    "tag_description": Joi.object().keys({
-      "tag": Joi.string(),
-      "is_series": Joi.boolean()
-    }).optional()
-  }).required(),
-  "author": Joi.object().keys({
-    "name": Joi.string().required(),
-    "email": Joi.string().email().required(),
-    "website": Joi.string().allow(''),
-  }).required()
+  title: Joi.string().required(),
+  content: Joi.string().allow(""),
+  description: Joi.string().allow(""),
+  metadata: Joi.object()
+    .keys({
+      is_embed: Joi.boolean().optional(),
+      is_tag_description: Joi.boolean().optional(),
+      content_type: Joi.string()
+        .optional()
+        .allow("", null),
+      header_image_url: Joi.string()
+        .optional()
+        .allow("", null),
+      tag_description: Joi.object()
+        .keys({
+          tag: Joi.string(),
+          is_series: Joi.boolean(),
+        })
+        .optional(),
+    })
+    .required(),
+  author: Joi.object()
+    .keys({
+      name: Joi.string().required(),
+      email: Joi.string()
+        .email()
+        .required(),
+      website: Joi.string().allow(""),
+    })
+    .required(),
 });
 
 const UpdateContentPageArgSchema = Joi.object().keys({
-  "title": Joi.string(),
-  "content": Joi.string().allow(''),
-  "description": Joi.string().allow(''),
-  "metadata": Joi.object().keys({
-    "is_embed": Joi.boolean().optional(),
-    "is_tag_description": Joi.boolean().optional(),
-    "content_type": Joi.string().optional().allow('', null),
-    "header_image_url": Joi.string().optional().allow('', null),
-    "tag_description": Joi.object().keys({
-      "tag": Joi.string(),
-      "is_series": Joi.boolean()
-    }).optional()
-  }).required(),
+  title: Joi.string(),
+  content: Joi.string().allow(""),
+  description: Joi.string().allow(""),
+  metadata: Joi.object()
+    .keys({
+      is_embed: Joi.boolean().optional(),
+      is_tag_description: Joi.boolean().optional(),
+      content_type: Joi.string()
+        .optional()
+        .allow("", null),
+      header_image_url: Joi.string()
+        .optional()
+        .allow("", null),
+      tag_description: Joi.object()
+        .keys({
+          tag: Joi.string(),
+          is_series: Joi.boolean(),
+        })
+        .optional(),
+    })
+    .required(),
 });
 
-export async function getItemById({ id, withComments = false, moreLikeThis = false }) {
+export async function getItemById({
+  id,
+  withComments = false,
+  moreLikeThis = false,
+}) {
   const resp = await esClient.get({
     index: ES_INDEX,
-    type: '_doc',
-    id
+    type: "_doc",
+    id,
   });
 
   const item = prepareHit(resp);
 
   if (withComments) {
     item.comments = await commentsService.getComments({
-      postIds: [ id ]
+      postIds: [id],
     });
   }
 
@@ -136,26 +202,26 @@ export async function getItemById({ id, withComments = false, moreLikeThis = fal
 }
 
 export async function getItemsByIds(ids, withComments = false) {
-  if (! ids.length) {
+  if (!ids.length) {
     return [];
   }
 
   const resp = await esClient.mget({
     index: ES_INDEX,
     body: {
-      ids
-    }
+      ids,
+    },
   });
 
   const docs = resp.docs.filter(d => d.found).map(prepareHit);
 
   if (withComments) {
     const comments = await commentsService.getComments({
-      postIds: docs.map(d => d.id)
+      postIds: docs.map(d => d.id),
     });
     return docs.map(d => ({
       ...d,
-      comments: comments.filter(c => c.post_id === d.id)
+      comments: comments.filter(c => c.post_id === d.id),
     }));
   }
 
@@ -165,8 +231,12 @@ export async function getItemsByIds(ids, withComments = false) {
 export async function createItem(type, post) {
   let schema;
   switch (type) {
-    case 'post': schema = CreatePostArgSchema; break;
-    case 'page': schema = CreateContentPageArgSchema; break;
+    case "post":
+      schema = CreatePostArgSchema;
+      break;
+    case "page":
+      schema = CreateContentPageArgSchema;
+      break;
   }
 
   const result = Joi.validate(post, schema);
@@ -178,9 +248,9 @@ export async function createItem(type, post) {
 
   const query = {
     index: ES_INDEX,
-    type: '_doc',
-    op_type: 'create',
-    refresh: 'wait_for',
+    type: "_doc",
+    op_type: "create",
+    refresh: "wait_for",
     body: {
       ...post,
       type,
@@ -189,16 +259,15 @@ export async function createItem(type, post) {
       last_edited_at: new Date().toISOString(),
       metadata: {
         ...post.metadata,
-        content_type: 'markdown'
-      }
-    }
+        content_type: "markdown",
+      },
+    },
   };
 
   let resp = null;
-  if (type === 'post') {
-    resp = await indexWithUniqueId(query);    
-  }
-  else {
+  if (type === "post") {
+    resp = await indexWithUniqueId(query);
+  } else {
     let id = query.body.slug;
     if (post.metadata.is_tag_description && tagDescription) {
       const { tag, is_series } = tagDescription;
@@ -208,7 +277,7 @@ export async function createItem(type, post) {
 
     resp = await esClient.index({
       ...query,
-      id
+      id,
     });
   }
 
@@ -222,11 +291,11 @@ export async function deleteItem(id) {
   await esClient.delete({
     id,
     index: ES_INDEX,
-    type: '_doc',
-    refresh: 'wait_for'
+    type: "_doc",
+    refresh: "wait_for",
   });
 
-  if (item.type === 'post') {
+  if (item.type === "post") {
     await commentsService.deletePostComments(id);
   }
 
@@ -236,8 +305,12 @@ export async function deleteItem(id) {
 export async function updateItem(id, type, post) {
   let schema;
   switch (type) {
-    case 'post': schema = UpdatePostArgSchema; break;
-    case 'page': schema = UpdateContentPageArgSchema; break;
+    case "post":
+      schema = UpdatePostArgSchema;
+      break;
+    case "page":
+      schema = UpdateContentPageArgSchema;
+      break;
   }
 
   const result = Joi.validate(post, schema);
@@ -246,10 +319,10 @@ export async function updateItem(id, type, post) {
   }
 
   convertToDatastoreFormat(post);
-  
+
   const doc = {
     ...post,
-    last_edited_at: new Date().toISOString()
+    last_edited_at: new Date().toISOString(),
   };
 
   if (doc.title) {
@@ -259,11 +332,11 @@ export async function updateItem(id, type, post) {
   await esClient.update({
     id,
     index: ES_INDEX,
-    type: '_doc',
-    refresh: 'wait_for',
+    type: "_doc",
+    refresh: "wait_for",
     body: {
-      doc
-    }
+      doc,
+    },
   });
   const updatedItem = await getItemById({ id });
 
@@ -276,11 +349,11 @@ export async function updateItemPartial(id, update) {
   await esClient.update({
     id,
     index: ES_INDEX,
-    type: '_doc',
-    refresh: 'wait_for',
+    type: "_doc",
+    refresh: "wait_for",
     body: {
-      doc: update
-    }
+      doc: update,
+    },
   });
 }
 
@@ -292,58 +365,58 @@ export async function getMoreLikeThis(itemId) {
     body: {
       query: {
         more_like_this: {
-          fields: ['title', 'content'],
+          fields: ["title", "content"],
           like: [
             {
               _index: ES_INDEX,
-              _id: itemId
-            }
+              _id: itemId,
+            },
           ],
-          min_term_freq : 1,
-          max_query_terms : 12
-        }
-      }
-    }
+          min_term_freq: 1,
+          max_query_terms: 12,
+        },
+      },
+    },
   });
 
   return resp.hits.hits.map(prepareHit);
 }
 
-export async function getAllItems({ type, series }) {
+export async function getAllItems({ type }) {
   let resp = await esClient.search({
     index: ES_INDEX,
-    scroll: '10s',
+    scroll: "10s",
     ignore_unavailable: true,
     body: {
       query: {
         bool: {
-          filter: [
-            { term: { type } }
-          ]
-        }
-      }
-    }
+          filter: [{ term: { type } }],
+        },
+      },
+    },
   });
-
-  if (series) {
-    query.body.query.bool.filter.push({
-      term: { 'series.id': series }
-    });
-  }
 
   const items = [];
   while (resp.hits.hits.length) {
     resp.hits.hits.forEach(hit => items.push(hit));
     resp = await esClient.scroll({
-      scroll: '10s',
-      scrollId: resp._scroll_id
+      scroll: "10s",
+      scrollId: resp._scroll_id,
     });
   }
 
   return items.map(prepareHit);
 }
 
-export async function getItems({ type, tag, series, search, pageIndex, pageSize, includePrivatePosts }) {
+export async function getItems({
+  type,
+  tag,
+  series,
+  search,
+  pageIndex,
+  pageSize,
+  includePrivatePosts,
+}) {
   const query = {
     index: ES_INDEX,
     from: pageIndex * pageSize,
@@ -352,23 +425,21 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
     body: {
       query: {
         bool: {
-          filter: [
-            { term: { type } }
-          ]
-        }
+          filter: [{ term: { type } }],
+        },
       },
       sort: [
         {
-          published_at: { order: series ? 'asc' : 'desc' }
-        }
+          published_at: { order: series ? "asc" : "desc" },
+        },
       ],
       aggs: {
         tags: {
-          terms: { field: 'tags', exclude: SERIES_REGEXP_STR, size: 50 }
+          terms: { field: "tags", exclude: SERIES_REGEXP_STR, size: 50 },
         },
         series: {
-          terms: { field: 'tags', include: SERIES_REGEXP_STR, size: 50 }
-        }        
+          terms: { field: "tags", include: SERIES_REGEXP_STR, size: 50 },
+        },
       },
       highlight: {
         pre_tags: ["<em class='search-highlight'>"],
@@ -377,17 +448,17 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
         fields: {
           title: {},
           description: {},
-          content: {}
-        }
-      }
-    }
+          content: {},
+        },
+      },
+    },
   };
 
-  if (! includePrivatePosts) {
+  if (!includePrivatePosts) {
     query.body.query.bool.must_not = {
       term: {
-        is_published: false
-      }
+        is_published: false,
+      },
     };
   }
 
@@ -395,8 +466,8 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
     query.body.query.bool.must = {
       multi_match: {
         query: search,
-        fields: ['title', 'description', 'content']
-      }
+        fields: ["title", "description", "content"],
+      },
     };
   }
 
@@ -404,17 +475,17 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
 
   if (tag) {
     filterByTags.push(tag);
-  }  
+  }
 
   if (series) {
-    filterByTags.push('{' + series + '}');
+    filterByTags.push("{" + series + "}");
   }
 
   if (filterByTags.length) {
     query.body.query.bool.filter.push({
-      terms: { tags: filterByTags }
-    });    
-  }  
+      terms: { tags: filterByTags },
+    });
+  }
 
   const resp = await esClient.search(query);
   const items = resp.hits.hits.map(prepareHit);
@@ -423,7 +494,7 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
   if (resp.aggregations) {
     allSeries = resp.aggregations.series.buckets.map(b => ({
       ...b,
-      key: stripSeriesTag(b.key)
+      key: stripSeriesTag(b.key),
     }));
   }
 
@@ -432,26 +503,31 @@ export async function getItems({ type, tag, series, search, pageIndex, pageSize,
     allSeries,
     allTags: resp.aggregations ? resp.aggregations.tags.buckets : [],
     total: resp.hits.total,
-    totalPages: Math.ceil(resp.hits.total / pageSize)
+    totalPages: Math.ceil(resp.hits.total / pageSize),
   };
 }
 
-export async function getStats({ startDate = null, endDate = null, type = null, interval = '1d' }) {
+export async function getStats({
+  startDate = null,
+  endDate = null,
+  type = null,
+  interval = "1d",
+}) {
   const filters = [];
   if (startDate || endDate) {
     filters.push({
       range: {
-        'published_at': {
+        published_at: {
           lte: endDate || null,
-          gte: startDate || null
-        }
-      }
+          gte: startDate || null,
+        },
+      },
     });
   }
 
   if (type) {
     filters.push({
-      term: { type }
+      term: { type },
     });
   }
 
@@ -460,27 +536,27 @@ export async function getStats({ startDate = null, endDate = null, type = null, 
     body: {
       query: {
         bool: {
-          filter: filters
-        }
+          filter: filters,
+        },
       },
       aggs: {
         posts_histogram: {
           date_histogram: {
-            field: 'published_at',
-            interval
-          }
-        }
-      }
-    }
+            field: "published_at",
+            interval,
+          },
+        },
+      },
+    },
   };
 
   const resp = await esClient.search(query);
   let postsByDate = [],
-      postsCount = 0;
+    postsCount = 0;
 
   if (resp.aggregations) {
     postsByDate = resp.aggregations.posts_histogram.buckets;
-    postsCount = _.sumBy(postsByDate, 'doc_count');
+    postsCount = _.sumBy(postsByDate, "doc_count");
   }
 
   return { postsByDate, postsCount };
@@ -495,33 +571,33 @@ export async function getAllTags() {
         bool: {
           must_not: {
             term: {
-              is_published: false
-            }
-          }
-        }
+              is_published: false,
+            },
+          },
+        },
       },
       aggs: {
         tags: {
-          terms: { field: 'tags', exclude: SERIES_REGEXP_STR, size: 50 }
+          terms: { field: "tags", exclude: SERIES_REGEXP_STR, size: 50 },
         },
         series: {
-          terms: { field: 'tags', include: SERIES_REGEXP_STR, size: 50 }
-        }
-      }
-    }
+          terms: { field: "tags", include: SERIES_REGEXP_STR, size: 50 },
+        },
+      },
+    },
   });
 
-  if (! resp.aggregations) {
+  if (!resp.aggregations) {
     return {
       tags: [],
-      series: []
+      series: [],
     };
   }
 
   return {
     tags: resp.aggregations.tags.buckets.map(b => b.key),
     series: resp.aggregations.series.buckets.map(b => stripSeriesTag(b.key)),
-  }
+  };
 }
 
 async function indexWithUniqueId(indexProps) {
@@ -532,11 +608,10 @@ async function indexWithUniqueId(indexProps) {
       const id = BLOGPOST_ID_PREFIX + uid(6).toLowerCase();
       return await esClient.index({
         ...indexProps,
-        id
+        id,
       });
-    }
-    catch (err) {
-      if (err.displayName === 'Conflict') {
+    } catch (err) {
+      if (err.displayName === "Conflict") {
         continue;
       }
 
@@ -544,13 +619,13 @@ async function indexWithUniqueId(indexProps) {
     }
   }
 
-  throw new Error('Failed to generate a unique id');
+  throw new Error("Failed to generate a unique id");
 }
 
 function makeSlug(title) {
   return slugify(title, {
-    remove: /[*+~.\/,()'"!:@^#?]/g,
-    lower: true
+    remove: /[*+~./,()'"!:@^#?]/g,
+    lower: true,
   }).substring(0, SLUG_MAX_LENGTH);
 }
 
@@ -558,25 +633,25 @@ function prepareHit(hit) {
   const res = {
     id: hit._id,
     highlight: hit.highlight,
-    ...hit._source
+    ...hit._source,
   };
 
-  if (res.type === 'post' && res.tags) {
-    const series = res.tags.filter(t => t.match(SERIES_REGEXP_STR))
-    res.tags = res.tags.filter(t => ! series.includes(t));
+  if (res.type === "post" && res.tags) {
+    const series = res.tags.filter(t => t.match(SERIES_REGEXP_STR));
+    res.tags = res.tags.filter(t => !series.includes(t));
 
     res.series = null;
     if (series.length) {
       res.series = stripSeriesTag(series[0]);
     }
-  }
-  else if (res.type === 'page' && res.metadata.is_tag_description) {
+  } else if (res.type === "page" && res.metadata.is_tag_description) {
     const tag = res.id.substring(CONTENT_DESCRIPTION_ID_PREFIX.length);
-    const isSeries = tag.length && tag[0] === '{' && tag[tag.length - 1] === '}';
+    const isSeries =
+      tag.length && tag[0] === "{" && tag[tag.length - 1] === "}";
 
     res.metadata.tag_description = {
       tag: isSeries ? stripSeriesTag(tag) : tag,
-      is_series: isSeries
+      is_series: isSeries,
     };
   }
 
@@ -590,7 +665,7 @@ function convertToDatastoreFormat(item) {
   if (item.series) {
     series = item.series;
     item.tags = item.tags || [];
-    item.tags = _.uniq(item.tags.concat('{' + item.series + '}'));
+    item.tags = _.uniq(item.tags.concat("{" + item.series + "}"));
     delete item.series;
   }
 
@@ -600,13 +675,13 @@ function convertToDatastoreFormat(item) {
   }
 
   return {
-    series,    
-    tagDescription
+    series,
+    tagDescription,
   };
 }
 
 export function stripSeriesTag(series) {
-  if (series && series[0] === '{' && series[series.length - 1] === '}') {
+  if (series && series[0] === "{" && series[series.length - 1] === "}") {
     series = series.substr(1, series.length - 2);
   }
   return series;

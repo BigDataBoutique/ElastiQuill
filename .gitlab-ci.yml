@@ -1,22 +1,37 @@
 image: docker:stable
 
 stages:
+  - test
   - package
   - release
 
 variables:
   STAGING_REGISTRY: "registry.gitlab.com"
   CONTAINER_TEST_IMAGE: ${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:commit-${CI_COMMIT_SHA}
-  
+
 services:
   - name: docker:dind
     command: ["--experimental"]
-  
-before_script:
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
+
+static-analysis:
+  stage: test
+  image: node
+  cache:
+    key: ${CI_JOB_NAME}
+    paths:
+      - admin-frontend/node_modules
+      - backend/node_modules
+  script:
+    # These are in () to run in a subshell and not modify the real pwd
+    - (cd admin-frontend && npm install)
+    - (cd backend && npm install)
+    - npm run prettier-check
+    - npm run lint
 
 package:
   stage: package
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
   script:
     - docker build --squash -t $CONTAINER_TEST_IMAGE .
     - docker push $CONTAINER_TEST_IMAGE
@@ -25,6 +40,8 @@ release:
   stage: release
   variables:
     GIT_STRATEGY: none
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
   script:
     - IMAGE_NAME=${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:`date '+%Y-%m-%d-%H%M'`-${CI_COMMIT_SHA:0:9}
     - echo $IMAGE_NAME

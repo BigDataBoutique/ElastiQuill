@@ -1,11 +1,11 @@
-import React, { Component, Fragment } from 'react';
-import { inject, observer } from 'mobx-react';
-import { withRouter } from 'react-router-dom';
-import LoggedInLayout from '../components/LoggedInLayout';
-import StatsOverTimeGraph from '../components/StatsOverTimeGraph';
-import CommentsList from '../components/CommentsList';
+import React, { Component, Fragment } from "react";
+import { inject, observer } from "mobx-react";
+import { withRouter } from "react-router-dom";
+import LoggedInLayout from "../components/LoggedInLayout";
+import StatsOverTimeGraph from "../components/StatsOverTimeGraph";
+import CommentsList from "../components/CommentsList";
 
-@inject('statsStore')
+@inject("statsStore")
 @withRouter
 @observer
 class ItemStatsPage extends Component {
@@ -18,36 +18,42 @@ class ItemStatsPage extends Component {
     const { item, comments, isLoading } = this.props.statsStore;
     const { type } = this.props.match.params;
 
-    const breadcrumbs = [{
-      label: type === 'post' ? 'Posts' : 'Content Pages',
-      url: type === 'post' ? '/posts' : '/pages'
-    }];
+    const breadcrumbs = [
+      {
+        label: type === "post" ? "Posts" : "Content Pages",
+        url: type === "post" ? "/posts" : "/pages",
+      },
+    ];
 
     return (
-      <LoggedInLayout pageTitle={item ? `Stats for '${item.title}'` : 'Loading...'} breadcrumbs={breadcrumbs}>
-        <div className='elastiquill-content'>
-          <div className='row'>
-            <div className='col-12'>
-              <div className='elastiquill-card'>
-                <StatsOverTimeGraph
-                  key={item ? item.id : null}
-                  item={item} />
+      <LoggedInLayout
+        pageTitle={item ? `Stats for '${item.title}'` : "Loading..."}
+        breadcrumbs={breadcrumbs}
+      >
+        <div className="elastiquill-content">
+          <div className="row">
+            <div className="col-12">
+              <div className="elastiquill-card">
+                <StatsOverTimeGraph key={item ? item.id : null} item={item} />
               </div>
             </div>
           </div>
-          {type === 'post' && (
+          {type === "post" && (
             <Fragment>
-              <div className='elastiquill-header'>Comments</div>
-              <div className='row'>
-                <div className='col-12'>
-                  <div className='elastiquill-card'>
-                    {isLoading ? 'Loading...' : (
+              <div className="elastiquill-header">Comments</div>
+              <div className="row">
+                <div className="col-12">
+                  <div className="elastiquill-card">
+                    {isLoading ? (
+                      "Loading..."
+                    ) : (
                       <CommentsList
                         treeView
                         showButtons
                         hidePostLink
                         requestReload={this._loadData.bind(this)}
-                        comments={comments || []} />
+                        comments={comments || []}
+                      />
                     )}
                   </div>
                 </div>
@@ -56,7 +62,7 @@ class ItemStatsPage extends Component {
           )}
         </div>
       </LoggedInLayout>
-    )
+    );
   }
 
   _loadData() {

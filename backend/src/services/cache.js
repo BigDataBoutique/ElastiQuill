@@ -1,16 +1,16 @@
-import _ from 'lodash';
-import NodeCache from 'node-cache';
-import MockExpressResponse from 'mock-express-response';
-import * as logging from './logging';
-import { config } from '../app';
+import _ from "lodash";
+import NodeCache from "node-cache";
+import MockExpressResponse from "mock-express-response";
+import * as logging from "./logging";
+import { config } from "../app";
 
-const CACHE_TTL = _.get(config, 'blog.cache-ttl');
+const CACHE_TTL = _.get(config, "blog.cache-ttl");
 
 const pageCache = new NodeCache();
 const dataCache = new NodeCache();
 
 export function cachePageHandler(handler) {
-  if (! CACHE_TTL) {
+  if (!CACHE_TTL) {
     return handler;
   }
 
@@ -20,56 +20,52 @@ export function cachePageHandler(handler) {
     if (data) {
       res.send(data);
     }
-    
-    if (! data || isExpired(timestamp)) {
+
+    if (!data || isExpired(timestamp)) {
       const recordedRes = await recordResponse(handler, req, res, next);
 
-      if (! data) {
+      if (!data) {
         res
           .status(recordedRes.statusCode)
           .set(recordedRes.getHeaders())
           .send(recordedRes.body);
       }
 
-      if (recordedRes.statusCode.toString().startsWith('2')) {
+      if (recordedRes.statusCode.toString().startsWith("2")) {
         cacheSet(pageCache, req.originalUrl, recordedRes.body);
       }
     }
   };
 }
 
-export function cacheAndReturn(key, cb) {
-  return new Promise(async (resolve, reject) => {
-    const { data, timestamp } = await cacheGet(dataCache, key);
-    if (data) {
-      resolve(data);
-    }
+export async function cacheAndReturn(key, cb) {
+  const { data, timestamp } = await cacheGet(dataCache, key);
+  if (data) {
+    return data;
+  }
 
-    if (! data || isExpired(timestamp)) {
-      let newData = null;
-      try {
-        newData = await cb();
-      }
-      catch (err) {
-        if (data) {
-          logging.logError(null, err);
-          return;
-        }
-        reject(err);
+  if (!data || isExpired(timestamp)) {
+    let newData = null;
+    try {
+      newData = await cb();
+    } catch (err) {
+      if (data) {
+        logging.logError(null, err);
         return;
       }
-
-      cacheSet(dataCache, key, newData);
-      if (! data) {
-        resolve(newData);
-      }
+      throw err;
     }
-  });
+
+    cacheSet(dataCache, key, newData);
+    if (!data) {
+      return newData;
+    }
+  }
 }
 
 export function clearPageCache(url) {
   return new Promise((resolve, reject) => {
-    pageCache.del(url, (err) => {
+    pageCache.del(url, err => {
       if (err) {
         reject(err);
         return;
@@ -101,7 +97,7 @@ function recordResponse(handler, req, res, next) {
       if (_.isString(c)) return Buffer.from(c);
       return c;
     });
-    resMock.body = Buffer.concat(bufferChunks).toString('utf8');
+    resMock.body = Buffer.concat(bufferChunks).toString("utf8");
     resMock._oldEnd(...args);
   };
 
@@ -111,7 +107,7 @@ function recordResponse(handler, req, res, next) {
   };
 
   return new Promise(resolve => {
-    resMock.on('finish', () => resolve(resMock));
+    resMock.on("finish", () => resolve(resMock));
     handler(req, resMock, next);
   });
 }
@@ -125,7 +121,7 @@ function cacheGet(cache, key) {
 
       resolve({
         data: value ? value.data : null,
-        timestamp: value ? value.timestamp : 0
+        timestamp: value ? value.timestamp : 0,
       });
     });
   });
@@ -134,7 +130,7 @@ function cacheGet(cache, key) {
 function cacheSet(cache, key, val) {
   cache.set(key, {
     data: val,
-    timestamp: new Date().getTime() / 1000
+    timestamp: new Date().getTime() / 1000,
   });
 }
 

@@ -2,11 +2,12 @@ export class EmailString {
   constructor(emailString) {
     this.rules = [];
 
-    if (! emailString || ! emailString.length) {
+    if (!emailString || !emailString.length) {
       return;
     }
 
-    this.rules = emailString.split(',')
+    this.rules = emailString
+      .split(",")
       .map(s => s.trim())
       .filter(s => s.length > 0);
   }
@@ -21,26 +22,24 @@ export class EmailString {
 
   isMatchAll() {
     for (const rule of this.rules) {
-      if (rule === '_all_') return true;
+      if (rule === "_all_") return true;
     }
     return false;
   }
 
   match(email) {
-    if (! email) {
+    if (!email) {
       return false;
     }
     for (const rule of this.rules) {
-       // first char or none at all
-      if (rule.indexOf('@') <= 0) {
-        if (rule === '_all_') {
+      // first char or none at all
+      if (rule.indexOf("@") <= 0) {
+        if (rule === "_all_") {
+          return rule;
+        } else if (email.endsWith(rule)) {
           return rule;
         }
-        else if (email.endsWith(rule)) {
-          return rule;
-        }
-      }
-      else if (rule === email) {
+      } else if (rule === email) {
         return rule;
       }
     }

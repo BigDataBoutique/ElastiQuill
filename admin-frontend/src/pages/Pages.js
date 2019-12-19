@@ -1,10 +1,9 @@
-import _ from 'lodash';
-import {inject, observer} from "mobx-react";
+import { inject, observer } from "mobx-react";
 
 import BaseItemsPage from "./BaseItemsPage";
-import * as api from '../api';
+import * as api from "../api";
 
-@inject('pagesStore')
+@inject("pagesStore")
 @observer
 class Pages extends BaseItemsPage {
   componentDidMount() {
@@ -12,12 +11,15 @@ class Pages extends BaseItemsPage {
   }
 
   render() {
-    return this._renderContent({
-      title: 'Content Pages',
-      newItem: 'Create a new content page',
-      noItems: 'No pages created yet',
-      urlPart: this._getUrlPart()
-    }, this.props.pagesStore);
+    return this._renderContent(
+      {
+        title: "Content Pages",
+        newItem: "Create a new content page",
+        noItems: "No pages created yet",
+        urlPart: this._getUrlPart(),
+      },
+      this.props.pagesStore
+    );
   }
 
   _getStore() {
@@ -25,7 +27,7 @@ class Pages extends BaseItemsPage {
   }
 
   _getUrlPart() {
-    return 'page';
+    return "page";
   }
 
   async _onDeleteItem() {
@@ -34,11 +36,9 @@ class Pages extends BaseItemsPage {
       await api.deleteContentPage(this.props.pagesStore.deleteItemId);
       this.props.pagesStore.loadPage(0);
       this.props.pagesStore.setDeleteItemId(null);
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
-    }
-    finally {
+    } finally {
       this.props.pagesStore.setItemDeleting(false);
     }
   }
