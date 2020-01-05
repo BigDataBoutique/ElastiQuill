@@ -1,5 +1,5 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.13.5
+version: v1.14.0
 ignore: {}
 # patches apply the minimum changes required to fix a vulnerability
 patch:
@@ -70,3 +70,6 @@ patch:
         patched: '2019-10-16T15:28:16.107Z'
     - '@google-cloud/storage > gaxios > https-proxy-agent':
         patched: '2019-10-16T15:51:10.044Z'
+  SNYK-JS-TREEKILL-536781:
+    - snyk > snyk-sbt-plugin > tree-kill:
+        patched: '2020-01-05T06:16:49.752Z'
