@@ -35,7 +35,7 @@
     "express": "~4.17.1",
     "express-async-handler": "^1.1.4",
     "globby": "9.2.0",
-    "handlebars": "^4.4.5",
+    "handlebars": "^4.5.3",
     "html-to-text": "^5.1.1",
     "http-errors": "~1.7.3",
     "inbound": "0.0.6",
