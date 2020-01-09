@@ -1,0 +1,11 @@
+{
+  "description" : "Request logs pipeline for sub 6.7 ES versions",
+  "processors" : [
+    {
+      "geoip" : {
+        "field" : "source.ip",
+        "target_field" : "source.geo"
+      }
+    }
+  ]
+}

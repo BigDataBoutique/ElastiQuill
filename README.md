@@ -108,8 +108,8 @@ See [config.yml](config.yml) for a sample configuration file.
 
 | Variable | Description | ENV variable | Default value |
 | ------ | ------ | ------ | ------ |
-| blog.admin-emails | Comma-separated list of admin emails, domains or `_all_`. Emails will be checked to match with Google/Github account email when using SSO on `/admin` | `BLOG_ADMIN_EMAILS` | None. Required.
-| blog.jwt-secret | A unique string used for encrypting authentication data. | `BLOG_JWT_SECRET` | None. Required.
+| blog.admin-emails | Comma-separated list of admin emails, domains or `_all_`. Emails will be checked to match with Google/Github account email when using SSO on `/admin` | `BLOG_ADMIN_EMAILS` | None. Required. |
+| blog.jwt-secret | A unique string used for encrypting authentication data. | `BLOG_JWT_SECRET` | None. Required. |
 | blog.url | Blog URL | `BLOG_URL` | `http://localhost:5000` |
 | blog.title | Blog title. Used in `/blog/rss` xml | `BLOG_TITLE` | `Sample blog` |
 | blog.description | Blog description. Used in `/blog/rss` xml | `BLOG_DESCRIPTION` | `Sample description` |

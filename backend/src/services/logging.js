@@ -13,7 +13,7 @@ let elasticsearchIsReady = false;
 const LOGS_INDICES_PREFIX = config.elasticsearch["blog-logs-index-name"];
 const LOGS_PERIOD = config.elasticsearch["blog-logs-period"];
 const CRAWLER_USER_AGENTS = new Set(
-  _.flatMap(crawlers, _.property("instances"))
+  _.flatMap(crawlers, _.property("instances")),
 );
 
 export async function getStatus() {
@@ -196,7 +196,7 @@ export async function getStats({
         },
         user_agent_os: {
           terms: {
-            field: "http.request.user_agent_parsed.os_name",
+            field: "http.request.user_agent_parsed.os.name",
             size: 5,
           },
         },
@@ -268,7 +268,7 @@ export async function getStats({
     avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
     avg_visitors_per_day = _.meanBy(
       _.get(resp.aggregations, visitsPerDayAgg + ".buckets"),
-      _.property("visitors.value")
+      _.property("visitors.value"),
     );
     referrer_type = resp.aggregations.referrer_type.buckets;
     referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
@@ -281,7 +281,7 @@ export async function getStats({
       bucket => ({
         location: geohash.decode_bbox(bucket.key),
         visits: bucket.doc_count,
-      })
+      }),
     );
 
     for (const mostViewedPost of resp.aggregations.posts.by_views.buckets) {
@@ -300,7 +300,7 @@ export async function getStats({
 
     const largestBucket = _.maxBy(
       _.get(resp.aggregations, visitsPerDayAgg + ".buckets"),
-      b => b.doc_count
+      b => b.doc_count,
     );
     most_busy_day = largestBucket
       ? {
@@ -313,7 +313,7 @@ export async function getStats({
     if (resp.aggregations.posts_visits) {
       const postsVisitsBuckets = resp.aggregations.posts_visits.visits.buckets;
       popular_posts = await blogPosts.getItemsByIds(
-        postsVisitsBuckets.map(bucket => bucket.key)
+        postsVisitsBuckets.map(bucket => bucket.key),
       );
       for (let post of popular_posts) {
         const bucket = _.find(postsVisitsBuckets, ["key", post.id]);
@@ -468,7 +468,7 @@ async function log({
 
       if (!excludeUrl) {
         const url = ecsUrl(
-          req.protocol + "://" + req.get("host") + req.originalUrl
+          req.protocol + "://" + req.get("host") + req.originalUrl,
         );
         for (const key in url) {
           body[key] = url[key];
