@@ -1,19 +1,26 @@
 import _ from "lodash";
 import fs from "fs";
 import path from "path";
+import semver from "semver";
+import stringifyDeterministic from "json-stringify-deterministic";
+
 import { esClient, config } from "../app";
 
 const BLOG_INDEX = _.get(config, "elasticsearch.blog-index-name");
 const BLOG_COMMENTS_INDEX = _.get(
   config,
-  "elasticsearch.blog-comments-index-name"
+  "elasticsearch.blog-comments-index-name",
 );
 const BLOG_LOGS_INDEX_PREFIX = _.get(
   config,
-  "elasticsearch.blog-logs-index-name"
+  "elasticsearch.blog-logs-index-name",
 );
 const BLOG_LOGS_INDEX_TEMPLATE_NAME = "blog-logs";
 const PIPELINE_NAME = "request_log";
+
+const setupDir = process.env.SETUP_DIR || "./_setup";
+
+let esVersion = null;
 
 export async function isReady() {
   const status = await getStatus();
@@ -25,15 +32,22 @@ export async function getClusterHealth() {
   return resp.status;
 }
 
+export async function getVersionString() {
+  if (!esVersion) {
+    const clusterStats = await esClient.cluster.stats({
+      nodeId: "_local",
+    });
+    esVersion = clusterStats.nodes.versions[0];
+  }
+
+  return esVersion;
+}
+
 export async function setup() {
   const status = await getStatus();
   const setupDir = process.env.SETUP_DIR || "./_setup";
-
-  const clusterStats = await esClient.cluster.stats({
-    nodeId: "_local",
-  });
-  const isES7 = clusterStats.nodes.versions[0].startsWith("7");
-  const includeTypeName = isES7 ? true : undefined;
+  const esVersion = await getVersionString();
+  const includeTypeName = semver.gte(esVersion, "7.0.0") ? true : undefined;
 
   if (!status.blogIndex) {
     await esClient.indices.create({
@@ -59,7 +73,7 @@ export async function setup() {
     const parsed = JSON.parse(
       fs
         .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
-        .toString("utf-8")
+        .toString("utf-8"),
     );
 
     try {
@@ -67,7 +81,7 @@ export async function setup() {
         name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
       });
       parsed.index_patterns = updateIndexPatterns(
-        current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
+        current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns,
       );
     } catch (err) {
       if (err.status != 404) {
@@ -86,9 +100,7 @@ export async function setup() {
   if (!status.ingestPipeline) {
     await esClient.ingest.putPipeline({
       id: PIPELINE_NAME,
-      body: fs
-        .readFileSync(path.join(setupDir, "request-log-pipeline.json"))
-        .toString("utf-8"),
+      body: await getRequestLogPipelineBody(),
     });
   }
 }
@@ -109,14 +121,13 @@ export async function getStatus() {
   });
 
   if (status.blogLogsIndexTemplate) {
-    const setupDir = process.env.SETUP_DIR || "./_setup";
     const current = await esClient.indices.getTemplate({
       name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
     });
     const file = JSON.parse(
       fs
         .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
-        .toString("utf-8")
+        .toString("utf-8"),
     );
     status.blogLogsIndexTemplateUpToDate =
       mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
@@ -124,10 +135,15 @@ export async function getStatus() {
   }
 
   try {
-    await esClient.ingest.getPipeline({
-      id: "request_log",
+    const pipelines = await esClient.ingest.getPipeline({
+      id: PIPELINE_NAME,
     });
-    status.ingestPipeline = true;
+
+    const currentPipeline = stringifyDeterministic(pipelines[PIPELINE_NAME]);
+    const targetPipeline = stringifyDeterministic(
+      await getRequestLogPipelineBody(),
+    );
+    status.ingestPipeline = currentPipeline === targetPipeline;
   } catch (err) {
     if (err.status === 404) {
       status.ingestPipeline = false;
@@ -139,11 +155,21 @@ export async function getStatus() {
   return status;
 }
 
-function mappingsEqual(m1, m2) {
-  return (
-    JSON.stringify(normalizeMapping(m1)) ===
-    JSON.stringify(normalizeMapping(m2))
+async function getRequestLogPipelineBody() {
+  const esVersion = await getVersionString();
+  const legacyLogsPipeline = semver.lt(esVersion, "6.7.0");
+  const pipelineFilename =
+    (legacyLogsPipeline ? "legacy-" : "") + "request-log-pipeline.json";
+  return JSON.parse(
+    fs.readFileSync(path.join(setupDir, pipelineFilename)).toString("utf-8"),
   );
+}
+
+function mappingsEqual(m1, m2) {
+  const s1 = stringifyDeterministic(normalizeMapping(m1)),
+    s2 = stringifyDeterministic(normalizeMapping(m2));
+
+  return s1 === s2;
 
   function normalizeMapping(m) {
     m = _.cloneDeep(m);

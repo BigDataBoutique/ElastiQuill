@@ -61,31 +61,6 @@
                 "method": {
                   "type": "keyword"
                 },
-                "user_agent_parsed": {
-                  "properties": {
-                    "patch": {
-                      "type": "keyword"
-                    },
-                    "major": {
-                      "type": "keyword"
-                    },
-                    "minor": {
-                      "type": "keyword"
-                    },
-                    "os": {
-                      "type": "keyword"
-                    },
-                    "name": {
-                      "type": "keyword"
-                    },
-                    "os_name": {
-                      "type": "keyword"
-                    },
-                    "device": {
-                      "type": "keyword"
-                    }
-                  }
-                },
                 "referrer_parsed": {
                   "properties": {
                     "path": {
@@ -113,6 +88,27 @@
                 },
                 "user_agent": {
                   "type": "text"
+                },
+                "user_agent_parsed" : {
+                  "properties" : {
+                    "device" : {
+                      "properties" : {
+                        "name" : {
+                          "type" : "keyword"
+                        }
+                      }
+                    },
+                    "name" : {
+                      "type" : "keyword"
+                    },
+                    "os" : {
+                      "properties" : {
+                        "name" : {
+                          "type" : "keyword"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             },
