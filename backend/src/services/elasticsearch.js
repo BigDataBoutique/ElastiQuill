@@ -9,11 +9,11 @@ import { esClient, config } from "../app";
 const BLOG_INDEX = _.get(config, "elasticsearch.blog-index-name");
 const BLOG_COMMENTS_INDEX = _.get(
   config,
-  "elasticsearch.blog-comments-index-name",
+  "elasticsearch.blog-comments-index-name"
 );
 const BLOG_LOGS_INDEX_PREFIX = _.get(
   config,
-  "elasticsearch.blog-logs-index-name",
+  "elasticsearch.blog-logs-index-name"
 );
 const BLOG_LOGS_INDEX_TEMPLATE_NAME = "blog-logs";
 const PIPELINE_NAME = "request_log";
@@ -73,7 +73,7 @@ export async function setup() {
     const parsed = JSON.parse(
       fs
         .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
-        .toString("utf-8"),
+        .toString("utf-8")
     );
 
     try {
@@ -81,7 +81,7 @@ export async function setup() {
         name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
       });
       parsed.index_patterns = updateIndexPatterns(
-        current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns,
+        current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
       );
     } catch (err) {
       if (err.status != 404) {
@@ -127,7 +127,7 @@ export async function getStatus() {
     const file = JSON.parse(
       fs
         .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
-        .toString("utf-8"),
+        .toString("utf-8")
     );
     status.blogLogsIndexTemplateUpToDate =
       mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
@@ -141,7 +141,7 @@ export async function getStatus() {
 
     const currentPipeline = stringifyDeterministic(pipelines[PIPELINE_NAME]);
     const targetPipeline = stringifyDeterministic(
-      await getRequestLogPipelineBody(),
+      await getRequestLogPipelineBody()
     );
     status.ingestPipeline = currentPipeline === targetPipeline;
   } catch (err) {
@@ -161,7 +161,7 @@ async function getRequestLogPipelineBody() {
   const pipelineFilename =
     (legacyLogsPipeline ? "legacy-" : "") + "request-log-pipeline.json";
   return JSON.parse(
-    fs.readFileSync(path.join(setupDir, pipelineFilename)).toString("utf-8"),
+    fs.readFileSync(path.join(setupDir, pipelineFilename)).toString("utf-8")
   );
 }
 
