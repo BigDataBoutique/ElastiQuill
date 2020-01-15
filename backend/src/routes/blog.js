@@ -30,7 +30,7 @@ const PAGE_SIZE = 10;
 events.onChange("post", () => clearPageCache(config.blog["blog-route-prefix"]));
 router.get("/", cachePageHandler(asyncHandler(handlePostsRequest("index"))));
 
-router.get("/page/:pageNum", asyncHandler(handlePostsRequest("index")));
+router.get("/page/:pageNum", asyncHandler(handlePostsRequest("posts")));
 router.get("/tagged/:tag", asyncHandler(handlePostsRequest("tagged")));
 router.get(
   "/tagged/:tag/page/:pageNum",

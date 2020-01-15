@@ -1,7 +1,7 @@
 $(function() {
   onImgLoad(".post-image>img, .fresh-post__img img, .post-img img", function() {
     if (this.naturalWidth / this.naturalHeight > 2) {
-      $(this).css("object-fit", "contain");
+      $(this).css("object-fit", "cover");
     }
   });
 

@@ -502,8 +502,8 @@ export async function getItems({
     items,
     allSeries,
     allTags: resp.aggregations ? resp.aggregations.tags.buckets : [],
-    total: resp.hits.total,
-    totalPages: Math.ceil(resp.hits.total / pageSize),
+    total: resp.hits.total.value,
+    totalPages: Math.ceil(resp.hits.total.value / pageSize),
   };
 }
 

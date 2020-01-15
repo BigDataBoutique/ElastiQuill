@@ -41,9 +41,8 @@ var GLOBAL;
 // initialize global singleton instance if not yet defined
 if (!global.__express_handlebars_multi__) {
   reset();
-}
-// use existing singleton instance
-else {
+} else {
+  // use existing singleton instance
   GLOBAL = global.__express_handlebars_multi__;
 }
 
@@ -153,9 +152,8 @@ function render(file, options, callback) {
           // if callback is passed then call with result
           if (callback) {
             callback(null, body);
-          }
-          // otherwise resolve with result
-          else {
+          } else {
+            // otherwise resolve with result
             return body;
           }
         });
@@ -232,8 +230,13 @@ function loadTemplate(file, options) {
       var template = (GLOBAL.templates[file] = handlebars.compile(data, {
         preventIndent: true,
       }));
+      // log which template is rendered
+      const loggedTemplate = (...args) => {
+        console.log("Rendering", file);
+        return template(...args);
+      };
       // resolve with template
-      return template;
+      return loggedTemplate;
     }));
   // return promise
   return promise;

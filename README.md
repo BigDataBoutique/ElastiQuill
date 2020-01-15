@@ -113,14 +113,14 @@ See [config.yml](config.yml) for a sample configuration file.
 | blog.url | Blog URL | `BLOG_URL` | `http://localhost:5000` |
 | blog.title | Blog title. Used in `/blog/rss` xml | `BLOG_TITLE` | `Sample blog` |
 | blog.description | Blog description. Used in `/blog/rss` xml | `BLOG_DESCRIPTION` | `Sample description` |
-| blog.cache-ttl | Page cache TTL in seconds. If `0` will disable caching. | `BLOG_CACHE_TTL` |  `60` |
+| blog.cache-ttl | Server-side page cache TTL in seconds. If `0` will disable caching (necessary for development). | `BLOG_CACHE_TTL` |  `60` |
 | blog.compression | Whether to compress HTTP responses | `BLOG_COMPRESSION` |  `false` |
 | blog.port | Port to run on | `PORT` | `5000` |
 | blog.comments-noreply-email | When set, blogpost authors and commenters will receive email notifications about on new discussion from this email. Should be a single email string e.g. `noreply@blog.com` | `BLOG_COMMENTS_NOREPLY_EMAIL` | |
 | blog.comments-post-period | Number of days to keep commenting enabled after publishing the blogpost. Set `-1` to never disable commenting | `BLOG_COMMENTS_POST_PERIOD` | `60` |
 | blog.contact-email | Email to send contacts form submits to | `CONTACT_FORM_SEND_TO` | |
 | blog.theme-path | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base` | `BLOG_THEME_PATH` | |
-| blog.theme-caching | View template compilation caching. Set `false` for hot-reloading. | `BLOG_THEME_CACHING` | `true` |
+| blog.theme-caching | View template compilation caching. Set this to `false` and `blog.cache-ttl` to 0 for hot-reloading. | `BLOG_THEME_CACHING` | `true` |
 | blog.blog-route-prefix | Url prefix for all blog posts urls. Does not apply to content page urls | `BLOG_ROUTE_PREFIX` | `/blog` |
 | blog.admin-route | Url under which admin dashboard can be accessed | `ADMIN_ROUTE` | `/admin` |
 | blog.uploads-bucket-prefix | Bucket prefix used for uploads | `UPLOADS_BUCKET_PREFIX` | |
@@ -129,32 +129,32 @@ See [config.yml](config.yml) for a sample configuration file.
 | elasticsearch.blog-comments-index-name | Elasticsearch index name to store blog comments | `BLOG_COMMENTS_INDEX` | `blog-comments` |
 | elasticsearch.blog-logs-index-name | Elasticsearch index name to store error logs and metrics | `BLOG_LOGS_INDEX` | `blog-logs` |
 | elasticsearch.blog-logs-period | Set to `monthly` to index logs in separate indices per month instead of per day | `BLOG_LOGS_PERIOD` | `daily` |
-| credentials.sendgrid | Sendgrid API key | `SENDGRID_API_KEY` |
-| credentials.google.analytics-code | GA tracking ID | `GOOGLE_ANALYTICS_CODE` |
-| credentials.google.oauth-client-id | Google OAuth 2 client ID | `GOOGLE_OAUTH_CLIENT_ID` |
-| credentials.google.oauth-client-secret | Google OAuth 2 client secret | `GOOGLE_OAUTH_CLIENT_SECRET` |
-| credentials.github.oauth-client-id | Github OAuth client ID | `GITHUB_CLIENT_ID` |
-| credentials.github.oauth-client-secret | Github OAuth client secret | `GITHUB_CLIENT_SECRET` |
-| credentials.google.recaptcha-v2-key | Google Recaptcha v2 client key | `GOOGLE_RECAPTCHA_V2_CLIENT_KEY` |
-| credentials.google.recaptcha-v2-secret | Google Recaptcha v2 client secret | `GOOGLE_RECAPTCHA_V2_SECRET_KEY` |
-| credentials.akismet.api-key | Akismet API key | `AKISMET_APIKEY` |
-| credentials.akismet.domain | Akismet domain | `AKISMET_DOMAIN` |
-| credentials.google.gcs-bucket | GCS bucket | `GOOGLE_GCS_BUCKET` |
-| credentials.google.gcs-keyfile | Path to the credentials file | `GOOGLE_APPLICATION_CREDENTIALS` |
-| credentials.aws.s3-bucket | S3 bucket | `AWS_S3_BUCKET` |
-| credentials.aws.access-key-id | AWS access key ID | `AWS_ACCESS_KEY_ID` |
-| credentials.aws.secret-access-key | AWS secret access key | `AWS_SECRET_ACCESS_KEY` |
-| credentials.linkedin.client-id | Linkedin Client ID | `LINKEDIN_CLIENT_ID` |
-| credentials.linkedin.client-secret | Linkedin Client Secret | `LINKEDIN_CLIENT_SECRET` |
-| credentials.twitter.consumer-key | Twitter Consumer Key | `TWITTER_CONSUMER_KEY` |
-| credentials.twitter.consumer-secret | Twitter Consumer Secret | `TWITTER_CONSUMER_SECRET` |
-| credentials.twitter.access-token-key | Twitter access token key | `TWITTER_ACCESS_TOKEN_KEY` |
-| credentials.twitter.access-token-secret | Twitter access token secret | `TWITTER_ACCESS_TOKEN_SECRET` |
-| credentials.reddit.client-id | Reddit Client ID | `REDDIT_CLIENT_ID` |
-| credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` |
-| credentials.medium.client-id | Medium Client ID | `MEDIUM_CLIENT_ID` |
-| credentials.medium.client-secret | Medium Client Secret | `MEDIUM_CLIENT_SECRET` |
-| credentials.facebook.app-id | Facebook App ID. Used to enable sharing selected text to Facebook. | `FACEBOOK_APP_ID` |
+| credentials.sendgrid | Sendgrid API key | `SENDGRID_API_KEY` ||
+| credentials.google.analytics-code | GA tracking ID | `GOOGLE_ANALYTICS_CODE` ||
+| credentials.google.oauth-client-id | Google OAuth 2 client ID | `GOOGLE_OAUTH_CLIENT_ID` ||
+| credentials.google.oauth-client-secret | Google OAuth 2 client secret | `GOOGLE_OAUTH_CLIENT_SECRET` ||
+| credentials.github.oauth-client-id | Github OAuth client ID | `GITHUB_CLIENT_ID` ||
+| credentials.github.oauth-client-secret | Github OAuth client secret | `GITHUB_CLIENT_SECRET` ||
+| credentials.google.recaptcha-v2-key | Google Recaptcha v2 client key | `GOOGLE_RECAPTCHA_V2_CLIENT_KEY` ||
+| credentials.google.recaptcha-v2-secret | Google Recaptcha v2 client secret | `GOOGLE_RECAPTCHA_V2_SECRET_KEY` ||
+| credentials.akismet.api-key | Akismet API key | `AKISMET_APIKEY` ||
+| credentials.akismet.domain | Akismet domain | `AKISMET_DOMAIN` ||
+| credentials.google.gcs-bucket | GCS bucket | `GOOGLE_GCS_BUCKET` ||
+| credentials.google.gcs-keyfile | Path to the credentials file | `GOOGLE_APPLICATION_CREDENTIALS` ||
+| credentials.aws.s3-bucket | S3 bucket | `AWS_S3_BUCKET` ||
+| credentials.aws.access-key-id | AWS access key ID | `AWS_ACCESS_KEY_ID` ||
+| credentials.aws.secret-access-key | AWS secret access key | `AWS_SECRET_ACCESS_KEY` ||
+| credentials.linkedin.client-id | Linkedin Client ID | `LINKEDIN_CLIENT_ID` ||
+| credentials.linkedin.client-secret | Linkedin Client Secret | `LINKEDIN_CLIENT_SECRET` ||
+| credentials.twitter.consumer-key | Twitter Consumer Key | `TWITTER_CONSUMER_KEY` ||
+| credentials.twitter.consumer-secret | Twitter Consumer Secret | `TWITTER_CONSUMER_SECRET` ||
+| credentials.twitter.access-token-key | Twitter access token key | `TWITTER_ACCESS_TOKEN_KEY` ||
+| credentials.twitter.access-token-secret | Twitter access token secret | `TWITTER_ACCESS_TOKEN_SECRET` ||
+| credentials.reddit.client-id | Reddit Client ID | `REDDIT_CLIENT_ID` ||
+| credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` ||
+| credentials.medium.client-id | Medium Client ID | `MEDIUM_CLIENT_ID` ||
+| credentials.medium.client-secret | Medium Client Secret | `MEDIUM_CLIENT_SECRET` ||
+| credentials.facebook.app-id | Facebook App ID. Used to enable sharing selected text to Facebook. | `FACEBOOK_APP_ID` ||
 
 ## Running locally
 
