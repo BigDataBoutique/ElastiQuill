@@ -60,6 +60,8 @@ if (BLOG_THEME_PATH) {
 export const hbs = exphbs({
   helpers: {
     eq: (arg1, arg2) => arg1 == arg2,
+    gt: (arg1, arg2) => arg1 > arg2,
+    lt: (arg1, arg2) => arg1 < arg2,
     or: (...args) => _.some(args.slice(0, -1)),
     and: (...args) => _.every(args.slice(0, -1)),
     head: xs => xs[0],

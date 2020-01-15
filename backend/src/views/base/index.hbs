@@ -5,15 +5,9 @@
         {{#each (tail posts)}}
           {{> post this}}
         {{/each}}
-        {{#unless (eq total 1)}}
-        <p class="blog-pagination">
-          Showing {{posts.length}} posts out of {{total}} total, page {{pageNum}}
+        <p class="blog-more-posts">
+          <a href="{{blogRoutePrefix}}/page/1">See more posts</a>
         </p>
-        <p class="blog-pagination">
-          {{#if prevPage}}<a href="{{blogRoutePrefix}}/page/{{prevPage}}">Previous page</a>{{/if}}
-          {{#if nextPage}}<a href="{{blogRoutePrefix}}/page/{{nextPage}}">Next page</a>{{/if}}
-        </p>
-        {{/unless}}
       {{else}}
         {{> no-content}}
       {{/if}}

@@ -260,6 +260,10 @@ span.author-name {
   width: 31px;
 }
 
+.blog-more-posts {
+  margin-top: 2rem;
+}
+
 .blog-pagination {
   margin-top: 2rem;
 }
@@ -447,6 +451,11 @@ span.post-quote {
 
 .post-img {
   width: 100%;
+  display: flex;
+}
+
+.post-img a {
+  display: flex;
 }
 
 .post-img img {
@@ -695,7 +704,6 @@ footer a {
   }
 
   .post-img img {
-    height: 242px;
     min-height: 242px;
     max-width: 270px;
     object-fit: cover;

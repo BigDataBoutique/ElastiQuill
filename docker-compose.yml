@@ -10,7 +10,7 @@ services:
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
-      - 127.0.0.1:9200:9200
+      - 9200:9200
 
   blog_kibana:
     image: docker.elastic.co/kibana/kibana:7.2.0
@@ -20,7 +20,7 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: http://blog_es:9200
     ports:
-      - 127.0.0.1:5601:5601
+      - 5601:5601
 
   blog:
     image: bigdataboutique/elastiquill
@@ -31,7 +31,7 @@ services:
     depends_on:
       - blog_es
     ports:
-      - 127.0.0.1:5000:5000
+      - 5000:5000
     volumes:
       - ${PWD}/_k8s:/etc/elastiquill
 
