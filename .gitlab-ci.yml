@@ -30,8 +30,8 @@ static-analysis:
   only:
     changes:
     - Dockerfile
-    - backend/
-    - admin-frontend/
+    - backend/*
+    - admin-frontend/*
 
 package:
   stage: package
@@ -43,8 +43,8 @@ package:
   only:
     changes:
     - Dockerfile
-    - backend/
-    - admin-frontend/
+    - backend/*
+    - admin-frontend/*
 
 release:
   stage: release
@@ -65,8 +65,8 @@ release:
     - master
     changes:
     - Dockerfile
-    - backend/
-    - admin-frontend/
+    - backend/*
+    - admin-frontend/*
     
 dockerhub:
   stage: release
