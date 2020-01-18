@@ -61,6 +61,7 @@ release:
     - docker tag $CONTAINER_TEST_IMAGE ${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:latest
     - docker push ${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:latest
   only:
+    refs:
     - master
     changes:
     - Dockerfile
