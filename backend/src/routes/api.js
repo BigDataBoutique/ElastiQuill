@@ -51,8 +51,7 @@ router.use((err, req, res) => {
     error: err.message ? err.message : err.toString(),
   });
 
-  const isDev = req.app.get("env") === "development";
-  if (isDev) {
+  if (req.app.get("env") === "development") {
     console.error(err);
   } else {
     loggingService.logError("api", err, req, res);
