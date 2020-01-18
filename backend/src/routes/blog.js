@@ -117,7 +117,7 @@ router.get(
         if (post.metadata.private_viewing_key !== req.query.secret) {
           throw new PageNotFoundError();
         }
-      } else if (!post.is_published) {
+      } else if ('is_published' in post && !post.is_published) {
         throw new PageNotFoundError();
       }
 

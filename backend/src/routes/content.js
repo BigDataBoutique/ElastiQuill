@@ -53,7 +53,7 @@ router.get(
 
     const processedItems = items
       .filter(it => {
-        if (req.user.role === "admin" || it.is_published) {
+        if (req.user.role === "admin" || it.is_published === true) {
           return true;
         }
         return req.user.emails.includes(it.author.email);
