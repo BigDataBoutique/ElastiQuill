@@ -27,6 +27,11 @@ static-analysis:
     - (cd backend && npm install)
     - npm run prettier-check
     - npm run lint
+  only:
+    changes:
+    - Dockerfile
+    - backend/
+    - admin-frontend/
 
 package:
   stage: package
@@ -35,6 +40,11 @@ package:
   script:
     - docker build --squash -t $CONTAINER_TEST_IMAGE .
     - docker push $CONTAINER_TEST_IMAGE
+  only:
+    changes:
+    - Dockerfile
+    - backend/
+    - admin-frontend/
 
 release:
   stage: release
@@ -52,6 +62,10 @@ release:
     - docker push ${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:latest
   only:
     - master
+    changes:
+    - Dockerfile
+    - backend/
+    - admin-frontend/
     
 dockerhub:
   stage: release
