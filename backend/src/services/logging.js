@@ -292,7 +292,7 @@ export async function getStats({
         most_viewed_post.views_count = mostViewedPost.doc_count;
         most_viewed_post.visitors_count = mostViewedPost.visitors.value;
       } catch (err) {
-        if (err.statusCode != 404) {
+        if (err.statusCode !== 404) {
           throw err;
         }
       }

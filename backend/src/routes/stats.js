@@ -28,9 +28,18 @@ router.get(
       postId: req.query.item_id || null,
     });
 
+    let most_viewed_post = preparePost(stats.most_viewed_post) || {};
+    stats.most_viewed_post = {
+    	title: most_viewed_post.title,
+    	url: most_viewed_post.url,
+    	full_url: most_viewed_post.full_url,
+    	published_at: most_viewed_post.published_at,
+    	comments_count: most_viewed_post.comments_count,
+    	views_count: most_viewed_post.views_count,
+    	visitors_count: most_viewed_post.visitors_count,
+	};
     stats.comments_by_date = commentsByDate;
     stats.popular_posts = stats.popular_posts.map(preparePost);
-    stats.most_viewed_post = preparePost(stats.most_viewed_post);
 
     if (!req.query.item_id) {
       const { postsCount, postsByDate } = await blogPosts.getStats({
