@@ -16,7 +16,7 @@ import * as cache from "../services/cache";
 import { preparePost, tagUrl, seriesUrl } from "./util";
 import { config } from "../app";
 
-const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
+const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"] || "/";
 const IS_LOCALHOST = config.blog.url.startsWith("http://localhost");
 
 const router = express.Router();
