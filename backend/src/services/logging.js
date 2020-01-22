@@ -540,9 +540,13 @@ function ecsHttp(req, res) {
 
   if (req.referrer) {
     const referrerRaw = req.header("referrer") || "";
-    const sameDomain = referrerRaw.startsWith(config.blog.url);
 
-    if (!sameDomain && !["direct", "internal"].includes(req.referrer.type)) {
+    const ignoreDomains = ["127.0.0.1", "0.0.0.0"];
+
+    if (
+      !ignoreDomains.includes(req.get("host")) &&
+      !["direct", "internal"].includes(req.referrer.type)
+    ) {
       body.http.request.referrer = referrerRaw;
       body.http.request.referrer_parsed = {
         ...ecsUrl(req.referrer.from).url,

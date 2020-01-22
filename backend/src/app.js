@@ -154,7 +154,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res, _next) {
   const isDev = req.app.get("env") === "development";
 
   if (isDev) {

@@ -10,7 +10,7 @@ module.exports = {
     "react/prop-types": "off",
     "react/jsx-no-target-blank": "off",
     "require-atomic-updates": "off",
-    "no-unused-vars": ["error", { ignoreRestSiblings: true }],
+    "no-unused-vars": ["error", { ignoreRestSiblings: true, argsIgnorePattern: "^_" }],
     "no-console": "off",
   },
   parserOptions: {
