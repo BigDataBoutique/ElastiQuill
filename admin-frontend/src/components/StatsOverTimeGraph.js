@@ -91,16 +91,16 @@ class StatsOverTimeGraph extends React.Component {
       viewsHistogram = this._extractVisitorsHistogram(viewsHistogram);
     }
 
-    const visitsData = this._prepareHistogram(visitsHistogram, true);
-    const viewsData = this._prepareHistogram(viewsHistogram, true);
+    const dummyData = this._generateDummySeriesData();
+    const xDomainEnd = _.last(dummyData).x.getTime();
+    const xDomainStart = _.first(dummyData).x.getTime();
+
+    const visitsData = this._prepareHistogram(visitsHistogram, dummyData);
+    const viewsData = this._prepareHistogram(viewsHistogram, dummyData);
     const commentsData = this._prepareHistogram(commentsHistogram);
     const postsData = this._prepareHistogram(postsHistogram);
 
     const { interval } = this._getInterval();
-    const dummyData = this._generateDummySeriesData();
-
-    const xDomainEnd = _.last(dummyData).x.getTime();
-    const xDomainStart = _.first(dummyData).x.getTime();
 
     const onNearestX = (value, { index }) => {
       const values = [];
@@ -234,7 +234,7 @@ class StatsOverTimeGraph extends React.Component {
     return data;
   }
 
-  _prepareHistogram(histogram, addZeros) {
+  _prepareHistogram(histogram, zeroData) {
     if (!histogram) {
       return [];
     }
@@ -243,10 +243,14 @@ class StatsOverTimeGraph extends React.Component {
       x: this._normalizeDate(new Date(item.key)),
       y: item.doc_count,
     }));
-
-    if (!addZeros) {
-      return data.filter(item => item.y > 0);
+    if (zeroData) {
+      zeroData.forEach(item => {
+        if (!data.find(i => i.x.valueOf() == item.x.valueOf())) {
+          data.push(item);
+        }
+      });
     }
+    data = _.sortBy(data, "x");
 
     if (data.length) {
       const { interval } = this._getInterval();
