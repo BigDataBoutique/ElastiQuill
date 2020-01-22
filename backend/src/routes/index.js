@@ -45,7 +45,7 @@ router.use((req, res, next) => {
 // parse referrer
 router.use((req, res, next) => {
   const referrer = req.header("referrer");
-  const href = req.url;
+  const href = req.protocol + "://" + req.get("host") + req.originalUrl;
 
   inbound.referrer.parse(href, referrer, (err, desc) => {
     req.referrer = desc.referrer;
