@@ -498,12 +498,17 @@ export async function getItems({
     }));
   }
 
+  const total =
+    typeof resp.hits.total === "object"
+      ? resp.hits.total.value
+      : resp.hits.total;
+
   return {
     items,
     allSeries,
     allTags: resp.aggregations ? resp.aggregations.tags.buckets : [],
-    total: resp.hits.total.value,
-    totalPages: Math.ceil(resp.hits.total.value / pageSize),
+    total,
+    totalPages: Math.ceil(total / pageSize),
   };
 }
 
