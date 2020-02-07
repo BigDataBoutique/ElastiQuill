@@ -40,7 +40,7 @@ router.post(
         url: resp.url,
       });
     } catch (err) {
-      console.log(err);  // TODO proper error logging
+      console.log(err); // TODO proper error logging
       res.json({
         error: err,
       });
