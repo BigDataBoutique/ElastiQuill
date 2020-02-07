@@ -12,7 +12,6 @@ import logo from "../assets/img/logo.png";
 class Login extends Component {
   componentDidMount() {
     document.body.classList.add("bg-dark");
-    console.log();
   }
 
   componentWillUnmount() {

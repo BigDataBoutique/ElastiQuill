@@ -96,7 +96,7 @@ export default class ItemsStore extends BaseStore {
       this.totalPages = resp.total_pages;
       this.pageIndex = pageIndex;
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     } finally {
       this.loaded(name);
     }
@@ -109,7 +109,7 @@ export default class ItemsStore extends BaseStore {
     try {
       this.currentItem = await func(id);
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     } finally {
       this.loaded(name);
     }

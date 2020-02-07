@@ -95,7 +95,7 @@ export default class CommentsList extends React.Component {
         this.props.requestReload();
       } catch (err) {
         toast.error("Failed to publish the comment");
-        console.log(err);
+        console.log(err); // TODO proper error logging
       } finally {
         this.setState({
           spamModalComment: null,
@@ -130,7 +130,7 @@ export default class CommentsList extends React.Component {
         this.props.requestReload();
       } catch (err) {
         toast.error("Failed to remove the comment");
-        console.log(err);
+        console.log(err); // TODO proper error logging
       } finally {
         this.setState({
           deleteModalComment: null,

@@ -232,7 +232,6 @@ function loadTemplate(file, options) {
       }));
       // log which template is rendered
       const loggedTemplate = (...args) => {
-        console.log("Rendering", file);
         return template(...args);
       };
       // resolve with template

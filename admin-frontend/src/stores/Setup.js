@@ -15,7 +15,7 @@ class Setup extends BaseStore {
       this.status = status;
     } catch (err) {
       this.status = null;
-      console.log(err);
+      console.log(err); // TODO proper error logging
     } finally {
       this.loaded("status");
     }

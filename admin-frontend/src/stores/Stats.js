@@ -20,7 +20,7 @@ class Stats extends BaseStore {
         this.item = await api.loadContentPageById(id);
       }
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     } finally {
       this.loaded("stats");
     }

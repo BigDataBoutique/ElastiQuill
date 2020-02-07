@@ -23,7 +23,7 @@ class Posts extends ItemsStore {
     try {
       this.socialAvailability = await api.loadSocialAvailability();
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     }
   }
 

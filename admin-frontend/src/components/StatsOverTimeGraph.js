@@ -318,7 +318,7 @@ class StatsOverTimeGraph extends React.Component {
         results = await api.loadAllStats(startDate, intervalName);
       }
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     } finally {
       if (results) {
         this.setState({

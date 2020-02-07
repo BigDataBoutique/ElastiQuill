@@ -192,11 +192,9 @@ class BaseForm extends Component {
           toast.error(resp.error);
           return;
         }
-
-        console.log(prop, resp.files[0].url);
         this._setValue(prop, resp.files[0].url);
       } catch (err) {
-        console.log(err);
+        console.log(err); // TODO proper error logging
       }
     };
 

@@ -108,7 +108,7 @@ class ItemFormPage extends Component {
       await this.updateItem(this.store.currentItem.id, formValues);
       this.store.setCurrentItem(formValues);
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     } finally {
       this.store.setFormAutosaving(false);
     }
@@ -132,7 +132,7 @@ class ItemFormPage extends Component {
       this.store.setFormModalOpen(false);
       this.store.setCurrentItem(formValues);
     } catch (err) {
-      console.log(err);
+      console.log(err);  // TODO proper error logging
       let errorMsg = err.message;
       if (err.message === "Conflict") {
         errorMsg = "Page with that name already exists";

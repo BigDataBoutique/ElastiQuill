@@ -33,16 +33,16 @@ class App extends BaseStore {
         setUnauthorizedHandler(() => this.setUser(null));
       }
     } catch (err) {
-      console.log(err);
+      console.log(err);  // TODO proper error logging
     }
 
     try {
       this.setSocialAuthSources(await api.loadAuthSources());
     } catch (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
     }
 
-    if (location.hash == "#error") {
+    if (location.hash === "#error") {
       this.showError(null, "Failed to authenticate.");
       location.hash = "";
     }

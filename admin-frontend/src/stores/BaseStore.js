@@ -43,7 +43,7 @@ export default class BaseStore {
     let errorMsg = customMessage ? customMessage : "A problem occurred";
 
     if (err) {
-      console.log(err);
+      console.log(err); // TODO proper error logging
       errorMsg += ": " + err.message;
     }
 
