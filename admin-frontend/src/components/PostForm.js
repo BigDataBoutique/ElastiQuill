@@ -80,7 +80,7 @@ class PostForm extends BaseForm {
               >
                 {this.props.isNew
                   ? "Publish now"
-                  : this.props.item.is_published
+                  : this.props.item.is_published === true
                   ? "Publish changes"
                   : "Publish post"}
               </Button>
@@ -135,7 +135,7 @@ class PostForm extends BaseForm {
           ...originalValues.metadata,
           private_viewing_key: uuid(),
         },
-        is_published: this.props.isNew ? false : this.props.item.is_published,
+        is_published: this.props.isNew ? false : this.props.item.is_published === true,
       });
       return;
     }

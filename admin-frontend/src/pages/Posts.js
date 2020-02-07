@@ -99,7 +99,7 @@ class Posts extends BaseItemsPage {
   }
 
   _renderLineItemExtra(item) {
-    if (!item.is_published) {
+    if (item.is_published === false) {
       return false;
     }
 
