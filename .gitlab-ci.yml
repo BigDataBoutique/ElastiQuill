@@ -29,9 +29,9 @@ static-analysis:
     - npm run lint
   only:
     changes:
-    - Dockerfile
-    - backend/*
-    - admin-frontend/*
+      - Dockerfile
+      - backend/**/*
+      - admin-frontend/**/*
 
 package:
   stage: package
@@ -42,9 +42,9 @@ package:
     - docker push $CONTAINER_TEST_IMAGE
   only:
     changes:
-    - Dockerfile
-    - backend/*
-    - admin-frontend/*
+      - Dockerfile
+      - backend/**/*
+      - admin-frontend/**/*
 
 release:
   stage: release
@@ -62,11 +62,11 @@ release:
     - docker push ${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:latest
   only:
     refs:
-    - master
+      - master
     changes:
-    - Dockerfile
-    - backend/*
-    - admin-frontend/*
+      - Dockerfile
+      - backend/**/*
+      - admin-frontend/**/*
     
 dockerhub:
   stage: release
