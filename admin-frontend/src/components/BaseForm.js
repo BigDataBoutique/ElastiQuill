@@ -63,6 +63,7 @@ class BaseForm extends Component {
         <div
           style={{ position: "absolute", right: 5, top: 5, cursor: "pointer" }}
         >
+          {this._renderExtraToolbarButton && this._renderExtraToolbarButton()}
           <button
             disabled={this.props.isFormAutosaving}
             onClick={onClickSave}
@@ -93,6 +94,7 @@ class BaseForm extends Component {
         >
           {this._renderModal()}
         </ReactModal>
+        {this._renderExtra && this._renderExtra()}
       </div>
     );
   }
@@ -112,8 +114,10 @@ class BaseForm extends Component {
     return (
       <div style={{ marginBottom: 10 }}>
         <ContentEditor
+          key={this.state.contentEditorKey}
           blogpostId={blogpostId}
           contentType={contentType}
+          disabled={!this._isEditable()}
           value={this._getValue(prop, "")}
           onChange={val => this._setValue(prop, val)}
         />
@@ -426,6 +430,10 @@ class BaseForm extends Component {
   }
 
   _setValue(prop, value, cb) {
+    if (!this._isEditable()) {
+      return;
+    }
+
     return this.setState(
       {
         formValues: _.set(this.state.formValues, prop, value),
@@ -468,6 +476,10 @@ class BaseForm extends Component {
         this.setState({ isSaving: true }, this._onSubmit.bind(this, opts));
       }
     );
+  }
+
+  _isEditable() {
+    return true;
   }
 }
 

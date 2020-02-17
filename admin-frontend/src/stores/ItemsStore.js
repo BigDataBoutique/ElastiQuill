@@ -86,11 +86,11 @@ export default class ItemsStore extends BaseStore {
   }
 
   @action
-  async _loadPage(pageIndex, name, func) {
+  async _loadPage(pageIndex, name, func, queryParams) {
     this.loading(name);
 
     try {
-      const resp = await func(pageIndex, this.searchQuery);
+      const resp = await func(pageIndex, queryParams);
       this.isSearchResult = this.searchQuery.length > 0;
       this.items = resp.items;
       this.totalPages = resp.total_pages;

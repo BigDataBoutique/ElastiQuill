@@ -32,12 +32,13 @@ router.get(
     const type = req.params.type;
     const pageIndex = req.query.page_index || 0;
     const searchQuery = req.query.query.length ? req.query.query : null;
+    const hideUnpublished = req.query.hideUnpublished == "true";
 
     const { items, totalPages } = await blogPosts.getItems({
       type,
       pageIndex,
       search: searchQuery,
-      includePrivatePosts: true,
+      includePrivatePosts: !hideUnpublished,
       pageSize: 10,
     });
 
@@ -165,7 +166,7 @@ router.post(
       }
 
       await blogPosts.updateItem(req.params.id, req.params.type, req.body);
-      res.json({ error: null });
+      res.json({ error: null, id: req.params.id });
     } catch (err) {
       if (err.isJoi) {
         res.status(400).json({

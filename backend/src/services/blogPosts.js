@@ -15,8 +15,16 @@ const SLUG_MAX_LENGTH = 100;
 
 // Posts
 export const CreatePostArgSchema = Joi.object().keys({
-  title: Joi.string().required(),
-  content: Joi.string().allow(""),
+  title: Joi.string().when("is_published", {
+    is: false,
+    then: Joi.allow(""),
+    otherwise: Joi.required(),
+  }),
+  content: Joi.string().when("is_published", {
+    is: false,
+    then: Joi.allow(""),
+    otherwise: Joi.required(),
+  }),
   description: Joi.string().allow(""),
   tags: Joi.array().items(Joi.string()),
   series: Joi.string().allow(null),
@@ -51,7 +59,7 @@ export const CreatePostArgSchema = Joi.object().keys({
   allow_comments: Joi.boolean().required(),
   draft: Joi.object()
     .keys({
-      title: Joi.string(),
+      title: Joi.string().allow(""),
       content: Joi.string().allow(""),
       description: Joi.string().allow(""),
       tags: Joi.array().items(Joi.string()),
@@ -71,8 +79,16 @@ export const CreatePostArgSchema = Joi.object().keys({
 });
 
 const UpdatePostArgSchema = Joi.object().keys({
-  title: Joi.string(),
-  content: Joi.string().allow(""),
+  title: Joi.string().when("is_published", {
+    is: false,
+    then: Joi.allow(""),
+    otherwise: Joi.required(),
+  }),
+  content: Joi.string().when("is_published", {
+    is: false,
+    then: Joi.allow(""),
+    otherwise: Joi.required(),
+  }),
   description: Joi.string().allow(""),
   tags: Joi.array().items(Joi.string()),
   series: Joi.string().allow(null),
@@ -98,7 +114,7 @@ const UpdatePostArgSchema = Joi.object().keys({
   allow_comments: Joi.boolean().required(),
   draft: Joi.object()
     .keys({
-      title: Joi.string(),
+      title: Joi.string().allow(""),
       content: Joi.string().allow(""),
       description: Joi.string().allow(""),
       tags: Joi.array().items(Joi.string()),
