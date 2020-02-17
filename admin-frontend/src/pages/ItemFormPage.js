@@ -1,4 +1,3 @@
-import _ from "lodash";
 import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
 import { toast } from "react-toastify";
@@ -46,9 +45,7 @@ class ItemFormPage extends Component {
         break;
     }
 
-    if (this._isNew()) {
-      this.store.setCurrentItem(null);
-    } else {
+    if (!this._isNew()) {
       this.store._loadItem(
         props.match.params.id,
         this._getType(),
@@ -108,19 +105,8 @@ class ItemFormPage extends Component {
   async _onAutosave(formValues) {
     this.store.setFormAutosaving(true);
     try {
-      const save = !formValues.id
-        ? this.createItem
-        : this.updateItem.bind(this, this.store.currentItem.id);
-
-      const resp = await save(formValues);
-      if (resp.error) {
-        throw resp.error;
-      }
-
-      this.store.setCurrentItem({
-        ...formValues,
-        id: resp.id,
-      });
+      await this.updateItem(this.store.currentItem.id, formValues);
+      this.store.setCurrentItem(formValues);
     } catch (err) {
       console.log(err); // TODO proper error logging
     } finally {
@@ -130,7 +116,7 @@ class ItemFormPage extends Component {
 
   async _onSubmit(formValues) {
     const store = this.store;
-    const save = !_.get(store.currentItem, "id")
+    const save = this._isNew()
       ? this.createItem
       : this.updateItem.bind(this, store.currentItem.id);
 
@@ -146,7 +132,7 @@ class ItemFormPage extends Component {
       this.store.setFormModalOpen(false);
       this.store.setCurrentItem(formValues);
     } catch (err) {
-      console.log(err); // TODO proper error logging
+      console.log(err);  // TODO proper error logging
       let errorMsg = err.message;
       if (err.message === "Conflict") {
         errorMsg = "Page with that name already exists";

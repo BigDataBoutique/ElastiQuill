@@ -153,15 +153,7 @@ class ContentEditor extends Component {
   }
 
   render() {
-    return (
-      <div
-        style={{
-          minHeight: "300px",
-          pointerEvents: this.props.disabled ? "none" : "default",
-        }}
-        ref={this.container}
-      />
-    );
+    return <div style={{ minHeight: "300px" }} ref={this.container} />;
   }
 
   _convertImagesToEmbeds(el) {

@@ -20,10 +20,7 @@ class BaseItemsPage extends Component {
     const { isLoading } = store;
 
     const toolbar = (
-      <div style={{ lineHeight: "38px", width: "100%" }}>
-        <div style={{ display: "inline-block", float: "left" }}>
-          {this._renderLeftNav && this._renderLeftNav()}
-        </div>
+      <div style={{ lineHeight: "38px" }}>
         <Link to={`/new/${strings.urlPart}`}>
           <FAIcon icon="plus" style={{ marginRight: "12px" }} />
           {strings.newItem}
