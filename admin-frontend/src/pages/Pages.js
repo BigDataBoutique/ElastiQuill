@@ -37,7 +37,7 @@ class Pages extends BaseItemsPage {
       this.props.pagesStore.loadPage(0);
       this.props.pagesStore.setDeleteItemId(null);
     } catch (err) {
-      console.log(err);  // TODO proper error logging
+      console.log(err); // TODO proper error logging
     } finally {
       this.props.pagesStore.setItemDeleting(false);
     }

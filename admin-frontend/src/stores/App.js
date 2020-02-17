@@ -33,7 +33,7 @@ class App extends BaseStore {
         setUnauthorizedHandler(() => this.setUser(null));
       }
     } catch (err) {
-      console.log(err);  // TODO proper error logging
+      console.log(err); // TODO proper error logging
     }
 
     try {

@@ -127,19 +127,31 @@ export async function postToLinkedin(
   return { url: null };
 }
 
-export function postToTwitter(text) {
-  return new Promise((resolve, reject) => {
-    const twitterClient = new Twitter({
-      consumer_key: config.credentials.twitter["consumer-key"],
-      consumer_secret: config.credentials.twitter["consumer-secret"],
-      access_token_key: config.credentials.twitter["access-token-key"],
-      access_token_secret: config.credentials.twitter["access-token-secret"],
-    });
+export function postToTwitter(text, imageUrl) {
+  const twitterClient = new Twitter({
+    consumer_key: config.credentials.twitter["consumer-key"],
+    consumer_secret: config.credentials.twitter["consumer-secret"],
+    access_token_key: config.credentials.twitter["access-token-key"],
+    access_token_secret: config.credentials.twitter["access-token-secret"],
+  });
+
+  return new Promise(async (resolve, reject) => {
+    let mediaId;
+
+    if (imageUrl) {
+      try {
+        mediaId = await uploadImage(imageUrl);
+      } catch (err) {
+        reject(err);
+        return;
+      }
+    }
 
     twitterClient.post(
       "statuses/update",
       {
         status: text,
+        media_ids: mediaId,
       },
       (errors, tweet) => {
         if (errors) {
@@ -153,6 +165,34 @@ export function postToTwitter(text) {
       }
     );
   });
+
+  function uploadImage(imgUrl) {
+    return new Promise(async (resolve, reject) => {
+      let imageBinary = null;
+      try {
+        imageBinary = await request({
+          method: "GET",
+          url: imgUrl,
+          encoding: null,
+        });
+      } catch (err) {
+        reject(err);
+        return;
+      }
+
+      twitterClient.post(
+        "media/upload",
+        { media: imageBinary },
+        (error, media) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(media.media_id_string);
+        }
+      );
+    });
+  }
 }
 
 export async function postToMedium(authData, post) {

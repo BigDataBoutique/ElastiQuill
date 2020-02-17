@@ -204,7 +204,7 @@ class Posts extends BaseItemsPage {
       this.props.postsStore.loadPage(0);
       this.props.postsStore.setDeleteItemId(null);
     } catch (err) {
-      console.log(err);  // TODO proper error logging
+      console.log(err); // TODO proper error logging
     } finally {
       this.props.postsStore.setItemDeleting(false);
     }
