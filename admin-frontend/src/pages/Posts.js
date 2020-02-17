@@ -50,6 +50,27 @@ class Posts extends BaseItemsPage {
     );
   }
 
+  _renderLeftNav() {
+    const inputId = "hide-unpublished-checkbox";
+
+    return (
+      <div className="form-check" style={{ lineHeight: "24px", marginTop: 10 }}>
+        <input
+          id={inputId}
+          className="form-check-input"
+          type="checkbox"
+          checked={this.props.postsStore.hideUnpublished}
+          onChange={ev =>
+            this.props.postsStore.setHideUnpublished(ev.target.checked)
+          }
+        />
+        <label className="form-check-label" htmlFor={inputId}>
+          Hide unpublished
+        </label>
+      </div>
+    );
+  }
+
   _renderNav() {
     return (
       <div className="elastiquill-nav-submenu-extra">
