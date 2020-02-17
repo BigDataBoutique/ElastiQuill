@@ -12,6 +12,7 @@ module.exports = {
     "require-atomic-updates": "off",
     "no-unused-vars": ["error", { ignoreRestSiblings: true, argsIgnorePattern: "^_" }],
     "no-console": "off",
+    "no-async-promise-executor": "off"
   },
   parserOptions: {
     ecmaFeatures: {

@@ -341,6 +341,10 @@ class Dashboard extends React.Component {
   }
 
   _textEllipsis(text, len) {
+    if (!text) {
+      return false;
+    }
+
     if (text.length - 3 > len) {
       text = text.substring(0, len - 3) + "...";
     }

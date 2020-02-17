@@ -81,9 +81,10 @@ router.post(
   "/post/twitter/:id",
   asyncHandler(async (req, res) => {
     const post = await blogPosts.getItemById({ id: req.params.id });
+    const imgUrl = post.metadata && post.metadata.header_image_url;
     const link = config.blog.url + preparePost(post).url;
     try {
-      const resp = await social.postToTwitter(`${post.title} ${link}`);
+      const resp = await social.postToTwitter(`${post.title} ${link}`, imgUrl);
       res.json({
         url: resp.url,
       });
