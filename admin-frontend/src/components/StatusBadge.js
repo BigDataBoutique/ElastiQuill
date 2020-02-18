@@ -28,9 +28,9 @@ export default function StatusBadge(props) {
                 NOT CONFIGURED
             </div>
         )
-    } else if(props.status == "success") {
+    } else if(props.status == "configured") {
         return(
-        <div style={{color: "#F85359", fontsize: 14}}>
+        <div style={{color: "#1991EB", fontsize: 14}}>
                 <img
                 style={{ height: 18}}
                 alt="CONFIGURED"
@@ -48,7 +48,7 @@ export default function StatusBadge(props) {
                 alt="ERROR"
                 src={error}
                 />{" "}
-                ERROR
+                {props.error ? props.error : "ERROR"}
             </div>
     )
 

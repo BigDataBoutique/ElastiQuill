@@ -220,15 +220,11 @@ class Status extends React.Component {
         error: "danger",
         yellow: "warning",
         warn: "warning",
-        green: "success",
+        green: "configured",
       };
 
       return (
-        <>
-        <StatusBadge status={mappings[status] || "success"}>
-
-        </StatusBadge>
-        </>
+        <StatusBadge error={error} status={mappings[status] || "configured"} />
       );
     };
 
@@ -294,9 +290,7 @@ class Status extends React.Component {
             </h5>
           </div>
           <div className="col" style={{ marginTop: -3 }} id={tooltipId}>
-            <StatusBadge status={success ? "success" : error ? "danger" : "warning"}>
-
-            </StatusBadge>
+            <StatusBadge error={error} status={success ? label == "Initial setup" ? "success" : "configured" : error ? "danger" : "warning"} />
           </div>
           {successTooltip && (
             <UncontrolledTooltip placement="bottom" target={tooltipId}>
