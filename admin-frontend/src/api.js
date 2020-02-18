@@ -51,9 +51,9 @@ export async function loadPostById(id) {
   return await authFetchJson(`/api/content/post/${id}`);
 }
 
-export async function loadPosts(pageIndex, searchQuery) {
+export async function loadPosts(pageIndex, queryParams) {
   return await authFetchJson(
-    `/api/content/post?page_index=${pageIndex}&query=${searchQuery}`
+    `/api/content/post?page_index=${pageIndex}&${qs.stringify(queryParams)}`
   );
 }
 
@@ -89,9 +89,9 @@ export async function updateContentPage(id, page) {
   );
 }
 
-export async function loadContentPages(pageIndex, searchQuery) {
+export async function loadContentPages(pageIndex, queryParams) {
   return await authFetchJson(
-    `/api/content/page?page_index=${pageIndex}&query=${searchQuery}`
+    `/api/content/page?page_index=${pageIndex}&${qs.stringify(queryParams)}`
   );
 }
 

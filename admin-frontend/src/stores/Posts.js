@@ -18,6 +18,9 @@ class Posts extends ItemsStore {
   @observable
   importModalOpen = false;
 
+  @observable
+  hideUnpublished = false;
+
   @action
   async loadSocialAvailability() {
     try {
@@ -25,6 +28,12 @@ class Posts extends ItemsStore {
     } catch (err) {
       console.log(err); // TODO proper error logging
     }
+  }
+
+  @action
+  setHideUnpublished(hideUnpublished) {
+    this.hideUnpublished = hideUnpublished;
+    this.loadPage(0);
   }
 
   @action
@@ -66,7 +75,10 @@ class Posts extends ItemsStore {
 
   @action
   async loadPage(pageIndex) {
-    await this._loadPage(pageIndex, "posts", api.loadPosts);
+    await this._loadPage(pageIndex, "posts", api.loadPosts, {
+      query: this.searchQuery,
+      hideUnpublished: this.hideUnpublished,
+    });
   }
 
   @action
