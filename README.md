@@ -89,7 +89,7 @@ You can connect your Linkedin, Twitter and Reddit accounts to Elastiquill to rep
 * Go to https://developer.twitter.com/en/apps/create
 * Set Callback URL to `http://localhost:5000/api/social/twitter/callback`. Change `http://localhost:5000` to your `blog.url` configuration.
 * `Sign in with Twitter` can be left disabled.
-* In the app page, select the `Keys and tokens` tab. Copy Consumer and Access token keys, and add them to your `config.yml` file.
+* In the app page, select the `Keys and tokens` tab. Generate both consumer API and access token keys and copy all four to your `config.yml` file (see configuration variables below).
 
 ### Reddit
 * Go to https://www.reddit.com/prefs/apps/ and create a `web` app.

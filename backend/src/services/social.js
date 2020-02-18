@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Twitter from "twitter";
 import medium from "medium-sdk";
 import request from "request-promise";
@@ -7,10 +8,24 @@ import { config } from "../app";
 export function getAvailability(connected = {}) {
   const res = {
     "hacker-news": true,
-    twitter: !!config.credentials.twitter,
-    linkedin: !!config.credentials.linkedin,
-    reddit: !!config.credentials.reddit,
-    medium: !!config.credentials.medium,
+    linkedin: _.every([
+      !!_.get(config, "credentials.linkedin.client-id"),
+      !!_.get(config, "credentials.linkedin.client-secret"),
+    ]),
+    reddit: _.every([
+      !!_.get(config, "credentials.reddit.client-id"),
+      !!_.get(config, "credentials.reddit.client-secret"),
+    ]),
+    medium: _.every([
+      !!_.get(config, "credentials.medium.client-id"),
+      !!_.get(config, "credentials.medium.client-secret"),
+    ]),
+    twitter: _.every([
+      !!_.get(config, "credentials.twitter.consumer-key"),
+      !!_.get(config, "credentials.twitter.consumer-secret"),
+      !!_.get(config, "credentials.twitter.access-token-key"),
+      !!_.get(config, "credentials.twitter.access-token-secret"),
+    ]),
   };
 
   for (const key in res) {
