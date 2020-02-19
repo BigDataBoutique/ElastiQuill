@@ -8,6 +8,11 @@ import * as api from "../api";
 
 import StatusBadge from "./../components/StatusBadge"
 
+import linkedin from "./../assets/img/linkedin.svg"
+import medium from "./../assets/img/medium.svg"
+import reddit from "./../assets/img/reddit.svg"
+import twitter from "./../assets/img/twitter.svg"
+
 class Status extends React.Component {
   constructor(props) {
     super(props);
@@ -40,11 +45,11 @@ class Status extends React.Component {
       titleStatus: {
         fontSize: 14,
         color: '#B9C0C9',
-        font: 'SemiBold 14px/33px Source Sans Pro'
+        fontFamily: "'Source Sans Pro', sans-serif"
       },
     }
     return (
-      <div className="row mb-3" style={{height: 14}}>
+      <div className="row mb-4" style={{height: 14}}>
         <div className="col-8">
           <p style={styles.titleStatus}>COMPONENT</p>
         </div>
@@ -76,7 +81,7 @@ class Status extends React.Component {
         fontSize: 24, 
         marginLeft: 0, 
         marginBottom: 22
-      }
+      },
     }
 
     return (
@@ -97,7 +102,7 @@ class Status extends React.Component {
                 value: theme.path,
               })
             ) : (
-              <div>Using base theme</div>
+              <div style={{fontSize: 18}}>Using base theme</div>
             )}
           </div>
           <div>
@@ -108,6 +113,7 @@ class Status extends React.Component {
                 : false,
               success: upload.backend !== null,
               error: upload.errors["gcs"],
+              opacity: true
             })}
             <hr />
           </div>
@@ -129,18 +135,21 @@ class Status extends React.Component {
               label: "Admin login via Github OAuth",
               success: admin.github,
             })}
+            <hr />
             <div>
-              Admin login enabled for:{" "}
+              <div style={{opacity: 0.75}}>
+                Admin login enabled for:{" "}
               {admin.rules.indexOf("_all_") > -1 ? (
-                <pre>everyone</pre>
+                <pre style={{color: "#09C199"}}>everyone</pre>
               ) : (
                 admin.rules.map((em, i) => (
-                  <pre key={i}>
+                  <pre style={{color: "#09C199"}} key={i}>
                     {em}
                     {admin.rules.length - 1 === i ? "" : ", "}
                   </pre>
                 ))
               )}
+              </div>
             </div>
             <hr />
           </div>
@@ -181,18 +190,22 @@ class Status extends React.Component {
             {this._renderLabel({
               label: "Twitter",
               success: social.twitter !== "not_configured",
+              image: twitter
             })}
             {this._renderLabel({
               label: "Reddit",
               success: social.reddit !== "not_configured",
+              image: reddit
             })}
             {this._renderLabel({
               label: "LinkedIn",
               success: social.linkedin !== "not_configured",
+              image: linkedin
             })}
             {this._renderLabel({
               label: "Medium",
               success: social.medium !== "not_configured",
+              image: medium
             })}
           </div>
 
@@ -223,11 +236,19 @@ class Status extends React.Component {
         green: "configured",
       };
 
+      
       return (
         <StatusBadge error={error} status={mappings[status] || "configured"} />
-      );
-    };
-
+        );
+      };
+      
+      const styles = {
+        renderText: {
+          fontSize: 16, 
+          color: "#404043", 
+          opacity: 0.75
+        }
+      }
     return (
       <>
       <div className="mb-5" style={{backgroundColor: "#FDFDFD"}}>
@@ -247,7 +268,7 @@ class Status extends React.Component {
         <hr />
 
         <div className="row" style={{lineHeight: 3}}> 
-          <div style={{fontSize: 16, color: "#404043"}} className="col-8">
+          <div style={styles.renderText} className="col-8">
             Elasticsearch cluster health{" "}
           </div>
           <div className="col"> 
@@ -256,7 +277,7 @@ class Status extends React.Component {
         </div>
           <hr />
         <div className="row">
-          <div style={{fontSize: 16, color: "#404043"}} className='col-8'>
+          <div style={styles.renderText} className='col-8'>
             Blog operation 
           </div>
           <div className="col">
@@ -278,6 +299,8 @@ class Status extends React.Component {
     successTooltip = false,
     successLabel = "Configured",
     warningLabel = "Not configured",
+    opacity = false,
+    image = null
   }) {
     const tooltipId = label.replace(" ", "");
     return (
@@ -285,9 +308,20 @@ class Status extends React.Component {
         <hr />
         <div className="row" style={{ display: "flex", marginBottom: 3}}>
           <div className="col-8">
-            <h5 style={{color: "#404043", fontSize: 18}}>
-              {label}: <pre>{value}</pre>{" "}
-            </h5>
+            {image && <img
+                style={{ height: 24}}
+                alt=""
+                src={image}
+                className="mr-3"
+                />}
+                  <h5 style={{
+                    display: "inline-block",
+                    color: "#404043", 
+                    fontSize: opacity ? 16 : 18, 
+                    opacity: opacity ? 0.75 : 1, 
+                    fontFamily: "'Source Sans Pro', sans-serif"}}>
+                    {label}: <pre>{value}</pre>{" "}
+                  </h5>
           </div>
           <div className="col" style={{ marginTop: -3 }} id={tooltipId}>
             <StatusBadge error={error} status={success ? label == "Initial setup" ? "success" : "configured" : error ? "danger" : "warning"} />
