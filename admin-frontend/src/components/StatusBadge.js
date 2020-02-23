@@ -8,7 +8,7 @@ export default function StatusBadge(props) {
 
     if(props.status == "success") {
         return (
-            <div style={{color: "#09C199", fontsize: 14}}>
+            <div style={{color: "#09C199", fontSize: 14}}>
                 <img
                 style={{ height: 18}}
                 alt="DONE"
@@ -19,7 +19,7 @@ export default function StatusBadge(props) {
         )
     } else if(props.status == "warning") {
         return (
-            <div style={{color: "#F7981C", fontsize: 14}}>
+            <div style={{color: "#F7981C", fontSize: 14}}>
                 <img
                 style={{ height: 18}}
                 alt="NOT CONFIGURED"
@@ -30,7 +30,7 @@ export default function StatusBadge(props) {
         )
     } else if(props.status == "configured") {
         return(
-        <div style={{color: "#1991EB", fontsize: 14}}>
+        <div style={{color: "#1991EB", fontSize: 14}}>
                 <img
                 style={{ height: 18}}
                 alt="CONFIGURED"
@@ -42,7 +42,7 @@ export default function StatusBadge(props) {
         )
     }
     return (
-        <div style={{color: "#F85359", fontsize: 14}}>
+        <div style={{color: "#F85359", fontSize: 14}}>
                 <img
                 style={{ height: 18}}
                 alt="ERROR"
