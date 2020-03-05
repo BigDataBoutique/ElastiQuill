@@ -116,16 +116,17 @@ class StatsOverTimeGraph extends React.Component {
       });
     };
 
-    const xyPlotOptions = {
-      yDomain: visitsData.length + viewsData.length ? undefined : [0, 10],
-    };
+    let yDomainEnd = 0;
+    [visitsData, viewsData, postsData].forEach(data => {
+      yDomainEnd = this._getMaxValue(data, yDomainEnd);
+    });
 
     return (
       <FlexibleXYPlot
-        {...xyPlotOptions}
         xType="time"
         yBaseValue={0}
         xDomain={[xDomainStart, xDomainEnd]}
+        yDomain={[0, yDomainEnd || 10]}
         height={300}
         onMouseLeave={() => this.setState({ crosshairValues: null })}
       >
@@ -296,6 +297,12 @@ class StatsOverTimeGraph extends React.Component {
       name = "1M";
     }
     return { name, interval };
+  }
+
+  _getMaxValue(data, max) {
+    const newMax = data.reduce((acc, row) => Math.max(acc, row.y), max);
+
+    return newMax;
   }
 
   async _loadStats() {
