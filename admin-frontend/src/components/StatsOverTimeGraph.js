@@ -160,6 +160,8 @@ class StatsOverTimeGraph extends React.Component {
         {!this.props.item && (
           <MarkSeries
             color={POSTS_COLOR}
+            // we set every post data point on 0 because we only want this series
+            // to mark days where new posts are published, actual post counts should be shown on tooltips
             data={postsData.map(item => ({ ...item, y: 0 }))}
           />
         )}
@@ -253,7 +255,7 @@ class StatsOverTimeGraph extends React.Component {
     }
     data = _.sortBy(data, "x");
 
-    if (data.length) {
+    if (data.length && zeroData) {
       const { interval } = this._getInterval();
       const zeroItem = {
         x: new Date(_.first(data).x.getTime() - interval),
