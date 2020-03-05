@@ -84,7 +84,12 @@ router.post(
     const imgUrl = post.metadata && post.metadata.header_image_url;
     const link = config.blog.url + preparePost(post).url;
     try {
-      const resp = await social.postToTwitter(`${post.title} ${link}`, imgUrl);
+      const resp = await social.postToTwitter(
+        post.title,
+        link,
+        imgUrl,
+        post.tags
+      );
       res.json({
         url: resp.url,
       });
