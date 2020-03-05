@@ -142,7 +142,7 @@ export async function postToLinkedin(
   return { url: null };
 }
 
-export function postToTwitter(text, imageUrl) {
+export function postToTwitter(title, url, imageUrl, tags) {
   const twitterClient = new Twitter({
     consumer_key: config.credentials.twitter["consumer-key"],
     consumer_secret: config.credentials.twitter["consumer-secret"],
@@ -162,10 +162,17 @@ export function postToTwitter(text, imageUrl) {
       }
     }
 
+    let status = `${title} ${url}`;
+    if (tags && tags.length) {
+      status += ` ${tags
+        .map(s => "#" + s.replace(/\s/g, "").toLowerCase())
+        .join(" ")}`;
+    }
+
     twitterClient.post(
       "statuses/update",
       {
-        status: text,
+        status,
         media_ids: mediaId,
       },
       (errors, tweet) => {
