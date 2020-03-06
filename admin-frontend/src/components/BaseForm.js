@@ -77,7 +77,7 @@ class BaseForm extends Component {
             {this._renderSimpleInput({
               prop: "title",
               placeholder: "Title",
-              style: { border: "0px", fontSize: "30px" },
+              style: { border: "0px", fontSize: "2.5rem", fontWeight: 500 },
             })}
           </div>
         </div>
