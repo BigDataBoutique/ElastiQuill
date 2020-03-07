@@ -132,7 +132,7 @@ class LoggedInLayout extends Component {
           <a href="https://github.com/BigDataBoutique/ElastiQuill">
             ElastiQuill
           </a>
-          , Copyright © 2019{" "}
+          , Copyright © 2019-2020{" "}
           <a href="https://bigdataboutique.com">BigData Boutique</a>
         </footer>
       </Layout>
