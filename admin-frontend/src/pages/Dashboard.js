@@ -20,7 +20,7 @@ class Dashboard extends React.Component {
 
   render() {
     return (
-      <LoggedInLayout>
+      <LoggedInLayout pageTitle="Dashboard">
         <div className="elastiquill-content">{this._renderContent()}</div>
       </LoggedInLayout>
     );

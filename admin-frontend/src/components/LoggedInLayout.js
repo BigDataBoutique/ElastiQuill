@@ -3,6 +3,7 @@ import { Collapse, Navbar, NavbarToggler, Nav, NavItem } from "reactstrap";
 import { Link, Redirect, withRouter } from "react-router-dom";
 import { inject, observer } from "mobx-react/index";
 import classnames from "classnames";
+import { Helmet } from "react-helmet";
 
 import FAIcon from "./FAIcon";
 import NavLink from "./NavLink";
@@ -43,6 +44,9 @@ class LoggedInLayout extends Component {
 
     return (
       <Layout>
+        <Helmet>
+          <title>{this.props.pageTitle}</title>
+        </Helmet>
         <div className="elastiquill-navbar">
           <div
             className="container"
@@ -186,5 +190,9 @@ class LoggedInLayout extends Component {
     appStore.logout();
   };
 }
+
+LoggedInLayout.defaultProps = {
+  pageTitle: "Admin Panel",
+};
 
 export default LoggedInLayout;
