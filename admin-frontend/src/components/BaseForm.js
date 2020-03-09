@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { toast } from "react-toastify";
 import classnames from "classnames";
 import ReactModal from "react-modal";
@@ -23,6 +23,7 @@ class BaseForm extends Component {
       strikethrough: true,
       tasklists: true,
     });
+    this.formRef = createRef();
   }
 
   render() {
@@ -174,6 +175,7 @@ class BaseForm extends Component {
   _renderFileInput({ label, prop, disabled }) {
     const formRenderer = onSubmit => (
       <form
+        ref={this.formRef}
         className="_react_fileupload_form_content"
         method="post"
         onSubmit={onSubmit}
@@ -218,6 +220,7 @@ class BaseForm extends Component {
             key={value}
             disabled={disabled}
             formRenderer={formRenderer}
+            formGetter={() => new FormData(this.formRef.current)}
             beforeSend={beforeSend}
             url={api.uploadImageUrl()}
             method="POST"
