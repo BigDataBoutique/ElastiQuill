@@ -4,10 +4,20 @@
 
 body {
   background: #fbfbfb;
+  font-family: "Source Sans Pro", sans-serif;
 }
 
 .elastiquill-content {
   margin-bottom: 30px;
+}
+
+.elastiquill-logo-container {
+  display: flex;
+  align-items: flex-end;
+}
+
+.elastiquill-logo-container:hover {
+  text-decoration: none;
 }
 
 .elastiquill-logo {
@@ -15,61 +25,51 @@ body {
 }
 
 .elastiquill-admin-label {
-  margin-top: 7px;
-  margin-left: 8px;
-  width: 54px;
-  height: 24px;
-  font-family: "Nunito Sans";
-  font-size: 18px;
-  font-weight: normal;
+  margin: 0 0 1px 18px;
+  font-size: 16px;
+  font-weight: 600;
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
-  letter-spacing: normal;
+  letter-spacing: 0.8px;
   text-align: right;
-  color: #d9156d;
+  text-transform: uppercase;
+  color: #c31573;
 }
 
 .elastiquill-user-area {
-  margin-top: -10px;
-  flex: 1;
-  text-align: right;
+  margin-left: auto;
 }
 
 .elastiquill-user-area img {
-  width: 41px;
-  height: 41px;
+  width: 40px;
+  height: 40px;
 }
 
 .elastiquill-user-area-label {
   display: inline-block;
-
-  margin-left: 10px;
+  margin: 0 32px 0 16px;
   max-width: 180px;
-  height: 24px;
-  opacity: 0.62;
-  font-family: "Nunito Sans";
-  font-size: 18px;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 14px;
   font-weight: normal;
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
   text-align: right;
-  color: #1a1819;
+  color: #354052;
 }
 
 .elastiquill-navbar {
   background: white;
-  height: 99px;
-  border-bottom: 1px solid #e5e5e5;
+  height: 75px;
+  border-bottom: 1px solid #dfe3e9;
 }
 
 .elastiquill-nav-link-container {
   background: white;
-  min-height: 92px;
-  padding-top: 26px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #dfe3e9;
 }
 
 .elastiquill-nav-submenu {
@@ -87,8 +87,48 @@ body {
   margin-left: 5px;
 }
 
+.elastiquill-nav-item {
+  border-left: 1px solid #dfe3e9;
+}
+
+.elastiquill-nav-item:last-child {
+  border-right: 1px solid #dfe3e9;
+}
+
+.elastiquill-nav-item a {
+  display: block;
+  text-decoration: none;
+}
+
+.elastiquill-nav-item a:hover .elastiquill-nav-link-icon path,
+.elastiquill-nav-item a:focus .elastiquill-nav-link-icon path {
+  fill: #d9156d;
+}
+
+.elastiquill-nav-item a:hover .elastiquill-nav-link-label,
+.elastiquill-nav-item a:focus .elastiquill-nav-link-label {
+  color: #d9156d;
+}
+
 .elastiquill-nav-link {
-  margin-right: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 35px 0;
+}
+
+.elastiquill-nav-link.elastiquill-nav-link-active {
+  position: relative;
+}
+
+.elastiquill-nav-link.elastiquill-nav-link-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #ea1569;
 }
 
 .elastiquill-nav-link-icon {
@@ -106,30 +146,27 @@ body {
 }
 
 .elastiquill-nav-link-label {
-  margin-left: 20px;
-  width: 89px;
-  height: 24px;
-  font-family: "Nunito Sans";
-  font-size: 18px;
-  font-weight: normal;
+  margin-left: 16px;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
   text-align: right;
-  color: black;
+  color: #354052;
 }
 
 .elastiquill-nav-link-label.elastiquill-nav-link-label-active {
-  color: #d9156d;
+  color: #ea1569;
 }
 
 .elastiquill-header {
   margin-top: 17px;
   margin-bottom: 17px;
-
   height: 28px;
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 21px;
   font-weight: 600;
   font-style: normal;
@@ -141,7 +178,7 @@ body {
 
 .elastiquill-header-2 {
   height: 32px;
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 24px;
   font-weight: normal;
   font-style: normal;
@@ -152,7 +189,7 @@ body {
 }
 
 .elastiquill-text {
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
@@ -167,7 +204,7 @@ body {
   border-radius: 6px;
   border: none;
   background-image: radial-gradient(circle at 0 0, #e32dab, #c31473);
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 14px;
   font-weight: 600;
   font-style: normal;
@@ -187,7 +224,7 @@ body {
 
 .elastiquill-card h1 {
   height: 57px;
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 42px;
   font-weight: normal;
   font-style: normal;
@@ -200,7 +237,7 @@ body {
 .elastiquill-card h2 {
   margin-bottom: 15px;
   height: 24px;
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 17px;
   font-weight: normal;
   font-style: normal;
@@ -218,7 +255,7 @@ body {
   height: 24px;
   border-radius: 10px;
   background-color: rgba(218, 21, 109, 0.04);
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 14px;
   font-weight: normal;
   font-style: normal;
@@ -234,7 +271,7 @@ body {
   margin-right: 12px;
   padding: 0px 7px;
   height: 24px;
-  font-family: "Nunito Sans";
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 14px;
   font-style: normal;
   font-stretch: normal;
@@ -350,9 +387,23 @@ blockquote em {
   font-style: italic;
 }
 
-@media screen and (max-width: 992px) {
+@media screen and (max-width: 991px) {
+  .elastiquill-user-area-label {
+    margin-right: 0;
+  }
+
+  .navbar-toggler {
+    margin: 5px 0;
+  }
+
+  .elastiquill-nav-item {
+    border-right: 1px solid #dfe3e9;
+    border-top: 1px solid #dfe3e9;
+  }
+
   .elastiquill-nav-link {
-    margin: 10px;
+    justify-content: flex-start;
+    padding: 10px 20px;
   }
 
   .elastiquill-nav-submenu-extra {

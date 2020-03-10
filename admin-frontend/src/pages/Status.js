@@ -381,10 +381,10 @@ class Status extends React.Component {
                   margin: 0,
                 }}
               >
-                {label}: <pre>{value}</pre>{" "}
+                {label}: {value}
               </h5>
             </div>
-            <div className="col" style={{ marginTop: -3 }} id={tooltipId}>
+            <div className="col" id={tooltipId}>
               <StatusBadge status={statusType} error={error} />
             </div>
             {successTooltip && (

@@ -10,6 +10,11 @@ import { Layout } from "./Layout";
 import SetupWarning from "./SetupWarning";
 import urls from "../config/urls";
 import logo from "../assets/img/logo.png";
+import dashboardIcon from "../assets/img/dashboard.svg";
+import postsIcon from "../assets/img/posts.svg";
+import contentPagesIcon from "../assets/img/content-pages.svg";
+import backupIcon from "../assets/img/backup.svg";
+import statusIcon from "../assets/img/status.svg";
 
 @inject("appStore")
 @withRouter
@@ -44,11 +49,8 @@ class LoggedInLayout extends Component {
     return (
       <Layout>
         <div className="elastiquill-navbar">
-          <div
-            className="container"
-            style={{ display: "flex", flexFlow: "row", paddingTop: "35px" }}
-          >
-            <Link to="/">
+          <div className="container h-100 d-flex align-items-center">
+            <Link to="/" className="elastiquill-logo-container">
               <img className="elastiquill-logo" src={logo} />
               <span className="elastiquill-admin-label">Admin</span>
             </Link>
@@ -59,8 +61,7 @@ class LoggedInLayout extends Component {
                 })}
               >
                 <button
-                  style={{ padding: "0px" }}
-                  className="btn btn-link active"
+                  className="btn btn-link active p-0 d-flex align-items-center"
                   onClick={this.handleUserMenuToggle}
                 >
                   <img
@@ -102,7 +103,7 @@ class LoggedInLayout extends Component {
         </div>
         <div className="elastiquill-nav-link-container">
           <div className="container">
-            <Navbar light expand="lg">
+            <Navbar light expand="lg" className="p-0">
               <NavbarToggler
                 onClick={() =>
                   this.setState({ navbarOpen: !this.state.navbarOpen })
@@ -141,14 +142,19 @@ class LoggedInLayout extends Component {
 
   _renderNavbar() {
     const items = [
-      { label: "Dashboard", url: urls.dashboard, icon: "tachometer-alt" },
-      { label: "Posts", url: urls.posts, icon: "pencil-alt" },
-      { label: "Content Pages", url: urls.pages, icon: "file" },
-      { label: "Backup", url: urls.backup, icon: "archive", roles: ["admin"] },
+      { label: "Dashboard", url: urls.dashboard, image: dashboardIcon },
+      { label: "Posts", url: urls.posts, image: postsIcon },
+      { label: "Content Pages", url: urls.pages, image: contentPagesIcon },
+      {
+        label: "Backup",
+        url: urls.backup,
+        image: backupIcon,
+        roles: ["admin"],
+      },
       {
         label: "Status",
         url: urls.status,
-        icon: "notes-medical",
+        image: statusIcon,
         roles: ["admin"],
       },
     ].filter(it => {
@@ -159,9 +165,9 @@ class LoggedInLayout extends Component {
     });
 
     return (
-      <Nav navbar>
+      <Nav navbar className="w-100 p-0">
         {items.map((item, i) => (
-          <NavItem key={i}>
+          <NavItem key={i} className="w-100 elastiquill-nav-item">
             <NavLink {...item} />
           </NavItem>
         ))}
