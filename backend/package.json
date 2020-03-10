@@ -27,7 +27,7 @@
     "bluebird": "3.5.5",
     "compression": "^1.7.4",
     "cookie-parser": "~1.4.4",
-    "crawler-user-agents": "^1.0.19",
+    "crawler-user-agents": "^1.0.78",
     "debug": "4.1.1",
     "dotenv": "^8.0.0",
     "elasticsearch": "^16.3.0",
