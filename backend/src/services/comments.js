@@ -92,20 +92,21 @@ export async function createComment(comment) {
 export async function getComments({ postIds, disableFiltering }) {
   let query = { match_all: {} };
   if (postIds || !disableFiltering) {
-    const filters = [];
+    const filters = [
+      {
+        bool: {
+          must_not: {
+            term: { spam: true },
+          },
+        },
+      },
+    ];
 
     if (postIds) {
       filters.push({ terms: { post_id: postIds } });
     }
     if (!disableFiltering) {
       filters.push({ term: { approved: true } });
-      filters.push({
-        bool: {
-          must_not: {
-            term: { spam: true },
-          },
-        },
-      });
     }
 
     query = { bool: { filter: filters } };
@@ -223,11 +224,15 @@ export async function deleteComment(path) {
 }
 
 export async function getStats({ startDate, postId, interval = "1d" }) {
-  let query = {
-    match_all: {},
-  };
-
-  const filters = [];
+  const filters = [
+    {
+      bool: {
+        must_not: {
+          term: { spam: true },
+        },
+      },
+    },
+  ];
 
   if (postId) {
     filters.push({
@@ -247,13 +252,11 @@ export async function getStats({ startDate, postId, interval = "1d" }) {
     });
   }
 
-  if (filters.length) {
-    query = {
-      bool: {
-        filter: filters,
-      },
-    };
-  }
+  const query = {
+    bool: {
+      filter: filters,
+    },
+  };
 
   const countResp = await esClient.count({
     index: ES_INDEX,
