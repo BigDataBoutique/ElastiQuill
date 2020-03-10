@@ -1,55 +1,83 @@
-import React from "react"
-import done from "./../assets/img/done.svg"
-import not from "./../assets/img/not.svg"
-import error from "./../assets/img/error.svg"
-import configured from "./../assets/img/configured.svg"
+import React from "react";
+import done from "./../assets/img/done.svg";
+import not from "./../assets/img/not.svg";
+import error from "./../assets/img/error.svg";
+import configured from "./../assets/img/configured.svg";
 
-export default function StatusBadge(props) {
+export const statusBadgeType = {
+  done: "DONE",
+  configured: "CONFIGURED",
+  unconfigured: "NOT CONFIGURED",
+  error: "ERROR",
+};
 
-    if(props.status == "success") {
-        return (
-            <div style={{color: "#09C199", fontSize: 14}}>
-                <img
-                style={{ height: 18}}
-                alt="DONE"
-                src={done}
-                />{" "}
-                DONE
-            </div>
-        )
-    } else if(props.status == "warning") {
-        return (
-            <div style={{color: "#F7981C", fontSize: 14}}>
-                <img
-                style={{ height: 18}}
-                alt="NOT CONFIGURED"
-                src={not}
-                />{" "}
-                NOT CONFIGURED
-            </div>
-        )
-    } else if(props.status == "configured") {
-        return(
-        <div style={{color: "#1991EB", fontSize: 14}}>
-                <img
-                style={{ height: 18}}
-                alt="CONFIGURED"
-                src={configured}
-                />{" "}
-                CONFIGURED
-            </div>
-
-        )
-    }
+function StatusBadge(props) {
+  if (props.status === statusBadgeType.done) {
     return (
-        <div style={{color: "#F85359", fontSize: 14}}>
-                <img
-                style={{ height: 18}}
-                alt="ERROR"
-                src={error}
-                />{" "}
-                {props.error ? props.error : "ERROR"}
-            </div>
-    )
-
+      <div
+        className="d-flex align-items-center"
+        style={{
+          color: "#09C199",
+          fontSize: 14,
+        }}
+      >
+        <img style={{ height: 18 }} className="mr-2" alt="DONE" src={done} />
+        <span style={{ fontWeight: 600 }}>DONE</span>
+      </div>
+    );
+  } else if (props.status === statusBadgeType.unconfigured) {
+    return (
+      <div
+        className="d-flex align-items-center"
+        style={{
+          color: "#F7981C",
+          fontSize: 14,
+        }}
+      >
+        <img
+          style={{ height: 18 }}
+          className="mr-2"
+          alt="NOT CONFIGURED"
+          src={not}
+        />
+        <span style={{ fontWeight: 600 }}>NOT CONFIGURED</span>
+      </div>
+    );
+  } else if (props.status === statusBadgeType.configured) {
+    return (
+      <div
+        className="d-flex align-items-center"
+        style={{
+          color: "#1991EB",
+          fontSize: 14,
+        }}
+      >
+        <img
+          style={{ height: 18 }}
+          className="mr-2"
+          alt="CONFIGURED"
+          src={configured}
+        />
+        <span style={{ fontWeight: 600 }}>CONFIGURED</span>
+      </div>
+    );
+  }
+  return (
+    <div
+      className="d-flex align-items-center"
+      style={{
+        color: "#F85359",
+        fontSize: 14,
+      }}
+    >
+      <img style={{ height: 18 }} className="mr-2" alt="ERROR" src={error} />
+      <span style={{ fontWeight: 600 }}>
+        ERROR
+        <br />
+        {props.error}
+      </span>
+    </div>
+  );
 }
+
+export default StatusBadge;
