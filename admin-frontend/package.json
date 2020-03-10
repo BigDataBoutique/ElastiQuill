@@ -58,7 +58,7 @@
     "showdown": "^1.9.1",
     "snyk": "^1.290.1",
     "turndown": "^5.0.3",
-    "typeface-nunito-sans": "0.0.72",
+    "typeface-source-sans-pro": "^1.1.5",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

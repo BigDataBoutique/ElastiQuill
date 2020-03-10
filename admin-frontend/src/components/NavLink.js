@@ -21,7 +21,11 @@ class NavLink extends Component {
 
           return (
             <Link to={this.props.url}>
-              <div className="elastiquill-nav-link">
+              <div
+                className={classnames("elastiquill-nav-link", {
+                  "elastiquill-nav-link-active": isActive,
+                })}
+              >
                 {this._renderIcon(isActive)}
                 <span
                   className={classnames("elastiquill-nav-link-label", {
