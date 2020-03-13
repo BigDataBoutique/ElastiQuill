@@ -1,5 +1,15 @@
 import React, { Component } from "react";
-import { Collapse, Navbar, NavbarToggler, Nav, NavItem } from "reactstrap";
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  Nav,
+  NavItem,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from "reactstrap";
 import { Link, Redirect, withRouter } from "react-router-dom";
 import { inject, observer } from "mobx-react/index";
 import classnames from "classnames";
@@ -59,49 +69,44 @@ class LoggedInLayout extends Component {
               <span className="elastiquill-admin-label">Admin</span>
             </Link>
             <div className="elastiquill-user-area">
-              <div
-                className={classnames("dropdown float-right", {
-                  show: this.state.userMenuOpen,
-                })}
+              <Dropdown
+                isOpen={this.state.userMenuOpen}
+                toggle={this.handleUserMenuToggle}
               >
-                <button
-                  className="btn btn-link active p-0 d-flex align-items-center"
-                  onClick={this.handleUserMenuToggle}
+                <DropdownToggle
+                  caret={false}
+                  className="elastiquill-user-area-toggle"
+                  color="link"
                 >
                   <img
                     className="rounded-circle"
                     src={this.props.appStore.user.avatarUrl}
                     alt="User Avatar"
                   />
-
                   <div className="elastiquill-user-area-label">
                     {this.props.appStore.user.name}
                   </div>
-                </button>
-                <div
-                  className={classnames("dropdown-menu", {
-                    show: this.state.userMenuOpen,
-                  })}
-                >
-                  {this.props.appStore.user.company && (
-                    <strong className="nav-link">
-                      {this.props.appStore.user.company}
-                    </strong>
-                  )}
-                  {this.props.appStore.user.authorizedBy && (
-                    <span className="nav-link">
-                      {this.props.appStore.user.authorizedBy}{" "}
-                    </span>
-                  )}
-                  <button
-                    className="btn btn-link nav-link"
+                </DropdownToggle>
+                <DropdownMenu right>
+                  <DropdownItem header>
+                    {this.props.appStore.user.company && (
+                      <strong className="mr-1">
+                        {this.props.appStore.user.company}
+                      </strong>
+                    )}
+                    {this.props.appStore.user.authorizedBy && (
+                      <span>{this.props.appStore.user.authorizedBy} </span>
+                    )}
+                  </DropdownItem>
+                  <DropdownItem
                     onClick={this.handleLogoutClick}
+                    className="elastiquill-user-area-logout"
                   >
-                    <FAIcon icon="power-off" />
+                    <FAIcon className="mr-2" icon="power-off" />
                     Logout
-                  </button>
-                </div>
-              </div>
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </div>
           </div>
         </div>

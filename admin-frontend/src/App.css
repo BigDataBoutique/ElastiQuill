@@ -46,6 +46,10 @@ body {
   height: 40px;
 }
 
+.elastiquill-user-area-toggle:focus {
+  outline: #007bff auto 1px;
+}
+
 .elastiquill-user-area-label {
   display: inline-block;
   margin: 0 32px 0 16px;
@@ -59,6 +63,16 @@ body {
   letter-spacing: normal;
   text-align: right;
   color: #354052;
+  vertical-align: middle;
+}
+
+.elastiquill-user-area-logout {
+  display: flex;
+  align-items: center;
+}
+
+.elastiquill-user-area-logout i {
+  font-size: 13px;
 }
 
 .elastiquill-navbar {

@@ -30,7 +30,7 @@ class StatsOverTimeGraph extends React.Component {
       visitsHistogram: null,
       commentsHistogram: null,
       postsHistogram: null,
-      hoveredValue: null,
+      crosshair: null,
     };
   }
 
@@ -98,11 +98,17 @@ class StatsOverTimeGraph extends React.Component {
     const visitsData = this._prepareHistogram(visitsHistogram, dummyData);
     const viewsData = this._prepareHistogram(viewsHistogram, dummyData);
     const commentsData = this._prepareHistogram(commentsHistogram);
-    const postsData = this._prepareHistogram(postsHistogram);
+    const postsData = this._prepareHistogram(
+      postsHistogram && postsHistogram.filter(item => item.doc_count)
+    );
 
     const { interval } = this._getInterval();
 
     const onNearestX = (value, { index }) => {
+      if (this.state.crosshair && this.state.crosshair.index === index) {
+        return;
+      }
+
       const values = [];
 
       values.push(dummyData[index]);
@@ -112,7 +118,10 @@ class StatsOverTimeGraph extends React.Component {
       values.push(_.find(postsData, ["x", value.x]) || { y: 0 });
 
       this.setState({
-        crosshairValues: values,
+        crosshair: {
+          index,
+          values,
+        },
       });
     };
 
@@ -128,7 +137,7 @@ class StatsOverTimeGraph extends React.Component {
         xDomain={[xDomainStart, xDomainEnd]}
         yDomain={[0, yDomainEnd || 10]}
         height={300}
-        onMouseLeave={() => this.setState({ crosshairValues: null })}
+        onMouseLeave={() => this.setState({ crosshair: null })}
       >
         <VerticalGridLines />
         <HorizontalGridLines />
@@ -171,10 +180,10 @@ class StatsOverTimeGraph extends React.Component {
   }
 
   _renderCrosshair() {
-    const { crosshairValues } = this.state;
-    if (!crosshairValues) {
+    if (!this.state.crosshair) {
       return false;
     }
+    const crosshairValues = this.state.crosshair.values;
 
     return (
       <Crosshair values={crosshairValues}>

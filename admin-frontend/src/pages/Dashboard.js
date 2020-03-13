@@ -78,6 +78,7 @@ class Dashboard extends React.Component {
 
     const mostViewedCard =
       mostViewedPost &&
+      mostViewedPost.title &&
       this._renderCard(
         <React.Fragment>
           <h4 style={{ flex: 1 }}>
@@ -126,7 +127,6 @@ class Dashboard extends React.Component {
           )}
           {mostBusyDayEverCard}
           {mostViewedCard}
-          <div className="col-lg-2" />
         </div>
 
         <div className="row" style={{ marginBottom: "41px" }}>
@@ -331,11 +331,18 @@ class Dashboard extends React.Component {
   _renderCard(contents) {
     const minHeight = 120;
     return (
-      <div
-        style={{ display: "flex", flexFlow: "column", minHeight }}
-        className="col-lg-2 mr-lg-4 elastiquill-card"
-      >
-        {contents}
+      <div className="col-lg align-items-stretch">
+        <div
+          className="elastiquill-card"
+          style={{
+            display: "flex",
+            flexFlow: "column",
+            height: "100%",
+            minHeight,
+          }}
+        >
+          {contents}
+        </div>
       </div>
     );
   }
