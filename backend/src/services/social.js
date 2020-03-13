@@ -26,17 +26,31 @@ export function getAvailability(connected = {}) {
       !!_.get(config, "credentials.twitter.access-token-key"),
       !!_.get(config, "credentials.twitter.access-token-secret"),
     ]),
+    facebook: !!_.get(config, "credentials.facebook.app-id"),
   };
 
   for (const key in res) {
     if (res[key]) {
-      if (connected[key] || ["twitter", "hacker-news"].indexOf(key) > -1) {
-        res[key] = "ready";
+      if (
+        connected[key] ||
+        ["twitter", "hacker-news", "facebook"].indexOf(key) > -1
+      ) {
+        res[key] = {
+          status: "ready",
+        };
       } else {
-        res[key] = "not_connected";
+        res[key] = {
+          status: "not_connected",
+        };
+      }
+      if (key === "facebook") {
+        res[key].appId = _.get(config, "credentials.facebook.app-id");
+        res[key].blogUrl = config.blog.url;
       }
     } else {
-      res[key] = "not_configured";
+      res[key] = {
+        status: "not_configured",
+      };
     }
   }
 

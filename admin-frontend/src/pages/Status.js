@@ -209,6 +209,11 @@ class Status extends React.Component {
             success: social.medium !== "not_configured",
             image: medium,
           })}
+          {this._renderLabel({
+            label: "Facebook",
+            success: social.facebook !== "not_configured",
+            image: medium,
+          })}
           <hr className="m-0" />
         </div>
       </div>
