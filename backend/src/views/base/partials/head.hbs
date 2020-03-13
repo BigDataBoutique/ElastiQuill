@@ -23,6 +23,11 @@
 {{#unless isLocalhost}}
     <meta http-equiv="Content-Security-Policy" content="default-src https: 'unsafe-inline'">
 {{/unless}}
+{{#each og}}
+    {{#if this.content}}
+        <meta property="{{this.property}}" content="{{this.content}}" />
+    {{/if}}
+{{/each}}
 
 <link rel="shortcut icon" href="/static/base/favicon/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/static/base/favicon/apple-touch-icon.png">
