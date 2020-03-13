@@ -13,6 +13,7 @@ import FAIcon from "../components/FAIcon";
 import ImportPostModal from "../components/ImportPostModal";
 import RedditShareDialog from "../components/RedditShareDialog";
 import ConfirmSocialDialog from "../components/ConfirmSocialDialog";
+import FacebookShareButton from "../components/FacebookShareButton";
 import BaseItemsPage from "./BaseItemsPage";
 import * as api from "../api";
 
@@ -130,7 +131,7 @@ class Posts extends BaseItemsPage {
     }
 
     const allNotConfigured = _.every(
-      _.values(socialAvailability),
+      _.values(socialAvailability).map(i => i.status),
       val => val === "not_configured"
     );
     if (allNotConfigured) {
@@ -165,6 +166,7 @@ class Posts extends BaseItemsPage {
           {this._renderDropdownItem(item, "Medium", "medium")}
           {this._renderDropdownItem(item, "Reddit", "reddit")}
           {this._renderDropdownItem(item, "Hacker News", "hacker-news")}
+          {this._renderDropdownItem(item, "Facebook", "facebook")}
         </DropdownMenu>
       </UncontrolledButtonDropdown>
     );
@@ -172,13 +174,15 @@ class Posts extends BaseItemsPage {
 
   _renderDropdownItem(item, title, key) {
     const { socialAvailability } = this.props.postsStore;
-    if (socialAvailability[key] === "not_configured") {
+    if (socialAvailability[key].status === "not_configured") {
       return false;
     }
 
     if (key === "medium" && _.get(item, "metadata.medium_crosspost_url")) {
       return (
-        <DropdownItem disabled={socialAvailability[key] === "not_configured"}>
+        <DropdownItem
+          disabled={socialAvailability[key].status === "not_configured"}
+        >
           <a
             href={_.get(item, "metadata.medium_crosspost_url")}
             target="_blank"
@@ -189,10 +193,23 @@ class Posts extends BaseItemsPage {
           </a>
         </DropdownItem>
       );
+    } else if (key === "facebook") {
+      return socialAvailability[key].appId ? (
+        <FacebookShareButton
+          appId={socialAvailability[key].appId}
+          url={socialAvailability[key].blogUrl + item.url}
+          as={DropdownItem}
+          quote={item.title}
+          hashtag={item.tags && item.tags.length ? `#${item.tags[0]}` : ""}
+        >
+          <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />
+          {title}
+        </FacebookShareButton>
+      ) : null;
     }
 
     const onClick = () => {
-      if (socialAvailability[key] === "ready") {
+      if (socialAvailability[key].status === "ready") {
         this.props.postsStore.setSocialDialog(key, item);
       } else {
         api.redirectToSocialConnect(key);
@@ -201,7 +218,7 @@ class Posts extends BaseItemsPage {
 
     return (
       <DropdownItem
-        disabled={socialAvailability[key] === "not_configured"}
+        disabled={socialAvailability[key].status === "not_configured"}
         onClick={onClick}
       >
         <i className={`fab fa-${key}`} style={{ marginRight: 10 }} />

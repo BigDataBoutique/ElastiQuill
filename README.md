@@ -101,6 +101,11 @@ You can connect your Linkedin, Twitter and Reddit accounts to Elastiquill to rep
 * Set callback URL to `http://localhost:5000/api/connect/medium/callback`. Change `http://localhost:5000` to your `blog.url` configuration.
 * Copy Client ID and Client Secret and add them to your `config.yml` file.
 
+### Facebook
+* Go to https://developers.facebook.com/apps and create a new app.
+* Under basic settings, add your `blog.url` configuration to `App Domains` input.
+* Copy App ID and add them to your `config.yml` file.
+
 ## Configuration
 
 All values in `config.yml` file can be overrided by ENV variables when they are set.  
@@ -154,7 +159,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | credentials.reddit.client-secret | Reddit Client Secret | `REDDIT_CLIENT_SECRET` ||
 | credentials.medium.client-id | Medium Client ID | `MEDIUM_CLIENT_ID` ||
 | credentials.medium.client-secret | Medium Client Secret | `MEDIUM_CLIENT_SECRET` ||
-| credentials.facebook.app-id | Facebook App ID. Used to enable sharing selected text to Facebook. | `FACEBOOK_APP_ID` ||
+| credentials.facebook.app-id | Facebook App ID. Used to enable sharing selected text and post to facebook. | `FACEBOOK_APP_ID` ||
 
 ## Running locally
 
