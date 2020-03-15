@@ -142,6 +142,32 @@ router.get(
         description: post.description,
         metaKeywords: postMetaKeywords(preparedPost),
         post: preparedPost,
+        og: [
+          {
+            property: "og:title",
+            content: post.title,
+          },
+          {
+            property: "og:description",
+            content: post.description,
+          },
+          {
+            property: "og:url",
+            content: canonicalUrl,
+          },
+          {
+            property: "og:image",
+            content: post.metadata.header_image_url,
+          },
+          {
+            property: "og:type",
+            content: "article",
+          },
+          {
+            property: "article:author",
+            content: post.author.name,
+          },
+        ],
       });
     })
   )
