@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React, { Component } from "react";
-import CreatableReactSelect from "react-select/lib/Creatable";
+import CreatableReactSelect from "react-select/creatable";
 
 import * as api from "../api";
 
