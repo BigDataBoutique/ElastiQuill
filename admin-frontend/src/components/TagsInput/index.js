@@ -25,8 +25,25 @@ class TagsInputContainer extends Component {
       name: tag,
     }));
 
-    const handleAddition = tag => {
-      this.props.onChange(value.concat(tag.name));
+    const handleAddition = tags => {
+      let newTags = [];
+      tags.name.split(",").forEach(tag => {
+        const newTag = tag.trim();
+        if (!newTag) {
+          return;
+        }
+        const savedTag = this.state.tags.find(
+          t => t.toUpperCase() === newTag.toUpperCase()
+        );
+        if (savedTag) {
+          newTags.push(savedTag);
+        } else {
+          newTags.push(newTag);
+        }
+      });
+      newTags = value.concat(newTags).filter(x => x.length);
+      newTags = _.uniq(newTags);
+      this.props.onChange(newTags);
     };
 
     const handleDelete = index => {
@@ -44,7 +61,6 @@ class TagsInputContainer extends Component {
         handleDelete={handleDelete}
         handleAddition={handleAddition}
         value={this.props.value}
-        onChange={this.props.onChange}
       />
     );
   }
