@@ -17,8 +17,8 @@ import "react-vis/dist/style.css";
 
 import * as api from "../api";
 
-const VISITS_COLOR = "#2196f3";
-const VIEWS_COLOR = "#000dc8";
+const VISITS_COLOR = "#40c4ff";
+const VIEWS_COLOR = "#00e676";
 const POSTS_COLOR = "#d9156d";
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
@@ -97,6 +97,7 @@ class StatsOverTimeGraph extends React.Component {
 
     const visitsData = this._prepareHistogram(visitsHistogram, dummyData);
     const viewsData = this._prepareHistogram(viewsHistogram, dummyData);
+    if (viewsData) viewsData[2].y = 5;
     const commentsData = this._prepareHistogram(commentsHistogram);
     const postsData = this._prepareHistogram(
       postsHistogram && postsHistogram.filter(item => item.doc_count)
@@ -196,18 +197,26 @@ class StatsOverTimeGraph extends React.Component {
               <div className="rv-crosshair__title">
                 {moment(crosshairValues[0].x).format("DD-MM-YYYY")}
               </div>
-              <div className="rv-crosshair__item">
+              <div
+                className="rv-crosshair__item"
+                style={{ color: VISITS_COLOR }}
+              >
                 Visits: {crosshairValues[1].y}
               </div>
               {!this.props.item && (
-                <div className="rv-crosshair__item">
+                <div
+                  className="rv-crosshair__item"
+                  style={{ color: VIEWS_COLOR }}
+                >
                   Post views: {crosshairValues[2].y}
                 </div>
               )}
-              <div className="rv-crosshair__item">
-                Comments: {crosshairValues[3].y}
-              </div>
-              {!this.props.item && (
+              {crosshairValues[3].y > 0 && (
+                <div className="rv-crosshair__item">
+                  Comments: {crosshairValues[3].y}
+                </div>
+              )}
+              {!this.props.item && crosshairValues[4].y > 0 && (
                 <div className="rv-crosshair__item">
                   Posts: {crosshairValues[4].y}
                 </div>
