@@ -3,10 +3,13 @@ import fs from "fs";
 import path from "path";
 import semver from "semver";
 import stringifyDeterministic from "json-stringify-deterministic";
+import sha256 from "js-sha256";
 
 import { esClient, config } from "../app";
+import * as loggingService from "../services/logging";
 
 const BLOG_INDEX = _.get(config, "elasticsearch.blog-index-name");
+export const BLOG_INDEX_ALIAS = BLOG_INDEX + "-active";
 const BLOG_COMMENTS_INDEX = _.get(
   config,
   "elasticsearch.blog-comments-index-name"
@@ -45,36 +48,42 @@ export async function getVersionString() {
 
 export async function setup() {
   const status = await getStatus();
-  const setupDir = process.env.SETUP_DIR || "./_setup";
   const esVersion = await getVersionString();
   const includeTypeName = semver.gte(esVersion, "7.0.0") ? true : undefined;
 
+  const blogIndexName = getBlogIndexName();
   if (!status.blogIndex) {
+    const parsed = readIndexFile("blog-index.json", { json: true });
+    parsed.aliases = {
+      [BLOG_INDEX_ALIAS]: {},
+    };
     await esClient.indices.create({
-      index: BLOG_INDEX,
-      body: fs
-        .readFileSync(path.join(setupDir, "blog-index.json"))
-        .toString("utf-8"),
+      index: blogIndexName,
+      body: JSON.stringify(parsed),
       includeTypeName,
     });
+  } else if (!status.blogIndexUpToDate) {
+    try {
+      await reindex(BLOG_INDEX_ALIAS, blogIndexName, "blog-index.json", {
+        includeTypeName,
+      });
+    } catch (err) {
+      loggingService.logError("elasticsearch setup", err);
+    }
   }
 
   if (!status.blogCommentsIndex) {
     await esClient.indices.create({
       index: BLOG_COMMENTS_INDEX,
-      body: fs
-        .readFileSync(path.join(setupDir, "blog-comments-index.json"))
-        .toString("utf-8"),
+      body: readIndexFile("blog-comments-index.json"),
       includeTypeName,
     });
   }
 
   if (!status.blogLogsIndexTemplate || !status.blogLogsIndexTemplateUpToDate) {
-    const parsed = JSON.parse(
-      fs
-        .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
-        .toString("utf-8")
-    );
+    const parsed = readIndexFile("blog-logs-index-template.json", {
+      json: true,
+    });
 
     try {
       const current = await esClient.indices.getTemplate({
@@ -108,9 +117,36 @@ export async function setup() {
 export async function getStatus() {
   const status = {};
 
-  status.blogIndex = await esClient.indices.exists({
-    index: BLOG_INDEX,
+  const blogIndexExist = await esClient.indices.existsAlias({
+    index: "*",
+    name: BLOG_INDEX_ALIAS,
   });
+  if (blogIndexExist) {
+    status.blogIndex = true;
+    // check whether blogs correctly pointing to the latest mapping
+    const blogIndexName = getBlogIndexName();
+    const blogIndexExistForLatestMapping = await esClient.indices.exists({
+      index: blogIndexName,
+    });
+    if (blogIndexExistForLatestMapping) {
+      // index for latest mapping exist,
+      // but this might be caused by hash collision,
+      // compare its mapping properties
+      const currentMapping = (
+        await esClient.indices.getMapping({
+          index: blogIndexName,
+        })
+      )[blogIndexName];
+      const latestMapping = readIndexFile("blog-index.json", { json: true });
+      delete latestMapping.settings;
+
+      status.blogIndexUpToDate = mappingsEqual(currentMapping, latestMapping);
+    } else {
+      status.blogIndexUpToDate = false;
+    }
+  } else {
+    status.blogIndex = false;
+  }
 
   status.blogCommentsIndex = await esClient.indices.exists({
     index: BLOG_COMMENTS_INDEX,
@@ -129,6 +165,7 @@ export async function getStatus() {
         .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
         .toString("utf-8")
     );
+    validateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
     status.blogLogsIndexTemplateUpToDate =
       mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
       validateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
@@ -209,4 +246,88 @@ function updateIndexPatterns(indexPatterns) {
   }
   patterns.sort();
   return patterns;
+}
+
+function readIndexFile(filename, opts = {}) {
+  const setupDir = process.env.SETUP_DIR || "./_setup";
+  const string = fs
+    .readFileSync(path.join(setupDir, filename))
+    .toString("utf-8");
+
+  if (opts.json) {
+    return JSON.parse(string);
+  }
+  return string;
+}
+
+function getMappingId(mappingString) {
+  return sha256(mappingString).substring(0, 8);
+}
+
+function getBlogIndexName() {
+  let blogIndexMapping = readIndexFile("blog-index.json", { json: true })
+    .mappings;
+  if (blogIndexMapping._doc) {
+    blogIndexMapping = blogIndexMapping._doc;
+  }
+  const blogIndexMappingId = getMappingId(JSON.stringify(blogIndexMapping));
+  return BLOG_INDEX + "-" + blogIndexMappingId;
+}
+
+async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
+  const tempIndexName = sourceIndex + "-temp";
+
+  await esClient.reindex({
+    refresh: true,
+    waitForCompletion: true,
+    body: {
+      source: {
+        index: sourceIndex,
+      },
+      dest: {
+        index: tempIndexName,
+      },
+    },
+  });
+
+  await esClient.indices.create({
+    index: targetIndex,
+    body: readIndexFile(filename),
+    includeTypeName: opts.includeTypeName,
+  });
+
+  await esClient.reindex({
+    refresh: true,
+    waitForCompletion: true,
+    body: {
+      conflicts: "proceed",
+      source: {
+        index: tempIndexName,
+      },
+      dest: {
+        index: targetIndex,
+      },
+    },
+  });
+
+  const deleteIndexes = async indexes => {
+    for (let index of indexes) {
+      await esClient.indices.delete({
+        index,
+      });
+    }
+  };
+  const oldIndex = Object.keys(
+    await esClient.indices.getAlias({
+      name: sourceIndex,
+    })
+  );
+  const indexes = [tempIndexName].concat(oldIndex);
+  await deleteIndexes(indexes);
+
+  await esClient.indices.updateAliases({
+    body: {
+      actions: [{ add: { index: targetIndex, alias: BLOG_INDEX_ALIAS } }],
+    },
+  });
 }

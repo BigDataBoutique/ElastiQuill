@@ -2,14 +2,14 @@ import _ from "lodash";
 import Joi from "joi";
 import uid from "uid";
 import slugify from "slugify";
-import { esClient, config } from "../app";
+import { esClient } from "../app";
 import * as events from "./events";
 import * as commentsService from "./comments";
+import { BLOG_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
 
 export const BLOGPOST_ID_PREFIX = "blogpost-";
 export const CONTENT_DESCRIPTION_ID_PREFIX = "content:description:";
 
-const ES_INDEX = config.elasticsearch["blog-index-name"];
 const SERIES_REGEXP_STR = "{.*}";
 const SLUG_MAX_LENGTH = 100;
 
@@ -450,10 +450,18 @@ export async function getItems({
       ],
       aggs: {
         tags: {
-          terms: { field: "tags", exclude: SERIES_REGEXP_STR, size: 50 },
+          terms: {
+            field: "tags",
+            exclude: SERIES_REGEXP_STR,
+            size: 50,
+          },
         },
         series: {
-          terms: { field: "tags", include: SERIES_REGEXP_STR, size: 50 },
+          terms: {
+            field: "tags",
+            include: SERIES_REGEXP_STR,
+            size: 50,
+          },
         },
       },
       highlight: {
@@ -598,10 +606,18 @@ export async function getAllTags() {
       },
       aggs: {
         tags: {
-          terms: { field: "tags", exclude: SERIES_REGEXP_STR, size: 50 },
+          terms: {
+            field: "tags",
+            exclude: SERIES_REGEXP_STR,
+            size: 50,
+          },
         },
         series: {
-          terms: { field: "tags", include: SERIES_REGEXP_STR, size: 50 },
+          terms: {
+            field: "tags",
+            include: SERIES_REGEXP_STR,
+            size: 50,
+          },
         },
       },
     },
