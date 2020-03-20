@@ -2,16 +2,6 @@
   "index_patterns": [],
   "settings": {
     "index": {
-      "analysis": {
-        "normalizer": {
-          "keyword_lowercase": {
-            "filter": [
-              "lowercase"
-            ],
-            "type": "custom"
-          }
-        }
-      },
       "number_of_shards": "1"
     }
   },
@@ -89,22 +79,22 @@
                 "user_agent": {
                   "type": "text"
                 },
-                "user_agent_parsed" : {
-                  "properties" : {
-                    "device" : {
-                      "properties" : {
-                        "name" : {
-                          "type" : "keyword"
+                "user_agent_parsed": {
+                  "properties": {
+                    "device": {
+                      "properties": {
+                        "name": {
+                          "type": "keyword"
                         }
                       }
                     },
-                    "name" : {
-                      "type" : "keyword"
+                    "name": {
+                      "type": "keyword"
                     },
-                    "os" : {
-                      "properties" : {
-                        "name" : {
-                          "type" : "keyword"
+                    "os": {
+                      "properties": {
+                        "name": {
+                          "type": "keyword"
                         }
                       }
                     }
@@ -199,7 +189,6 @@
           }
         },
         "tags": {
-          "normalizer": "keyword_lowercase",
           "type": "keyword"
         }
       }

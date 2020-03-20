@@ -129,14 +129,7 @@ class BaseForm extends Component {
   _renderTagsInput({ prop }) {
     const value = this._getValue(prop, []);
     const onChange = tags => {
-      let newTags = [];
-      tags.forEach(tag => {
-        newTags = newTags.concat(tag.split(","));
-      });
-      newTags = _.uniq(newTags)
-        .filter(x => x.length)
-        .map(x => x.trim());
-      this._setValue(prop, newTags);
+      this._setValue(prop, tags);
     };
 
     return (

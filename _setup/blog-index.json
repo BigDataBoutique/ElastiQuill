@@ -18,7 +18,7 @@
             }
           }
         },
-        "draft" : {
+        "draft": {
           "type": "object",
           "enabled": false
         },
@@ -46,8 +46,7 @@
           "doc_values": false
         },
         "tags": {
-          "type": "keyword",
-          "normalizer": "keyword_lowercase"
+          "type": "keyword"
         },
         "title": {
           "type": "text"
@@ -62,16 +61,6 @@
   "settings": {
     "index": {
       "number_of_shards": 1
-    },
-    "analysis": {
-      "normalizer": {
-        "keyword_lowercase": {
-          "type": "custom",
-          "filter": [
-            "lowercase"
-          ]
-        }
-      }
     }
   }
 }
