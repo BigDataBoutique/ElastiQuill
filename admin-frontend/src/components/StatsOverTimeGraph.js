@@ -97,7 +97,6 @@ class StatsOverTimeGraph extends React.Component {
 
     const visitsData = this._prepareHistogram(visitsHistogram, dummyData);
     const viewsData = this._prepareHistogram(viewsHistogram, dummyData);
-    if (viewsData) viewsData[2].y = 5;
     const commentsData = this._prepareHistogram(commentsHistogram);
     const postsData = this._prepareHistogram(
       postsHistogram && postsHistogram.filter(item => item.doc_count)
