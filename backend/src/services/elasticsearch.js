@@ -51,7 +51,7 @@ export async function setup() {
   const esVersion = await getVersionString();
   const includeTypeName = semver.gte(esVersion, "7.0.0") ? true : undefined;
 
-  const blogIndexName = getBlogIndexName();
+  const blogIndexName = getIndexName(BLOG_INDEX, "blog-index.json");
   if (!status.blogIndex) {
     const parsed = readIndexFile("blog-index.json", { json: true });
     parsed.aliases = {
@@ -124,7 +124,7 @@ export async function getStatus() {
   if (blogIndexExist) {
     status.blogIndex = true;
     // check whether blogs correctly pointing to the latest mapping
-    const blogIndexName = getBlogIndexName();
+    const blogIndexName = getIndexName(BLOG_INDEX, "blog-index.json");
     const blogIndexExistForLatestMapping = await esClient.indices.exists({
       index: blogIndexName,
     });
@@ -264,14 +264,13 @@ function getMappingId(mappingString) {
   return sha256(mappingString).substring(0, 8);
 }
 
-function getBlogIndexName() {
-  let blogIndexMapping = readIndexFile("blog-index.json", { json: true })
-    .mappings;
-  if (blogIndexMapping._doc) {
-    blogIndexMapping = blogIndexMapping._doc;
+function getIndexName(prefix, filename) {
+  let mapping = readIndexFile(filename, { json: true }).mappings;
+  if (mapping._doc) {
+    mapping = mapping._doc;
   }
-  const blogIndexMappingId = getMappingId(JSON.stringify(blogIndexMapping));
-  return BLOG_INDEX + "-" + blogIndexMappingId;
+  const mappingId = getMappingId(stringifyDeterministic(mapping));
+  return prefix + "-" + mappingId;
 }
 
 async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
@@ -310,8 +309,8 @@ async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
     },
   });
 
-  const deleteIndexes = async indexes => {
-    for (let index of indexes) {
+  const deleteIndices = async indices => {
+    for (let index of indices) {
       await esClient.indices.delete({
         index,
       });
@@ -322,8 +321,8 @@ async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
       name: sourceIndex,
     })
   );
-  const indexes = [tempIndexName].concat(oldIndex);
-  await deleteIndexes(indexes);
+  const indices = [tempIndexName].concat(oldIndex);
+  await deleteIndices(indices);
 
   await esClient.indices.updateAliases({
     body: {
