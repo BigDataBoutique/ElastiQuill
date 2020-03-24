@@ -13,8 +13,18 @@ const defaultFormValues = {
 class ContentPageForm extends BaseForm {
   constructor(props) {
     super(props);
+
+    let formValues;
+
+    if (props.isNew) {
+      formValues = _.cloneDeep(defaultFormValues);
+      formValues.metadata.content_type = props.contentType;
+    } else {
+      formValues = _.cloneDeep(props.item);
+    }
+
     this.state = {
-      formValues: _.cloneDeep(props.isNew ? defaultFormValues : props.item),
+      formValues,
     };
   }
 

@@ -20,6 +20,9 @@ require("./lib/jquery-sortable-min.js");
 require("./lib/linkify.min.js");
 require("./lib/linkify-jquery.min.js");
 window.MediumInsert = require("./lib/medium-editor-insert-plugin.min.js").MediumInsert;
+// Needed for simplemde
+require("./lib/inline-attachment.min.js");
+require("./lib/codemirror-4.inline-attachment.min.js");
 
 localforage.config({
   name: "ElasticBlogEngine",

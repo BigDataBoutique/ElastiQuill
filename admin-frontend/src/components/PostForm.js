@@ -21,6 +21,7 @@ class PostForm extends BaseForm {
 
     if (props.isNew) {
       formValues = _.cloneDeep(defaultFormValues);
+      formValues.metadata.content_type = props.contentType;
     } else {
       formValues = _.cloneDeep(props.item);
 

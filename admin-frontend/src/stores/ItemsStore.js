@@ -21,6 +21,9 @@ export default class ItemsStore extends BaseStore {
   totalPages = 0;
 
   @observable
+  contentType = "markdown";
+
+  @observable
   formErrorMessage = null;
 
   @observable
@@ -37,6 +40,9 @@ export default class ItemsStore extends BaseStore {
 
   @observable
   isItemDeleting = false;
+
+  @observable
+  isCreateModalOpen = false;
 
   isSearchResult = false;
 
@@ -83,6 +89,16 @@ export default class ItemsStore extends BaseStore {
   @action
   setSearchQuery(text) {
     this.searchQuery = text;
+  }
+
+  @action
+  setCreateModalOpen(open) {
+    this.isCreateModalOpen = open;
+  }
+
+  @action
+  setContentType(contentType) {
+    this.contentType = contentType;
   }
 
   @action
