@@ -14,6 +14,7 @@ const BLOG_COMMENTS_INDEX = _.get(
   config,
   "elasticsearch.blog-comments-index-name"
 );
+const BLOG_COMMENTS_INDEX_ALIAS = BLOG_COMMENTS_INDEX + "-active";
 const BLOG_LOGS_INDEX_PREFIX = _.get(
   config,
   "elasticsearch.blog-logs-index-name"
@@ -72,12 +73,33 @@ export async function setup() {
     }
   }
 
+  const blogCommentsIndexName = getIndexName(
+    BLOG_COMMENTS_INDEX,
+    "blog-comments-index.json"
+  );
   if (!status.blogCommentsIndex) {
+    const parsed = readIndexFile("blog-comments-index.json", { json: true });
+    parsed.aliases = {
+      [BLOG_COMMENTS_INDEX_ALIAS]: {},
+    };
     await esClient.indices.create({
-      index: BLOG_COMMENTS_INDEX,
-      body: readIndexFile("blog-comments-index.json"),
+      index: blogCommentsIndexName,
+      body: JSON.stringify(parsed),
       includeTypeName,
     });
+  } else if (!status.blogCommentsIndexUpToDate) {
+    try {
+      await reindex(
+        BLOG_COMMENTS_INDEX_ALIAS,
+        blogCommentsIndexName,
+        "blog-comments-index.json",
+        {
+          includeTypeName,
+        }
+      );
+    } catch (err) {
+      loggingService.logError("elasticsearch setup", err);
+    }
   }
 
   if (!status.blogLogsIndexTemplate || !status.blogLogsIndexTemplateUpToDate) {
@@ -117,40 +139,24 @@ export async function setup() {
 export async function getStatus() {
   const status = {};
 
-  const blogIndexExist = await esClient.indices.existsAlias({
+  status.blogIndex = await esClient.indices.existsAlias({
     index: "*",
     name: BLOG_INDEX_ALIAS,
   });
-  if (blogIndexExist) {
-    status.blogIndex = true;
-    // check whether blogs correctly pointing to the latest mapping
-    const blogIndexName = getIndexName(BLOG_INDEX, "blog-index.json");
-    const blogIndexExistForLatestMapping = await esClient.indices.exists({
-      index: blogIndexName,
-    });
-    if (blogIndexExistForLatestMapping) {
-      // index for latest mapping exist,
-      // but this might be caused by hash collision,
-      // compare its mapping properties
-      const currentMapping = (
-        await esClient.indices.getMapping({
-          index: blogIndexName,
-        })
-      )[blogIndexName];
-      const latestMapping = readIndexFile("blog-index.json", { json: true });
-      delete latestMapping.settings;
-
-      status.blogIndexUpToDate = mappingsEqual(currentMapping, latestMapping);
-    } else {
-      status.blogIndexUpToDate = false;
-    }
-  } else {
-    status.blogIndex = false;
+  if (status.blogIndex) {
+    status.blogIndexUpToDate = isIndexUpToDate(BLOG_INDEX, "blog-index.json");
   }
 
-  status.blogCommentsIndex = await esClient.indices.exists({
-    index: BLOG_COMMENTS_INDEX,
+  status.blogCommentsIndex = await esClient.indices.existsAlias({
+    index: "*",
+    name: BLOG_COMMENTS_INDEX_ALIAS,
   });
+  if (status.blogCommentsIndex) {
+    status.blogCommentsIndexUpToDate = isIndexUpToDate(
+      BLOG_COMMENTS_INDEX,
+      "blog-comments-index.json"
+    );
+  }
 
   status.blogLogsIndexTemplate = await esClient.indices.existsTemplate({
     name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
@@ -271,6 +277,30 @@ function getIndexName(prefix, filename) {
   }
   const mappingId = getMappingId(stringifyDeterministic(mapping));
   return prefix + "-" + mappingId;
+}
+
+async function isIndexUpToDate(index, filename) {
+  // check whether index correctly pointing to the latest mapping
+  const indexName = getIndexName(index, filename);
+  const indexExistForLatestMapping = await esClient.indices.exists({
+    index: indexName,
+  });
+  if (indexExistForLatestMapping) {
+    // index for latest mapping exist,
+    // but this might be caused by hash collision,
+    // compare its mapping properties
+    const currentMapping = (
+      await esClient.indices.getMapping({
+        index: indexName,
+      })
+    )[indexName];
+    const latestMapping = readIndexFile(filename, { json: true });
+    delete latestMapping.settings;
+
+    return mappingsEqual(currentMapping, latestMapping);
+  } else {
+    return false;
+  }
 }
 
 async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
