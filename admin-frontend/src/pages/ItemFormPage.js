@@ -120,6 +120,7 @@ class ItemFormPage extends Component {
       this.store.setCurrentItem({
         ...formValues,
         id: resp.id,
+        url: resp.url,
       });
     } catch (err) {
       console.log(err); // TODO proper error logging

@@ -47,7 +47,7 @@ class PostForm extends BaseForm {
   }
 
   _renderExtraToolbarButton() {
-    if (this.props.isNew || !this.props.item.draft) {
+    if (this.props.isNew && !this.props.item) {
       return false;
     }
 
@@ -62,14 +62,34 @@ class PostForm extends BaseForm {
       });
     };
 
+    const previewUrl = this.props.item
+      ? `${this.props.item.url}${
+          _.isEmpty(this.props.item.metadata.private_viewing_key)
+            ? ""
+            : "?secret=" + this.props.item.metadata.private_viewing_key
+        }`
+      : "";
+
     return (
-      <button
-        onClick={onClick}
-        className="btn btn-outline-secondary btn-sm"
-        style={{ marginRight: 5 }}
-      >
-        {editDraftContents ? "Show published" : "Back to drafted changes"}
-      </button>
+      <>
+        {!this.props.isNew && this.props.item && this.props.item.draft && (
+          <button
+            onClick={onClick}
+            className="btn btn-outline-secondary btn-sm"
+            style={{ marginRight: 5 }}
+          >
+            {editDraftContents ? "Show published" : "Back to drafted changes"}
+          </button>
+        )}
+        <a
+          href={previewUrl}
+          target="_blank"
+          className="btn btn-outline-secondary btn-sm"
+          style={{ marginRight: 5 }}
+        >
+          Preview post
+        </a>
+      </>
     );
   }
 
