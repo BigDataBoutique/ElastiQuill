@@ -275,7 +275,6 @@ export async function createItem(type, post) {
       last_edited_at: new Date().toISOString(),
       metadata: {
         ...post.metadata,
-        content_type: "markdown",
       },
     },
   };

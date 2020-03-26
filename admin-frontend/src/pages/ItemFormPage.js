@@ -76,6 +76,7 @@ class ItemFormPage extends Component {
           ) : (
             <ItemForm
               blogpostId={blogpostId}
+              contentType={this.store.contentType}
               isNew={this._isNew()}
               isFormSaving={this.store.isFormSaving}
               isFormAutosaving={this.store.isFormAutosaving}

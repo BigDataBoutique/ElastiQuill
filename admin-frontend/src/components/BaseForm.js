@@ -115,7 +115,7 @@ class BaseForm extends Component {
     return (
       <div style={{ marginBottom: 10 }}>
         <ContentEditor
-          key={this.state.contentEditorKey}
+          editorKey={this.state.contentEditorKey}
           blogpostId={blogpostId}
           contentType={contentType}
           disabled={!this._isEditable()}
@@ -453,9 +453,9 @@ class BaseForm extends Component {
 
   _getCurrentContentType(item) {
     if (this.props.isNew) {
-      return "markdown";
+      return this.props.contentType;
     }
-    return item.content_type;
+    return item.metadata.content_type;
   }
 
   _submit(opts) {

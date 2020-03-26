@@ -8,6 +8,7 @@ import { Button, ButtonGroup } from "reactstrap";
 import defaultItemImage from "../assets/img/default-post-image.jpg";
 import LoggedInLayout from "../components/LoggedInLayout";
 import ConfirmModal from "../components/ConfirmModal";
+import CreateItemModal from "../components/CreateItemModal";
 import FAIcon from "../components/FAIcon";
 import HoverIcon from "../components/Icons/HoverIcon";
 import SvgEdit from "../components/Icons/SvgEdit";
@@ -19,16 +20,27 @@ class BaseItemsPage extends Component {
   _renderContent(strings, store) {
     const { isLoading } = store;
 
+    const onCreate = contentType => {
+      store.setContentType(contentType);
+      this.props.history.push(`/new/${strings.urlPart}`);
+      store.setCreateModalOpen(false);
+    };
+
     const toolbar = (
       <div style={{ lineHeight: "38px", width: "100%" }}>
         <div style={{ display: "inline-block", float: "left" }}>
           {this._renderLeftNav && this._renderLeftNav()}
         </div>
-        <Link to={`/new/${strings.urlPart}`}>
+        <Button color="link" onClick={() => store.setCreateModalOpen(true)}>
           <FAIcon icon="plus" style={{ marginRight: "12px" }} />
           {strings.newItem}
-        </Link>
+        </Button>
         {this._renderNav && this._renderNav()}
+        <CreateItemModal
+          isOpen={store.isCreateModalOpen}
+          onRequestCreate={onCreate}
+          onRequestClose={() => store.setCreateModalOpen(false)}
+        />
       </div>
     );
 
