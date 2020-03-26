@@ -16,6 +16,7 @@ class MarkdownEditor extends Component {
   render() {
     return (
       <div
+        className="content-editor"
         style={{
           pointerEvents: this.props.disabled ? "none" : "default",
         }}

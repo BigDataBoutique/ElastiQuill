@@ -111,6 +111,7 @@ class HtmlEditor extends Component {
   render() {
     return (
       <div
+        className="content-editor"
         style={{
           minHeight: "300px",
           pointerEvents: this.props.disabled ? "none" : "default",
