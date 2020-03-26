@@ -144,7 +144,10 @@ export async function getStatus() {
     name: BLOG_INDEX_ALIAS,
   });
   if (status.blogIndex) {
-    status.blogIndexUpToDate = isIndexUpToDate(BLOG_INDEX, "blog-index.json");
+    status.blogIndexUpToDate = await isIndexUpToDate(
+      BLOG_INDEX,
+      "blog-index.json"
+    );
   }
 
   status.blogCommentsIndex = await esClient.indices.existsAlias({
@@ -152,7 +155,7 @@ export async function getStatus() {
     name: BLOG_COMMENTS_INDEX_ALIAS,
   });
   if (status.blogCommentsIndex) {
-    status.blogCommentsIndexUpToDate = isIndexUpToDate(
+    status.blogCommentsIndexUpToDate = await isIndexUpToDate(
       BLOG_COMMENTS_INDEX,
       "blog-comments-index.json"
     );
