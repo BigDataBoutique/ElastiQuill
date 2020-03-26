@@ -5,7 +5,6 @@ import classnames from "classnames";
 import ReactModal from "react-modal";
 import ReactSelect from "react-select";
 import { Alert } from "reactstrap";
-import * as Showdown from "showdown";
 import FileUploadProgress from "react-fileupload-progress";
 
 import ContentEditor from "./ContentEditor";
@@ -17,12 +16,6 @@ import { getJwtToken } from "../util";
 class BaseForm extends Component {
   constructor(props) {
     super(props);
-    this._markdownConverter = Showdown.Converter({
-      tables: true,
-      simplifiedAutoLink: true,
-      strikethrough: true,
-      tasklists: true,
-    });
     this.formRef = createRef();
   }
 
