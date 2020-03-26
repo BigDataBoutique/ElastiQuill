@@ -101,6 +101,7 @@ router.get(
       id: req.params.id,
       withComments,
     });
+    item.url = blogpostUrl(item);
     res.json(item);
   })
 );
@@ -117,8 +118,9 @@ router.post(
           website: "",
         },
       });
+      const item = await blogPosts.getItemById({ id: newId });
 
-      res.json({ error: null, id: newId });
+      res.json({ error: null, id: newId, url: blogpostUrl(item) });
     } catch (err) {
       if (err.isJoi) {
         res.status(400).json({
@@ -166,7 +168,7 @@ router.post(
       }
 
       await blogPosts.updateItem(req.params.id, req.params.type, req.body);
-      res.json({ error: null, id: req.params.id });
+      res.json({ error: null, id: req.params.id, url: blogpostUrl(item) });
     } catch (err) {
       if (err.isJoi) {
         res.status(400).json({

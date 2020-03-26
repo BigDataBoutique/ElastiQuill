@@ -48,7 +48,8 @@ class PostForm extends BaseForm {
   }
 
   _renderExtraToolbarButton() {
-    if (this.props.isNew || !this.props.item.draft) {
+    // render toolbar only when the post has been published or saved as draft
+    if (!this.props.item) {
       return false;
     }
 
@@ -63,14 +64,32 @@ class PostForm extends BaseForm {
       });
     };
 
+    const previewUrl = `${this.props.item.url}${
+      _.isEmpty(this.props.item.metadata.private_viewing_key)
+        ? ""
+        : "?secret=" + this.props.item.metadata.private_viewing_key
+    }`;
+
     return (
-      <button
-        onClick={onClick}
-        className="btn btn-outline-secondary btn-sm"
-        style={{ marginRight: 5 }}
-      >
-        {editDraftContents ? "Show published" : "Back to drafted changes"}
-      </button>
+      <>
+        {this.props.item.is_published && this.props.item.draft && (
+          <button
+            onClick={onClick}
+            className="btn btn-outline-secondary btn-sm"
+            style={{ marginRight: 5 }}
+          >
+            {editDraftContents ? "Show published" : "Back to drafted changes"}
+          </button>
+        )}
+        <a
+          href={previewUrl}
+          target="_blank"
+          className="btn btn-outline-secondary btn-sm"
+          style={{ marginRight: 5 }}
+        >
+          Preview post
+        </a>
+      </>
     );
   }
 
