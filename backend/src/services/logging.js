@@ -4,7 +4,8 @@ import moment from "moment";
 import geohash from "ngeohash";
 import crawlers from "crawler-user-agents";
 
-import { esClient, config } from "../app";
+import { esClient } from "../lib/elasticsearch";
+import { config } from "../config";
 import * as blogPosts from "./blogPosts";
 import * as elasticsearch from "./elasticsearch";
 

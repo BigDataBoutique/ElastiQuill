@@ -6,7 +6,7 @@ import * as commentsService from "../services/comments";
 import * as blogPostsService from "../services/blogPosts";
 import * as loggingService from "../services/logging";
 import { restrictRolesMiddleware } from "../routes/auth";
-import { config } from "../app";
+import { config } from "../config";
 
 const router = express.Router();
 

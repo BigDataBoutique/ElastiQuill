@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import passport from "passport";
 
 import * as logging from "../../services/logging";
-import { frontendAddress, config } from "../../app";
+import { frontendAddress } from "../../app";
+import { config } from "../../config";
 
 import initJwt from "./jwt";
 import initGoogle from "./google";

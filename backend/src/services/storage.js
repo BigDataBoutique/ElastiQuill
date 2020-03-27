@@ -9,7 +9,7 @@ import multerS3 from "multer-s3";
 import { Storage as GCSStorage } from "@google-cloud/storage";
 import MulterGcsStorage from "../lib/multer-gcs-storage";
 
-import { config } from "../app";
+import { config } from "../config";
 
 let configuredStorageName = null;
 let errors = {};

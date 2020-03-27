@@ -1,7 +1,7 @@
 import _ from "lodash";
 import request from "request-promise-native";
 
-import { config } from "../app";
+import { config } from "../config";
 
 const RECAPTCHA_KEY = _.get(
   config,

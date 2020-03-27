@@ -2,7 +2,7 @@ import _ from "lodash";
 import NodeCache from "node-cache";
 import MockExpressResponse from "mock-express-response";
 import * as logging from "./logging";
-import { config } from "../app";
+import { config } from "../config";
 
 const CACHE_TTL = _.get(config, "blog.cache-ttl");
 

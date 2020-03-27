@@ -2,7 +2,7 @@ import _ from "lodash";
 import Joi from "joi";
 import uid from "uid";
 import slugify from "slugify";
-import { esClient } from "../app";
+import { esClient } from "../lib/elasticsearch";
 import * as events from "./events";
 import * as commentsService from "./comments";
 import { BLOG_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";

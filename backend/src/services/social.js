@@ -3,7 +3,7 @@ import Twitter from "twitter";
 import medium from "medium-sdk";
 import request from "request-promise";
 
-import { config } from "../app";
+import { config } from "../config";
 
 export function getAvailability(connected = {}) {
   const res = {

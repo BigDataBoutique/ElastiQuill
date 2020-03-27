@@ -12,13 +12,15 @@
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
     "prettier-check": "prettier --check src/** webpack.config.js",
-    "lint": "eslint --cache --ext js src"
+    "lint": "eslint --cache --ext js src",
+    "test": "CONFIG_PATH=../../config.yml SETUP_DIR=../_setup jest"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/BigDataBoutique/ElastiQuill.git"
   },
   "dependencies": {
+    "@babel/runtime": "^7.9.2",
     "@google-cloud/storage": "^3.0.0",
     "@sendgrid/mail": "^6.4.0",
     "akismet-api": "^4.2.0",
@@ -81,6 +83,7 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.5.5",
     "babel-eslint": "^10.0.3",
     "copy-webpack-plugin": "^5.0.3",

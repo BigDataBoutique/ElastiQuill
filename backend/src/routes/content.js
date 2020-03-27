@@ -11,7 +11,7 @@ import {
   preparePost,
   prepareComments,
 } from "./util";
-import { config } from "../app";
+import { config } from "../config";
 
 const router = express.Router();
 

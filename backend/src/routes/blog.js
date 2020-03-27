@@ -21,7 +21,7 @@ import {
   blogpostUrl,
   PageNotFoundError,
 } from "./util";
-import { config } from "../app";
+import { config } from "../config";
 
 const router = express.Router();
 

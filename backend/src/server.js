@@ -2,13 +2,14 @@
  * Module dependencies.
  */
 const app = require("./app");
+const { config } = require("./config");
 const debug = require("debug")("backend:server");
 const http = require("http");
 
 /**
  * Get port from environment and store in Express.
  */
-let port = normalizePort(app.config.blog.port);
+let port = normalizePort(config.blog.port);
 app.default.set("port", port);
 
 /**

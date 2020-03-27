@@ -7,7 +7,7 @@ import htmlToText from "html-to-text";
 import readingTime from "reading-time";
 import sanitizeHtml from "sanitize-html";
 
-import { config } from "../app";
+import { config } from "../config";
 import {
   stripSeriesTag,
   CONTENT_DESCRIPTION_ID_PREFIX,

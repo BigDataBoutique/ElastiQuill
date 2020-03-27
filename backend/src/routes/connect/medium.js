@@ -5,7 +5,8 @@ import medium from "medium-sdk";
 import asyncHandler from "express-async-handler";
 
 import { getJwtToken, updateJwtToken } from "../auth";
-import { config, frontendAddress } from "../../app";
+import { frontendAddress } from "../../app";
+import { config } from "../../config";
 
 const router = express.Router();
 

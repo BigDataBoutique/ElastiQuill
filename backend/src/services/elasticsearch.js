@@ -3,9 +3,10 @@ import fs from "fs";
 import path from "path";
 import semver from "semver";
 import stringifyDeterministic from "json-stringify-deterministic";
-import sha256 from "js-sha256";
+import { sha256 } from "js-sha256";
 
-import { esClient, config } from "../app";
+import { config } from "../config";
+import { esClient } from "../lib/elasticsearch";
 import * as loggingService from "../services/logging";
 
 const BLOG_INDEX = _.get(config, "elasticsearch.blog-index-name");
@@ -14,7 +15,7 @@ const BLOG_COMMENTS_INDEX = _.get(
   config,
   "elasticsearch.blog-comments-index-name"
 );
-const BLOG_COMMENTS_INDEX_ALIAS = BLOG_COMMENTS_INDEX + "-active";
+export const BLOG_COMMENTS_INDEX_ALIAS = BLOG_COMMENTS_INDEX + "-active";
 const BLOG_LOGS_INDEX_PREFIX = _.get(
   config,
   "elasticsearch.blog-logs-index-name"
@@ -70,6 +71,7 @@ export async function setup() {
       });
     } catch (err) {
       loggingService.logError("elasticsearch setup", err);
+      return;
     }
   }
 
@@ -99,6 +101,7 @@ export async function setup() {
       );
     } catch (err) {
       loggingService.logError("elasticsearch setup", err);
+      return;
     }
   }
 
@@ -134,6 +137,9 @@ export async function setup() {
       body: await getRequestLogPipelineBody(),
     });
   }
+
+  // success
+  return true;
 }
 
 export async function getStatus() {
@@ -211,7 +217,7 @@ async function getRequestLogPipelineBody() {
   );
 }
 
-function mappingsEqual(m1, m2) {
+export function mappingsEqual(m1, m2) {
   const s1 = stringifyDeterministic(normalizeMapping(m1)),
     s2 = stringifyDeterministic(normalizeMapping(m2));
 
@@ -257,7 +263,7 @@ function updateIndexPatterns(indexPatterns) {
   return patterns;
 }
 
-function readIndexFile(filename, opts = {}) {
+export function readIndexFile(filename, opts = {}) {
   const setupDir = process.env.SETUP_DIR || "./_setup";
   const string = fs
     .readFileSync(path.join(setupDir, filename))
@@ -273,7 +279,7 @@ function getMappingId(mappingString) {
   return sha256(mappingString).substring(0, 8);
 }
 
-function getIndexName(prefix, filename) {
+export function getIndexName(prefix, filename) {
   let mapping = readIndexFile(filename, { json: true }).mappings;
   if (mapping._doc) {
     mapping = mapping._doc;
@@ -359,7 +365,7 @@ async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
 
   await esClient.indices.updateAliases({
     body: {
-      actions: [{ add: { index: targetIndex, alias: BLOG_INDEX_ALIAS } }],
+      actions: [{ add: { index: targetIndex, alias: sourceIndex } }],
     },
   });
 }

@@ -3,7 +3,7 @@ import fs from "fs";
 import express from "express";
 import asyncHandler from "express-async-handler";
 
-import { config } from "../app";
+import { config } from "../config";
 import { restrictRolesMiddleware } from "../routes/auth";
 
 import * as emails from "../services/emails";
