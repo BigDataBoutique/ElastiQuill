@@ -73,13 +73,16 @@ import $ from "jquery";
   AddHr.prototype.add = function() {
     var $place = this.$el.find(".medium-insert-active");
 
-    // Hide editor's placeholder
-    $place.click();
-
-    $place.replaceWith("<hr/>");
     this.core.hideButtons();
-    $(".medium-insert-buttons").remove();
-    this.core.triggerInput();
+
+    $place.replaceWith("<hr class='medium-insert-active'/>");
+    $place = this.$el.find(".medium-insert-active");
+    if ($place.next().is("p")) {
+      this.core.moveCaret($place.next());
+    } else {
+      $place.after("<p><br></p>"); // add empty paragraph so we can move the caret to the next line.
+      this.core.moveCaret($place.next());
+    }
   };
 
   /** Addon initialization */
