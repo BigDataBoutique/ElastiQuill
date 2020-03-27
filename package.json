@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "prettier-check": "./scripts/prettier-check.sh",
-    "lint": "./scripts/lint.sh"
+    "lint": "./scripts/lint.sh",
+    "test": "./scripts/test.sh"
   }
 }
