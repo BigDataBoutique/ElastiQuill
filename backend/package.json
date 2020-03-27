@@ -93,6 +93,7 @@
     "eslint-plugin-jest": "^23.1.1",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.17.0",
+    "jest": "^25.2.3",
     "nodemon": "^1.19.1",
     "prettier": "^1.19.1",
     "webpack": "^4.36.1",
