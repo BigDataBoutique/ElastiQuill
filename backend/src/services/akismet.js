@@ -1,6 +1,6 @@
 import _ from "lodash";
 import akismet from "akismet-api";
-import { config } from "../app";
+import { config } from "../config";
 
 const AKISMET_APIKEY = _.get(config, "credentials.akismet.api-key"),
   AKISMET_DOMAIN = _.get(config, "credentials.akismet.domain");

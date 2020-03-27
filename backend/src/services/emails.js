@@ -5,7 +5,7 @@ import ellipsize from "ellipsize";
 import escapeHtml from "escape-html";
 import MarkdownIt from "markdown-it";
 
-import { config } from "../app";
+import { config } from "../config";
 
 // Markdown converter with disabled HTML tags
 const markdown = new MarkdownIt();

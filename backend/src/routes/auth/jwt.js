@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 
-import { config } from "../../app";
+import { config } from "../../config";
 
 const jwtSecret = _.get(config, "blog.jwt-secret");
 if (!jwtSecret) {

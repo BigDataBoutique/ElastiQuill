@@ -222,13 +222,18 @@ class Status extends React.Component {
 
   _renderBlogStatus(elasticsearch) {
     const allConfigured = _.every(_.values(elasticsearch.setup));
+    const mapping = {
+      blogIndexUpToDate: "blog",
+      blogLogsIndexTemplateUpToDate: "blog-logs",
+    };
+
     const error =
       "Errors in setup detected: " +
       _.keys(elasticsearch.setup)
         .filter(k => !elasticsearch.setup[k])
         .map(k => {
-          if (k === "blogLogsIndexTemplateUpToDate") {
-            return "blog-logs template is out-of-date";
+          if (Object.keys(mapping).includes(k)) {
+            return `${mapping[k]} template is out-of-date`;
           }
           return `${k} misconfigured`;
         })

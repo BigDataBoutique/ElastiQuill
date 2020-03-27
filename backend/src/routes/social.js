@@ -4,7 +4,7 @@ import asyncHandler from "express-async-handler";
 
 import * as blogPosts from "../services/blogPosts";
 import * as social from "../services/social";
-import { config } from "../app";
+import { config } from "../config";
 import { preparePost } from "./util";
 
 const router = express.Router();

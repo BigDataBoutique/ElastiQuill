@@ -14,7 +14,7 @@ import * as blogPosts from "../services/blogPosts";
 import * as logging from "../services/logging";
 import * as cache from "../services/cache";
 import { preparePost, tagUrl, seriesUrl } from "./util";
-import { config } from "../app";
+import { config } from "../config";
 
 function ensureNoSlash(str) {
   if (str[str.length - 1] == "/") {

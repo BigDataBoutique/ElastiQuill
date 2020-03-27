@@ -5,7 +5,8 @@ import asyncHandler from "express-async-handler";
 import request from "request-promise";
 
 import { getJwtToken, updateJwtToken } from "../auth";
-import { config, frontendAddress } from "../../app";
+import { frontendAddress } from "../../app";
+import { config } from "../../config";
 
 const router = express.Router();
 

@@ -2,7 +2,8 @@ import _ from "lodash";
 import Joi from "joi";
 import uid from "uid";
 import * as blogPosts from "./blogPosts";
-import { esClient, config } from "../app";
+import { esClient } from "../lib/elasticsearch";
+import { config } from "../config";
 
 const ES_INDEX = config.elasticsearch["blog-comments-index-name"];
 

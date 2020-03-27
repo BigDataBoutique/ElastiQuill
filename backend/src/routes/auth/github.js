@@ -2,7 +2,7 @@ import _ from "lodash";
 import { Strategy as GitHubStrategy } from "passport-github";
 
 import { passportDefaultCallback } from "./index";
-import { config } from "../../app";
+import { config } from "../../config";
 
 export default function(passport, router, handleRequest) {
   passport.use(
