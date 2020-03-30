@@ -9,6 +9,7 @@ import { getJwtToken } from "../../util";
 
 import "./add-hr-plugin";
 import "./embeds-patched-plugin";
+import "./add-code-block-plugin";
 
 class HtmlEditor extends Component {
   constructor(props) {
@@ -91,6 +92,7 @@ class HtmlEditor extends Component {
         addHr: {
           test: true,
         },
+        addCodeBlock: {},
       },
     });
     $(this.container.current).removeClass("medium-editor-placeholder");
