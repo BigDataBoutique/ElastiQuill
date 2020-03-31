@@ -3,13 +3,19 @@ import React, { Fragment } from "react";
 import moment from "moment";
 import countries from "i18n-iso-countries";
 import { inject, observer } from "mobx-react";
+import { Link } from "react-router-dom";
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
-import VisitsMap from "../components/VisitsMap";
 import CommentsList from "../components/CommentsList";
 import LoggedInLayout from "../components/LoggedInLayout";
-import StatsOverTimeGraph from "../components/StatsOverTimeGraph";
+import {
+  StatsOverTimeGraph,
+  VisitsMap,
+  VisitsByCountry,
+  ReferralsStats,
+  UserAgentStats,
+} from "../components/Stats";
 
 @inject("dashboardStore")
 @observer
@@ -41,6 +47,10 @@ class Dashboard extends React.Component {
       averageVisitsPerDay,
       averageVisitorsPerDay,
       uniqueVisitorsEnabled,
+      userAgentOperatingSystem,
+      userAgentName,
+      referrerType,
+      referrerFromDomain,
     } = this.props.dashboardStore;
 
     if (beingLoaded.length) {
@@ -82,13 +92,12 @@ class Dashboard extends React.Component {
       this._renderCard(
         <React.Fragment>
           <h4 style={{ flex: 1 }}>
-            <a
-              target="_blank"
+            <Link
+              to={`/stats/post/${mostViewedPost.id}`}
               style={{ fontSize: "24px" }}
-              href={mostViewedPost.url}
             >
               {this._textEllipsis(mostViewedPost.title, 35)}
-            </a>
+            </Link>
           </h4>
           <h6>
             {(uniqueVisitorsEnabled
@@ -131,10 +140,7 @@ class Dashboard extends React.Component {
 
         <div className="row" style={{ marginBottom: "41px" }}>
           <div className="col-12">
-            <div
-              className="elastiquill-header"
-              style={{ display: "flex", width: "100%" }}
-            >
+            <div className="elastiquill-header d-flex w-100">
               Blog Statistics
               <div style={{ flex: 1, textAlign: "right", userSelect: "none" }}>
                 <div>
@@ -166,26 +172,32 @@ class Dashboard extends React.Component {
               <VisitsMap mapData={visitsByLocation} />
             </div>
           </div>
-          <div
-            className="col-lg-4"
-            style={{ display: "flex", flexFlow: "column" }}
-          >
+          <div className="col-lg-4">
             <div className="elastiquill-header">Visits by country</div>
             <div className="elastiquill-card">
-              {this._renderVisitsByCountry(visitsByCountry)}
+              <VisitsByCountry data={visitsByCountry} />
             </div>
           </div>
         </div>
 
         <div className="row">
           <div className="col-md-6">
-            {this._renderSection("Referrals stats", this._renderReferrals())}
+            <div className="elastiquill-header">Referrals stats</div>
+            <div className="elastiquill-card">
+              <ReferralsStats
+                referrerDomain={referrerFromDomain}
+                referrerType={referrerType}
+              />
+            </div>
           </div>
           <div className="col-md-6">
-            {this._renderSection(
-              "User-Agent stats",
-              this._renderUserAgentStats()
-            )}
+            <div className="elastiquill-header">User-Agent stats</div>
+            <div className="elastiquill-card">
+              <UserAgentStats
+                userAgentName={userAgentName}
+                userAgentOperatingSystem={userAgentOperatingSystem}
+              />
+            </div>
           </div>
         </div>
         <div className="row" style={{ marginTop: 20 }}>
@@ -219,60 +231,6 @@ class Dashboard extends React.Component {
     );
   }
 
-  _renderVisitsByCountry(visitsByCountry) {
-    if (!visitsByCountry.length) {
-      return "No data yet";
-    }
-
-    return (
-      <div>
-        {visitsByCountry.map(bucket => (
-          <div key={bucket.key} style={{ margin: "5px 0px" }}>
-            <span
-              style={{ marginRight: 10 }}
-              className={"flag-icon flag-icon-" + bucket.key.toLowerCase()}
-            ></span>
-            {countries.getName(bucket.key, "en")}
-            <span className="float-right text-muted">{bucket.doc_count}</span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  _renderReferrals() {
-    const { referrerType, referrerFromDomain } = this.props.dashboardStore;
-
-    if (referrerFromDomain.length + referrerType.length === 0) {
-      return "No data";
-    }
-
-    return (
-      <div>
-        {this._renderStatsList("Domain", referrerFromDomain)}
-        {this._renderStatsList("Type", referrerType)}
-      </div>
-    );
-  }
-
-  _renderUserAgentStats() {
-    const {
-      userAgentOperatingSystem,
-      userAgentName,
-    } = this.props.dashboardStore;
-
-    if (userAgentOperatingSystem.length + userAgentName.length === 0) {
-      return "No data";
-    }
-
-    return (
-      <div>
-        {this._renderStatsList("Operating system", userAgentOperatingSystem)}
-        {this._renderStatsList("User agent name", userAgentName)}
-      </div>
-    );
-  }
-
   _renderStatsList(title, list) {
     return (
       <div style={{ minHeight: 160 }}>
@@ -298,9 +256,7 @@ class Dashboard extends React.Component {
       <div>
         {list.map(item => (
           <div key={item.id}>
-            <a target="_blank" href={item.url}>
-              {item.title}
-            </a>{" "}
+            <Link to={`/stats/post/${item.id}`}>{item.title}</Link>{" "}
             {label(item)}
           </div>
         ))}
@@ -312,9 +268,7 @@ class Dashboard extends React.Component {
     return (
       <div style={{ marginBottom: 10 }}>
         <div className="elastiquill-header">{title}</div>
-        <div className="elastiquill-card" style={{ marginTop: 15 }}>
-          {content}
-        </div>
+        <div className="elastiquill-card">{content}</div>
       </div>
     );
   }
@@ -333,11 +287,8 @@ class Dashboard extends React.Component {
     return (
       <div className="col-lg align-items-stretch">
         <div
-          className="elastiquill-card"
+          className="elastiquill-card d-flex flex-column h-100"
           style={{
-            display: "flex",
-            flexFlow: "column",
-            height: "100%",
             minHeight,
           }}
         >

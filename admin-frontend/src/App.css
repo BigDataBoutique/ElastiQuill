@@ -335,6 +335,17 @@ body {
   width: 100%;
 }
 
+.elastiquill-post-stats-container {
+  height: auto;
+  opacity: 1;
+}
+
+.elastiquill-post-stats-container.hidden {
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 blockquote {
   display: block;
   background: #fff;

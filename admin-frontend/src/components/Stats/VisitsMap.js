@@ -7,8 +7,9 @@ import {
   Markers,
   Marker,
 } from "react-simple-maps";
+import PropType from "prop-types";
 
-import worldMap from "../assets/world-50m.json";
+import worldMap from "../../assets/world-50m.json";
 
 class VisitsMap extends React.Component {
   render() {
@@ -88,5 +89,14 @@ class VisitsMap extends React.Component {
     );
   }
 }
+
+VisitsMap.propTypes = {
+  mapData: PropType.arrayOf(
+    PropType.shape({
+      location: PropType.array,
+      visits: PropType.number,
+    })
+  ).isRequired,
+};
 
 export default VisitsMap;
