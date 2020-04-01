@@ -143,7 +143,7 @@ export async function setup() {
 }
 
 export async function getStatus() {
-  const status = {};
+  const status = { error: {} };
 
   status.blogIndex = await esClient.indices.existsAlias({
     index: "*",
@@ -154,6 +154,11 @@ export async function getStatus() {
       BLOG_INDEX,
       "blog-index.json"
     );
+    if (!status.blogIndexUpToDate) {
+      status.error.blogIndexUpToDate = "Blog index template is out of date";
+    }
+  } else {
+    status.error.blogIndex = "Blog index is misconfigured";
   }
 
   status.blogCommentsIndex = await esClient.indices.existsAlias({
@@ -165,12 +170,17 @@ export async function getStatus() {
       BLOG_COMMENTS_INDEX,
       "blog-comments-index.json"
     );
+    if (!status.blogCommentsIndexUpToDate) {
+      status.error.blogCommentsIndexUpToDate =
+        "Blog comments index template is out of date";
+    }
+  } else {
+    status.error.blogCommentsIndex = "Blog comments index is misconfigured";
   }
 
   status.blogLogsIndexTemplate = await esClient.indices.existsTemplate({
     name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
   });
-
   if (status.blogLogsIndexTemplate) {
     const current = await esClient.indices.getTemplate({
       name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
@@ -184,6 +194,8 @@ export async function getStatus() {
     status.blogLogsIndexTemplateUpToDate =
       mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
       validateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
+  } else {
+    status.error.blogLogsIndexTemplate = "Blog logs index is misconfigured";
   }
 
   try {
@@ -196,9 +208,13 @@ export async function getStatus() {
       await getRequestLogPipelineBody()
     );
     status.ingestPipeline = currentPipeline === targetPipeline;
+    if (!status.ingestPipeline) {
+      status.error.ingestPipeline = "Ingest pipeline is misconfigured";
+    }
   } catch (err) {
     if (err.status === 404) {
       status.ingestPipeline = false;
+      status.error.ingestPipeline = "Ingest pipeline is misconfigured";
     } else {
       throw err;
     }

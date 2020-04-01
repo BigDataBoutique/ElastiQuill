@@ -1,17 +1,17 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 
-@inject("setupStore")
+@inject("statusStore")
 @observer
 export default class SetupWarning extends React.Component {
   componentDidMount() {
-    this.props.setupStore.loadStatus();
+    this.props.statusStore.loadSetupStatus();
   }
 
   render() {
     if (
-      !this.props.setupStore.status ||
-      this.props.setupStore.status === "ready"
+      !this.props.statusStore.setupStatus ||
+      this.props.statusStore.setupStatus === "ready"
     ) {
       return false;
     }

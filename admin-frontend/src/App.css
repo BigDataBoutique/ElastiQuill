@@ -145,15 +145,8 @@ body {
   background-color: #ea1569;
 }
 
-.elastiquill-nav-link-icon {
-  color: black;
-}
-.elastiquill-nav-link-icon.elastiquill-nav-link-icon-active {
-  color: #d9156d;
-}
-
 .elastiquill-nav-link-icon path {
-  fill: black;
+  fill: currentColor;
 }
 .elastiquill-nav-link-icon.elastiquill-nav-link-icon-active path {
   fill: #d9156d;

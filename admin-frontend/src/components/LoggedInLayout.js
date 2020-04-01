@@ -12,7 +12,6 @@ import {
 } from "reactstrap";
 import { Link, Redirect, withRouter } from "react-router-dom";
 import { inject, observer } from "mobx-react/index";
-import classnames from "classnames";
 import { Helmet } from "react-helmet";
 
 import FAIcon from "./FAIcon";
@@ -20,14 +19,17 @@ import NavLink from "./NavLink";
 import { Layout } from "./Layout";
 import SetupWarning from "./SetupWarning";
 import urls from "../config/urls";
+import colors from "../config/colors";
 import logo from "../assets/img/logo.png";
 import dashboardIcon from "../assets/img/dashboard.svg";
 import postsIcon from "../assets/img/posts.svg";
 import contentPagesIcon from "../assets/img/content-pages.svg";
 import backupIcon from "../assets/img/backup.svg";
-import statusIcon from "../assets/img/status.svg";
+import statusNormalIcon from "../assets/img/status-normal.svg";
+import statusErrorIcon from "../assets/img/status-error.svg";
 
 @inject("appStore")
+@inject("statusStore")
 @withRouter
 @observer
 class LoggedInLayout extends Component {
@@ -36,6 +38,10 @@ class LoggedInLayout extends Component {
     leftMenuOpen: false,
     userMenuOpen: false,
   };
+
+  componentDidMount() {
+    this.props.statusStore.loadStatus();
+  }
 
   render() {
     const { appStore } = this.props;
@@ -150,6 +156,11 @@ class LoggedInLayout extends Component {
   }
 
   _renderNavbar() {
+    const colorMappings = {
+      yellow: colors.warning,
+      red: colors.danger,
+    };
+
     const items = [
       { label: "Dashboard", url: urls.dashboard, image: dashboardIcon },
       { label: "Posts", url: urls.posts, image: postsIcon },
@@ -163,7 +174,11 @@ class LoggedInLayout extends Component {
       {
         label: "Status",
         url: urls.status,
-        image: statusIcon,
+        image:
+          this.props.statusStore.statusHealth === "green"
+            ? statusNormalIcon
+            : statusErrorIcon,
+        iconColor: colorMappings[this.props.statusStore.statusHealth],
         roles: ["admin"],
       },
     ].filter(it => {

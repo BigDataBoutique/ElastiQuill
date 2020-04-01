@@ -1,12 +1,10 @@
 import _ from "lodash";
 import React from "react";
 import { toast } from "react-toastify";
-import { UncontrolledTooltip } from "reactstrap";
-import { uniqueId } from "lodash";
 
-import LoggedInLayout from "../components/LoggedInLayout";
 import * as api from "../api";
-
+import colors from "../config/colors";
+import LoggedInLayout from "../components/LoggedInLayout";
 import StatusBadge, { statusBadgeType } from "./../components/StatusBadge";
 
 import linkedin from "./../assets/img/linkedin.svg";
@@ -108,11 +106,9 @@ class Status extends React.Component {
           <div>
             {this._renderLabel({
               label: "File upload",
-              successTooltip: upload.backend
-                ? upload.backend.toUpperCase()
-                : false,
+              tooltip: upload.backend ? upload.backend.toUpperCase() : false,
               success: upload.backend !== null,
-              error: upload.errors["gcs"],
+              error: upload.errors[upload.backend],
               opacity: true,
             })}
             <hr className="m-0" />
@@ -142,10 +138,10 @@ class Status extends React.Component {
             <div style={{ opacity: 0.75 }}>
               Admin login enabled for:{" "}
               {admin.rules.indexOf("_all_") > -1 ? (
-                <pre style={{ color: "#09C199" }}>everyone</pre>
+                <pre style={{ color: colors.success }}>everyone</pre>
               ) : (
                 admin.rules.map((em, i) => (
-                  <pre style={{ color: "#09C199" }} key={i}>
+                  <pre style={{ color: colors.success }} key={i}>
                     {em}
                     {admin.rules.length - 1 === i ? "" : ", "}
                   </pre>
@@ -221,42 +217,41 @@ class Status extends React.Component {
   }
 
   _renderBlogStatus(elasticsearch) {
-    const allConfigured = _.every(_.values(elasticsearch.setup));
-    const mapping = {
-      blogIndexUpToDate: "blog",
-      blogLogsIndexTemplateUpToDate: "blog-logs",
-    };
+    const { error: setupError, ...setup } = elasticsearch.setup;
+    const allConfigured = _.every(_.values(setup));
+    const notConfigured = _.every(_.values(setup), i => i === false);
 
-    const error =
-      "Errors in setup detected: " +
-      _.keys(elasticsearch.setup)
-        .filter(k => !elasticsearch.setup[k])
-        .map(k => {
-          if (Object.keys(mapping).includes(k)) {
-            return `${mapping[k]} template is out-of-date`;
-          }
-          return `${k} misconfigured`;
-        })
-        .join(", ");
+    let error;
+    if (!allConfigured && !notConfigured) {
+      error = Object.values(setupError).join(", ");
+    }
+
+    const type = allConfigured
+      ? statusBadgeType.done
+      : notConfigured
+      ? statusBadgeType.unconfigured
+      : statusBadgeType.error;
 
     const renderHealth = status => {
       const mappings = {
-        red: statusBadgeType.configured,
-        yellow: statusBadgeType.configured,
+        // cluster health
+        red: statusBadgeType.error,
+        yellow: statusBadgeType.error,
         green: statusBadgeType.configured,
-        warn: statusBadgeType.configured,
+        // log level
+        warn: statusBadgeType.error,
         error: statusBadgeType.error,
       };
 
       const colorMappings = {
-        red: "bg-danger",
-        yellow: "bg-warning",
-        green: "bg-success",
-        warn: "bg-warning",
-        error: "bg-danger",
+        red: colors.danger,
+        yellow: colors.warning,
+        green: colors.primary,
+        warn: colors.warning,
+        error: colors.error,
       };
 
-      const tooltipMappings = {
+      const descriptionMappings = {
         red:
           "One or more primary shards are unassigned, so some data is unavailable.",
         yellow:
@@ -266,26 +261,27 @@ class Status extends React.Component {
         error: "Error",
       };
 
-      const tooltipId = uniqueId("tooltip");
+      // for warnings
+      const healthWarning =
+        status === "yellow" || status === "warn"
+          ? descriptionMappings[status]
+          : undefined;
+      // for errors
+      const healthError =
+        status === "red" || status === "error"
+          ? descriptionMappings[status]
+          : undefined;
 
       return (
         <div className="d-flex align-items-center">
           <StatusBadge
-            error={error}
             status={mappings[status] || statusBadgeType.configured}
+            color={colorMappings[status]}
+            tooltip={healthWarning}
+            // for warnings use "configured" text instead of "error"
+            text={healthWarning ? statusBadgeType.configured : undefined}
+            error={healthError}
           />
-          {colorMappings[status] && (
-            <>
-              <span
-                id={tooltipId}
-                className={`ml-2 ${colorMappings[status]}`}
-                style={{ width: 8, height: 8, borderRadius: "50%" }}
-              />
-              <UncontrolledTooltip placement="bottom" target={tooltipId}>
-                {tooltipMappings[status]}
-              </UncontrolledTooltip>
-            </>
-          )}
         </div>
       );
     };
@@ -302,12 +298,15 @@ class Status extends React.Component {
         <div className="mb-5">
           {this._renderLabel({
             label: "Initial setup",
-            type: allConfigured ? statusBadgeType.done : statusBadgeType.error,
-            success: allConfigured,
-            error: error || "Wasn't done, see README",
+            type,
+            error,
+            text:
+              type === statusBadgeType.unconfigured
+                ? "Wasn't done, see README"
+                : undefined,
           })}
           {!allConfigured && (
-            <div>
+            <div className="pb-3">
               Go to <a href="#/setup">/setup</a> page to complete setup.
             </div>
           )}
@@ -349,13 +348,12 @@ class Status extends React.Component {
     success,
     error,
     type,
+    text,
     value = false,
-    successTooltip = false,
+    tooltip,
     opacity = false,
     image = null,
   }) {
-    const tooltipId = label.replace(" ", "");
-
     let statusType = type;
     if (!statusType) {
       statusType = success
@@ -394,14 +392,14 @@ class Status extends React.Component {
                 {label}: {value}
               </h5>
             </div>
-            <div className="col" id={tooltipId}>
-              <StatusBadge status={statusType} error={error} />
+            <div className="col">
+              <StatusBadge
+                status={statusType}
+                error={error}
+                tooltip={tooltip}
+                text={text}
+              />
             </div>
-            {successTooltip && (
-              <UncontrolledTooltip placement="bottom" target={tooltipId}>
-                {successTooltip}
-              </UncontrolledTooltip>
-            )}
           </div>
         </div>
       </>
