@@ -30,6 +30,7 @@ router.get(
 
     let most_viewed_post = preparePost(stats.most_viewed_post) || {};
     stats.most_viewed_post = {
+      id: most_viewed_post.id,
       title: most_viewed_post.title,
       url: most_viewed_post.url,
       full_url: most_viewed_post.full_url,

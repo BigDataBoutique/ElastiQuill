@@ -1,9 +1,17 @@
 import React, { Component, Fragment } from "react";
 import { inject, observer } from "mobx-react";
 import { withRouter } from "react-router-dom";
+import classnames from "classnames";
 import LoggedInLayout from "../components/LoggedInLayout";
-import StatsOverTimeGraph from "../components/StatsOverTimeGraph";
 import CommentsList from "../components/CommentsList";
+import FAIcon from "../components/FAIcon";
+import {
+  StatsOverTimeGraph,
+  VisitsMap,
+  VisitsByCountry,
+  ReferralsStats,
+  UserAgentStats,
+} from "../components/Stats";
 
 @inject("statsStore")
 @withRouter
@@ -12,6 +20,10 @@ class ItemStatsPage extends Component {
   constructor(props) {
     super(props);
     this._loadData();
+
+    this.state = {
+      showStats: true,
+    };
   }
 
   render() {
@@ -25,23 +37,42 @@ class ItemStatsPage extends Component {
       },
     ];
 
+    const toggleStats = () => {
+      this.setState(prevState => ({ showStats: !prevState.showStats }));
+    };
+
     return (
       <LoggedInLayout
         pageTitle={item ? `Stats for '${item.title}'` : "Loading..."}
         breadcrumbs={breadcrumbs}
       >
         <div className="elastiquill-content">
-          <div className="row">
-            <div className="col-12">
-              <div className="elastiquill-card">
-                <StatsOverTimeGraph key={item ? item.id : null} item={item} />
-              </div>
-            </div>
+          <div className="d-flex justify-content-end">
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={toggleStats}
+              style={{ color: "black", paddingRight: 0 }}
+            >
+              Collapse stats
+              <FAIcon
+                icon={this.state.showStats ? "angle-down" : "angle-up"}
+                className="ml-2"
+              />
+            </button>
+          </div>
+          <div
+            className={classnames(
+              "elastiquill-post-stats-container",
+              !this.state.showStats && "hidden"
+            )}
+          >
+            {this._renderStats()}
           </div>
           {type === "post" && (
             <Fragment>
               <div className="elastiquill-header">Comments</div>
-              <div className="row">
+              <div className="row mb-4">
                 <div className="col-12">
                   <div className="elastiquill-card">
                     {isLoading ? (
@@ -65,9 +96,100 @@ class ItemStatsPage extends Component {
     );
   }
 
+  _renderStats() {
+    const {
+      beingLoaded,
+      item,
+      visitsByLocation,
+      visitsByCountry,
+      referrerType,
+      referrerFromDomain,
+      userAgentOperatingSystem,
+      userAgentName,
+      uniqueVisitorsEnabled,
+    } = this.props.statsStore;
+
+    if (beingLoaded.length) {
+      return "Loading...";
+    }
+
+    const onToggleUniqueVisitors = () =>
+      this.props.statsStore.toggleUniqueVisitors();
+
+    return (
+      <>
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="elastiquill-header d-flex w-100">
+              {item.type === "post" ? "Post" : "Page"} statistics
+              <div style={{ flex: 1, textAlign: "right", userSelect: "none" }}>
+                <div>
+                  <input
+                    readOnly
+                    checked={uniqueVisitorsEnabled}
+                    type="checkbox"
+                    onClick={onToggleUniqueVisitors}
+                  />
+                  <label
+                    onClick={onToggleUniqueVisitors}
+                    style={{ cursor: "pointer", marginLeft: 10 }}
+                  >
+                    Unique visitors
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="elastiquill-card">
+              <StatsOverTimeGraph
+                key={item ? item.id : null}
+                item={item}
+                uniqueVisitors={uniqueVisitorsEnabled}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="row mb-4">
+          <div className="col-lg-8">
+            <div className="elastiquill-header">Visitors Map</div>
+            <div className="elastiquill-card">
+              <VisitsMap mapData={visitsByLocation} />
+            </div>
+          </div>
+          <div className="col-lg-4">
+            <div className="elastiquill-header">Visitors by country</div>
+            <div className="elastiquill-card">
+              <VisitsByCountry data={visitsByCountry} />
+            </div>
+          </div>
+        </div>
+        <div className="row mb-4">
+          <div className="col-md-6">
+            <div className="elastiquill-header">Referrals stats</div>
+            <div className="elastiquill-card">
+              <ReferralsStats
+                referrerDomain={referrerFromDomain}
+                referrerType={referrerType}
+              />
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="elastiquill-header">User-Agent stats</div>
+            <div className="elastiquill-card">
+              <UserAgentStats
+                userAgentName={userAgentName}
+                userAgentOperatingSystem={userAgentOperatingSystem}
+              />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   _loadData() {
     const { id, type } = this.props.match.params;
     this.props.statsStore.loadData(type, id);
+    this.props.statsStore.loadStats(type, id);
   }
 }
 

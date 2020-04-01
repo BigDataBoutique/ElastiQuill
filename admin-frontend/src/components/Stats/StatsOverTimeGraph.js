@@ -15,7 +15,7 @@ import {
 } from "react-vis";
 import "react-vis/dist/style.css";
 
-import * as api from "../api";
+import * as api from "../../api";
 
 const VISITS_COLOR = "#40c4ff";
 const VIEWS_COLOR = "#00e676";

@@ -1,6 +1,7 @@
 import React from "react";
 import { Badge } from "reactstrap";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 import ConfirmModal from "./ConfirmModal";
 import * as api from "../api";
@@ -61,9 +62,9 @@ export default class CommentsList extends React.Component {
         {isRoot && !this.props.hidePostLink && (
           <div style={{ marginTop: 10 }}>
             Commented on post{" "}
-            <a target="_blank" href={comment.post_url}>
+            <Link to={`/stats/post/${comment.post_id}`}>
               {`"${comment.post_title}"`}
-            </a>
+            </Link>
           </div>
         )}
         {this.props.treeView && comment.replies.length > 0 && (
