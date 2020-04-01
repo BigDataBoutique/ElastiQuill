@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link, Route } from "react-router-dom";
 import SVG from "react-inlinesvg";
 import classnames from "classnames";
+import PropType from "prop-types";
 
 import FAIcon from "./FAIcon";
 
@@ -46,10 +47,16 @@ class NavLink extends Component {
     if (this.props.image) {
       return (
         <SVG
+          style={{
+            color: this.props.iconColor || "black",
+          }}
           className={classnames("elastiquill-nav-link-icon", {
             "elastiquill-nav-link-icon-active": isActive,
           })}
           src={this.props.image}
+          preProcessor={code =>
+            code.replace(/fill=".*?"/g, 'fill="currentColor"')
+          }
         />
       );
     }
@@ -64,5 +71,17 @@ class NavLink extends Component {
     );
   }
 }
+
+NavLink.propTypes = {
+  label: PropType.string.isRequired,
+  url: PropType.oneOfType([
+    PropType.string,
+    PropType.shape({
+      pathname: PropType.string,
+    }),
+  ]).isRequired,
+  image: PropType.string.isRequired,
+  iconColor: PropType.string,
+};
 
 export default NavLink;

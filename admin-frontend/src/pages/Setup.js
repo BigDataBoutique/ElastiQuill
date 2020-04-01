@@ -3,11 +3,11 @@ import { inject, observer } from "mobx-react";
 
 import LoggedInLayout from "../components/LoggedInLayout";
 
-@inject("setupStore")
+@inject("statusStore")
 @observer
 class Setup extends Component {
   componentDidMount() {
-    this.props.setupStore.loadStatus();
+    this.props.statusStore.loadSetupStatus();
   }
 
   render() {
@@ -23,11 +23,11 @@ class Setup extends Component {
   }
 
   _renderContent() {
-    if (this.props.setupStore.isLoading) {
+    if (this.props.statusStore.isLoading) {
       return "Loading...";
     }
 
-    if (this.props.setupStore.status === "ready") {
+    if (this.props.statusStore.setupStatus === "ready") {
       return (
         <div className="alert alert-success">
           Elasticsearch setup is completed.
@@ -36,12 +36,12 @@ class Setup extends Component {
     }
 
     const isLoadingSetup =
-      this.props.setupStore.beingLoaded.indexOf("setup") > -1;
+      this.props.statusStore.beingLoaded.indexOf("setup") > -1;
 
     return (
       <div>
         <div
-          onClick={() => this.props.setupStore.setupElasticsearch()}
+          onClick={() => this.props.statusStore.setupElasticsearch()}
           disabled={isLoadingSetup}
           className="btn btn-primary btn-lg"
         >
