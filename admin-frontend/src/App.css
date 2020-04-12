@@ -339,6 +339,30 @@ body {
   pointer-events: none;
 }
 
+.elastiquill-log-level-tag {
+  border: none;
+  background: transparent;
+  padding: 1px 8px;
+  margin-right: 8px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+
+.elastiquill-log-level-tag.danger {
+  color: #f85359;
+  background-color: rgba(248, 83, 89, 0.1);
+}
+
+.elastiquill-log-level-tag.warning {
+  color: #f7981c;
+  background-color: rgba(247, 152, 28, 0.1);
+}
+
+.elastiquill-log-level-tag.info {
+  color: #1991eb;
+  background-color: rgba(25, 145, 235, 0.1);
+}
+
 blockquote {
   display: block;
   background: #fff;

@@ -67,7 +67,7 @@ class Status extends BaseStore {
     const setupError = this.setupStatus && this.setupStatus !== "ready";
     const clusterHealthError =
       this.status.elasticsearch.cluster_health === "red";
-    const logLevelError = this.status.elasticsearch.log_level === "error";
+    const logLevelError = !!this.status.elasticsearch.log_level.error;
     const uploadError = !!this.status.upload.errors[this.status.upload.backend];
     const themeError = !!this.status.theme.error;
     if (
@@ -80,7 +80,7 @@ class Status extends BaseStore {
       return "red";
     } else if (
       this.status.elasticsearch.cluster_health === "yellow" ||
-      this.status.elasticsearch.log_level === "warn"
+      !!this.status.elasticsearch.log_level.warn
     ) {
       return "yellow";
     } else {

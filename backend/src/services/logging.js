@@ -29,20 +29,18 @@ export async function getStatus() {
     },
   });
 
-  let logLevel = null;
+  let logLevel = {};
 
   if (resp.aggregations && resp.aggregations.log_levels) {
-    const logLevels = resp.aggregations.log_levels.buckets.map(b => b.key);
-    if (logLevels.includes("error")) {
-      logLevel = "error";
-    } else if (logLevels.includes("warn")) {
-      logLevel = "warn";
-    }
+    logLevel = resp.aggregations.log_levels.buckets.reduce((result, b) => {
+      return {
+        ...result,
+        [b.key]: b.doc_count,
+      };
+    }, {});
   }
 
-  return {
-    logLevel,
-  };
+  return logLevel;
 }
 
 export async function getStats({
@@ -339,6 +337,59 @@ export async function getStats({
     user_agent_os,
     user_agent_name,
   };
+}
+
+export async function getLogsByLevel(level) {
+  let query = {
+    bool: {
+      must: {
+        match: {
+          "log.level": level,
+        },
+      },
+    },
+  };
+
+  if (level === "info") {
+    query = {
+      match_all: {},
+    };
+  }
+
+  let resp = await esClient.search({
+    index: LOGS_INDICES_PREFIX + "*",
+    size: 20,
+    ignore_unavailable: true,
+    body: {
+      query,
+      sort: [
+        {
+          "@timestamp": { order: "desc" },
+        },
+      ],
+    },
+  });
+
+  return resp.hits.hits.map(hit => {
+    const level = hit._source.log.level;
+    let message = "";
+    if (level === "error") {
+      message = hit._source.error.message;
+    } else {
+      if (hit._source.tags.includes("auth")) {
+        message = `${hit._source.email} - ${hit._source.status}`;
+      } else if (hit._source.tags.includes("visit")) {
+        message = hit._source.url.full;
+      }
+    }
+
+    return {
+      level,
+      message,
+      timestamp: hit._source["@timestamp"],
+      tags: hit._source.tags,
+    };
+  });
 }
 
 export async function* allLogsGenerator() {

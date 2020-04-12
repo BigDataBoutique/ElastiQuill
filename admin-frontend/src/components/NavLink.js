@@ -47,6 +47,7 @@ class NavLink extends Component {
     if (this.props.image) {
       return (
         <SVG
+          key={this.props.image + this.props.iconColor}
           style={{
             color: this.props.iconColor || "black",
           }}

@@ -10,6 +10,7 @@ import importRoute from "./import";
 import status from "./status";
 import setup from "./setup";
 import dump from "./dump";
+import logs from "./logs";
 import auth, { updateAuthInfoToken, updateUserRole } from "./auth";
 
 import * as loggingService from "../services/logging";
@@ -45,6 +46,7 @@ router.use("/content", content);
 router.use("/social", social);
 router.use("/stats", stats);
 router.use("/dump", dump);
+router.use("/logs", logs);
 
 router.use((err, req, res) => {
   res.status(err.status || 500).json({
