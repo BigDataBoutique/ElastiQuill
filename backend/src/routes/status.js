@@ -32,7 +32,7 @@ router.get(
       elasticsearch: {
         setup: await elasticsearch.getStatus(),
         cluster_health: await elasticsearch.getClusterHealth(),
-        log_level: (await logging.getStatus()).logLevel,
+        log_level: await logging.getStatus(),
       },
       upload: await storage.getStatus(),
       admin: {

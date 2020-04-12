@@ -198,6 +198,10 @@ export async function loadStatus() {
   return await authFetchJson("/api/status");
 }
 
+export async function loadLogs(level) {
+  return await authFetchJson("/api/logs?level=" + level);
+}
+
 export function uploadImageUrl() {
   return "/api/uploads/image";
 }

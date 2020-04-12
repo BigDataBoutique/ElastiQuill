@@ -75,7 +75,7 @@ function StatusBadge({ status, error, text, tooltip, color }) {
 StatusBadge.propTypes = {
   status: PropType.oneOf(Object.values(statusBadgeType)).isRequired,
   error: PropType.string,
-  text: PropType.string,
+  text: PropType.node,
   tooltip: PropType.string,
   color: PropType.string,
 };

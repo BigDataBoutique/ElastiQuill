@@ -1,28 +1,25 @@
 import _ from "lodash";
 import React from "react";
-import { toast } from "react-toastify";
+import { inject, observer } from "mobx-react";
 
-import * as api from "../api";
 import colors from "../config/colors";
 import LoggedInLayout from "../components/LoggedInLayout";
 import StatusBadge, { statusBadgeType } from "./../components/StatusBadge";
+import LogModal from "../components/LogModal";
 
 import linkedin from "./../assets/img/linkedin.svg";
 import medium from "./../assets/img/medium.svg";
 import reddit from "./../assets/img/reddit.svg";
 import twitter from "./../assets/img/twitter.svg";
 
+@inject("statusStore")
+@observer
 class Status extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      status: null,
+      logLevel: null,
     };
-
-    api
-      .loadStatus()
-      .then(status => this.setState({ status }))
-      .catch(err => toast.error(err.message));
   }
 
   render() {
@@ -32,6 +29,12 @@ class Status extends React.Component {
           <div className="row">
             <div className="col-12">
               <div>{this._renderStatus()}</div>
+              {this.state.logLevel && (
+                <LogModal
+                  level={this.state.logLevel}
+                  onRequestClose={() => this.setState({ logLevel: null })}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -60,7 +63,7 @@ class Status extends React.Component {
   }
 
   _renderStatus() {
-    if (!this.state.status) {
+    if (!this.props.statusStore.status) {
       return "Loading...";
     }
 
@@ -72,7 +75,7 @@ class Status extends React.Component {
       social,
       theme,
       emails,
-    } = this.state.status;
+    } = this.props.statusStore.status;
 
     const styles = {
       title: {
@@ -232,112 +235,155 @@ class Status extends React.Component {
       ? statusBadgeType.unconfigured
       : statusBadgeType.error;
 
-    const renderHealth = status => {
-      const mappings = {
-        // cluster health
-        red: statusBadgeType.error,
-        yellow: statusBadgeType.error,
-        green: statusBadgeType.configured,
-        // log level
-        warn: statusBadgeType.error,
-        error: statusBadgeType.error,
-      };
+    return (
+      <div className="mb-5">
+        {this._renderLabel({
+          label: "Initial setup",
+          type,
+          error,
+          text:
+            type === statusBadgeType.unconfigured
+              ? "Wasn't done, see README"
+              : undefined,
+        })}
+        {!allConfigured && (
+          <div className="pb-3">
+            Go to <a href="#/setup">/setup</a> page to complete setup.
+          </div>
+        )}
+        {this._renderClusterHealth(elasticsearch.cluster_health)}
+        {this._renderLogLevel(elasticsearch.log_level)}
+        <hr className="m-0" />
+      </div>
+    );
+  }
 
-      const colorMappings = {
-        red: colors.danger,
-        yellow: colors.warning,
-        green: colors.primary,
-        warn: colors.warning,
-        error: colors.error,
-      };
-
-      const descriptionMappings = {
-        red:
-          "One or more primary shards are unassigned, so some data is unavailable.",
-        yellow:
-          "All primary shards are assigned, but one or more replica shards are unassigned.",
-        green: "All shards are assigned.",
-        warn: "Warn",
-        error: "Error",
-      };
-
-      // for warnings
-      const healthWarning =
-        status === "yellow" || status === "warn"
-          ? descriptionMappings[status]
-          : undefined;
-      // for errors
-      const healthError =
-        status === "red" || status === "error"
-          ? descriptionMappings[status]
-          : undefined;
-
-      return (
-        <div className="d-flex align-items-center">
-          <StatusBadge
-            status={mappings[status] || statusBadgeType.configured}
-            color={colorMappings[status]}
-            tooltip={healthWarning}
-            // for warnings use "configured" text instead of "error"
-            text={healthWarning ? statusBadgeType.configured : undefined}
-            error={healthError}
-          />
-        </div>
-      );
+  _renderClusterHealth(health) {
+    const mappings = {
+      red: statusBadgeType.error,
+      yellow: statusBadgeType.error,
+      green: statusBadgeType.configured,
     };
 
-    const styles = {
-      renderText: {
-        fontSize: 16,
-        color: "#404043",
-        opacity: 0.75,
-      },
+    const colorMappings = {
+      red: colors.danger,
+      yellow: colors.warning,
+      green: colors.primary,
     };
+
+    const descriptionMappings = {
+      red:
+        "One or more primary shards are unassigned, so some data is unavailable.",
+      yellow:
+        "All primary shards are assigned, but one or more replica shards are unassigned.",
+      green: "All shards are assigned.",
+    };
+
+    // for warnings
+    const healthWarning =
+      health === "yellow" ? descriptionMappings[health] : undefined;
+    // for errors
+    const healthError =
+      health === "red" ? descriptionMappings[health] : undefined;
+
     return (
       <>
-        <div className="mb-5">
-          {this._renderLabel({
-            label: "Initial setup",
-            type,
-            error,
-            text:
-              type === statusBadgeType.unconfigured
-                ? "Wasn't done, see README"
-                : undefined,
-          })}
-          {!allConfigured && (
-            <div className="pb-3">
-              Go to <a href="#/setup">/setup</a> page to complete setup.
+        <hr className="m-0" />
+        <div
+          style={{ backgroundColor: "rgba(229, 229, 229, 0.06)" }}
+          className="py-3"
+        >
+          <div className="row">
+            <div
+              style={{ fontSize: 16, color: "#404043", opacity: 0.75 }}
+              className="col-8"
+            >
+              Elasticsearch cluster health{" "}
             </div>
-          )}
+            <div className="col">
+              <div className="d-flex align-items-center">
+                <StatusBadge
+                  status={mappings[health] || statusBadgeType.configured}
+                  color={colorMappings[health]}
+                  tooltip={healthWarning}
+                  // for warnings use "configured" text instead of "error"
+                  text={healthWarning ? statusBadgeType.configured : undefined}
+                  error={healthError}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
-          <hr className="m-0" />
-          <div
-            style={{ backgroundColor: "rgba(229, 229, 229, 0.06)" }}
-            className="py-3"
+  _renderLogLevel(logLevel) {
+    const status =
+      logLevel.error || logLevel.warn
+        ? statusBadgeType.error
+        : statusBadgeType.configured;
+    const color = logLevel.error
+      ? colors.danger
+      : logLevel.warn
+      ? colors.warning
+      : colors.primary;
+
+    const setLogLevel = level => () => {
+      this.setState({ logLevel: level });
+    };
+    const text = (
+      <>
+        <span className="mr-2">
+          {logLevel.error ? statusBadgeType.error : statusBadgeType.configured}
+        </span>
+        {logLevel.error && (
+          <button
+            className="elastiquill-log-level-tag danger"
+            onClick={setLogLevel("error")}
           >
-            <div className="row">
-              <div style={styles.renderText} className="col-8">
-                Elasticsearch cluster health{" "}
-              </div>
-              <div className="col">
-                {renderHealth(elasticsearch.cluster_health)}
+            errors ({logLevel.error})
+          </button>
+        )}
+        {logLevel.warn && (
+          <button
+            className="elastiquill-log-level-tag warning"
+            onClick={setLogLevel("warn")}
+          >
+            warnings ({logLevel.warn})
+          </button>
+        )}
+        {logLevel.info && (
+          <button
+            className="elastiquill-log-level-tag info"
+            onClick={setLogLevel("info")}
+          >
+            info ({logLevel.info})
+          </button>
+        )}
+      </>
+    );
+
+    return (
+      <>
+        <hr className="m-0" />
+        <div
+          style={{ backgroundColor: "rgba(229, 229, 229, 0.06)" }}
+          className="py-3"
+        >
+          <div className="row">
+            <div
+              style={{ fontSize: 16, color: "#404043", opacity: 0.75 }}
+              className="col-8"
+            >
+              Blog operation
+            </div>
+            <div className="col">
+              <div className="d-flex align-items-center">
+                <StatusBadge status={status} color={color} text={text} />
               </div>
             </div>
           </div>
-          <hr className="m-0" />
-          <div
-            style={{ backgroundColor: "rgba(229, 229, 229, 0.06)" }}
-            className="py-3"
-          >
-            <div className="row">
-              <div style={styles.renderText} className="col-8">
-                Blog operation
-              </div>
-              <div className="col">{renderHealth(elasticsearch.log_level)}</div>
-            </div>
-          </div>
-          <hr className="m-0" />
         </div>
       </>
     );
