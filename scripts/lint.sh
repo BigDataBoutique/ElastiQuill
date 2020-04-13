@@ -7,8 +7,6 @@ for dir in $DIRS; do
   echo "Checking $dir source"
   (cd $dir && npm run lint)
   DIR_STATUS=$?
-  [ $DIR_STATUS -ne 0 ] && COMBINED_STATUS=$DIR_STATUS
+  [ "$DIR_STATUS" != "0" ] && [ "$COMBINED_STATUS" = "0" ] && COMBINED_STATUS=$DIR_STATUS
 done
-
-[ $COMBINED_STATUS -ne 0 ] && exit $DIR_STATUS
-exit 0
+exit $COMBINED_STATUS

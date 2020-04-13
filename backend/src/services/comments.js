@@ -3,9 +3,7 @@ import Joi from "joi";
 import uid from "uid";
 import * as blogPosts from "./blogPosts";
 import { esClient } from "../lib/elasticsearch";
-import { config } from "../config";
-
-const ES_INDEX = config.elasticsearch["blog-comments-index-name"];
+import { BLOG_COMMENTS_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
 
 const CreateCommentArgSchema = Joi.object().keys({
   recipient_comment_id: Joi.string()

@@ -11,6 +11,7 @@ import * as elasticsearch from "./elasticsearch";
 
 let elasticsearchIsReady = false;
 
+const LOGS_DEFAULT_START_FROM = "now-24h";
 const LOGS_INDICES_PREFIX = config.elasticsearch["blog-logs-index-name"];
 const LOGS_PERIOD = config.elasticsearch["blog-logs-period"];
 const CRAWLER_USER_AGENTS = new Set(
@@ -21,6 +22,17 @@ export async function getStatus() {
   const resp = await esClient.search({
     index: LOGS_INDICES_PREFIX + "*",
     body: {
+      query: {
+        bool: {
+          filter: {
+            range: {
+              "@timestamp": {
+                gte: LOGS_DEFAULT_START_FROM,
+              },
+            },
+          },
+        },
+      },
       aggs: {
         log_levels: {
           terms: { field: "log.level" },
@@ -340,20 +352,26 @@ export async function getStats({
 }
 
 export async function getLogsByLevel(level) {
-  let query = {
+  const query = {
     bool: {
-      must: {
-        match: {
-          "log.level": level,
+      filter: [
+        {
+          range: {
+            "@timestamp": {
+              gte: LOGS_DEFAULT_START_FROM,
+            },
+          },
         },
-      },
+      ],
     },
   };
 
-  if (level === "info") {
-    query = {
-      match_all: {},
-    };
+  if (level !== "info") {
+    query.bool.filter.push({
+      match: {
+        "log.level": level,
+      },
+    });
   }
 
   let resp = await esClient.search({

@@ -55,7 +55,7 @@ class FacebookShareButton extends Component {
         quote: this.props.quote,
         hashtag: this.props.hashtag,
       },
-      res => {}
+      () => {}
     );
   }
 }
