@@ -44,6 +44,7 @@ class MarkdownEditor extends Component {
       uploadImageUrl += "?post_id=" + this.props.blogpostId;
     }
 
+    // eslint-disable-next-line
     inlineAttachment.editors.codemirror4.attach(instance.codemirror, {
       uploadUrl: uploadImageUrl,
       extraHeaders: {

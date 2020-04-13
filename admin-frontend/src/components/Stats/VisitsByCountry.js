@@ -1,5 +1,6 @@
 import React from "react";
 import PropType from "prop-types";
+import countries from "i18n-iso-countries";
 
 const VisitsByCountry = ({ data }) => {
   if (!data.length) {
