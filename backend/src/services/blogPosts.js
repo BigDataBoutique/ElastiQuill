@@ -659,6 +659,10 @@ async function indexWithUniqueId(indexProps) {
 }
 
 function makeSlug(title) {
+  if (!title || !title.length) {
+    return "untitled";
+  }
+
   return slugify(title, {
     remove: /[*+~./,()'"!:@^#?]/g,
     lower: true,
