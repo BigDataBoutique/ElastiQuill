@@ -109,6 +109,19 @@ class BaseItemsPage extends Component {
         false
       );
 
+    const getDescription = item => {
+      const content = _.get(item, "draft.content", item.content);
+      if (item.description || item.metadata.content_type === "markdown") {
+        return item.description || content;
+      }
+
+      const el = $(content);
+      el.each(function() {
+        $(this).append(" ");
+      });
+      return el.text().replace(/\s\s+/g, " ");
+    };
+
     return (
       <div
         className="elastiquill-card"
@@ -155,7 +168,7 @@ class BaseItemsPage extends Component {
             style={{ marginTop: "10px" }}
             className="elastiquill-text elastiquill-text-ellipsis"
           >
-            {item.description || _.get(item, "draft.content", item.content)}
+            {getDescription(item)}
           </div>
           <div style={{ marginTop: "16px" }}>
             {item.series && (
