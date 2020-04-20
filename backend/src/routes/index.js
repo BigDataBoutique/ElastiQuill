@@ -17,7 +17,7 @@ import { preparePost, tagUrl, seriesUrl } from "./util";
 import { config } from "../config";
 
 function ensureNoSlash(str) {
-  if (str[str.length - 1] == "/") {
+  if (str[str.length - 1] === "/") {
     return str.substr(0, -1);
   }
   return str;
@@ -30,6 +30,10 @@ const router = express.Router();
 
 router.get("/healthz", (req, res) => {
   res.status(200).json({ status: "ok" });
+});
+
+router.get("/robots.txt", (req, res) => {
+  res.end("User-agent: *\n" + "Disallow:\n");
 });
 
 if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== "/") {
