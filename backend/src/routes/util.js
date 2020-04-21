@@ -229,7 +229,7 @@ export function seriesUrl(series) {
     throw new Error("Invalid argument provided to seriesUrl");
   }
 
-  const url = "/series/" + encodeURIComponent(series);
+  const url = "/series/" + encodeURIComponent(series.toLowerCase());
   return BLOG_ROUTE_PREFIX === "/" ? url : BLOG_ROUTE_PREFIX + url;
 }
 
@@ -238,7 +238,7 @@ export function tagUrl(tag) {
     throw new Error("Invalid argument provided to tagUrl");
   }
 
-  const url = "/tagged/" + encodeURIComponent(tag);
+  const url = "/tagged/" + encodeURIComponent(tag.toLowerCase());
   return BLOG_ROUTE_PREFIX === "/" ? url : BLOG_ROUTE_PREFIX + url;
 }
 

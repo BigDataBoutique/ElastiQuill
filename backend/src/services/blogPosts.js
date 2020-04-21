@@ -451,14 +451,14 @@ export async function getItems({
       aggs: {
         tags: {
           terms: {
-            field: "tags",
+            field: "tags.keyword",
             exclude: SERIES_REGEXP_STR,
             size: 50,
           },
         },
         series: {
           terms: {
-            field: "tags",
+            field: "tags.keyword",
             include: SERIES_REGEXP_STR,
             size: 50,
           },
@@ -506,7 +506,7 @@ export async function getItems({
 
   if (filterByTags.length) {
     query.body.query.bool.filter.push({
-      terms: { tags: filterByTags },
+      terms: { "tags.keyword-lowercase": filterByTags },
     });
   }
 
@@ -607,14 +607,14 @@ export async function getAllTags() {
       aggs: {
         tags: {
           terms: {
-            field: "tags",
+            field: "tags.keyword",
             exclude: SERIES_REGEXP_STR,
             size: 50,
           },
         },
         series: {
           terms: {
-            field: "tags",
+            field: "tags.keyword",
             include: SERIES_REGEXP_STR,
             size: 50,
           },

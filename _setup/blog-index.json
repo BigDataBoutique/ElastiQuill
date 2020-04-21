@@ -46,7 +46,16 @@
           "doc_values": false
         },
         "tags": {
-          "type": "keyword"
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "keyword-lowercase": {
+              "type": "keyword",
+              "normalizer": "keyword_lowercase"
+            }
+          }
         },
         "title": {
           "type": "text"
@@ -61,6 +70,14 @@
   "settings": {
     "index": {
       "number_of_shards": 1
+    },
+    "analysis": {
+      "normalizer": {
+        "keyword_lowercase": {
+          "type": "custom",
+          "filter": ["lowercase"]
+        }
+      }
     }
   }
 }
