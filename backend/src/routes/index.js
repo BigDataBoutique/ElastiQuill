@@ -43,13 +43,8 @@ if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== "/") {
 }
 
 // lowercase urls
-const caseSensitiveUrlsRegex = /\/tagged\/|\/series\//;
 router.use((req, res, next) => {
-  if (
-    req.method === "GET" &&
-    req.path.toLowerCase() !== req.path &&
-    !req.path.match(caseSensitiveUrlsRegex)
-  ) {
+  if (req.method === "GET" && req.path.toLowerCase() !== req.path) {
     var parsedUrl = url.parse(req.originalUrl);
     parsedUrl.pathname = parsedUrl.pathname.toLowerCase();
     res.redirect(url.format(parsedUrl));
