@@ -361,6 +361,14 @@ function handlePostsRequest(template) {
       }
     }
 
+    let description = null;
+    if (tagDescription) {
+      description = tagDescription.content
+        .replace(/(<([^>]+)>)/gi, " ")
+        .replace(/\s\s+/g, " ")
+        .trim();
+    }
+
     res.render(template, {
       tag,
       total,
@@ -375,6 +383,7 @@ function handlePostsRequest(template) {
       prevPage: pageIndex > 0 ? pageIndex : null,
       nextPage: pageIndex + 1 < totalPages ? pageIndex + 2 : null,
       posts: items.map(preparePost),
+      ...(description && { description }),
     });
   };
 }
