@@ -383,7 +383,7 @@ function handlePostsRequest(template) {
       prevPage: pageIndex > 0 ? pageIndex : null,
       nextPage: pageIndex + 1 < totalPages ? pageIndex + 2 : null,
       posts: items.map(preparePost),
-      ...(description && { description }),
+      description,
     });
   };
 }
