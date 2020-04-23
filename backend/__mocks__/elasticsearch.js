@@ -31,6 +31,9 @@ const esMock = {
     },
     reindex: mockReindex,
     ping: () => {},
+    index: () => {},
+    get: () => {},
+    update: () => {},
     __setupMock: setupMock,
   }),
 };

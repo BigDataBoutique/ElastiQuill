@@ -344,6 +344,11 @@ export async function updateItem(id, type, post) {
     doc.slug = makeSlug(doc.title);
   }
 
+  const item = await getItemById({ id });
+  if (!item.is_published && post.is_published) {
+    doc.published_at = new Date().toISOString();
+  }
+
   await esClient.update({
     id,
     index: ES_INDEX,
@@ -543,14 +548,21 @@ export async function getStats({
 }) {
   const filters = [];
   if (startDate || endDate) {
-    filters.push({
-      range: {
-        published_at: {
-          lte: endDate || null,
-          gte: startDate || null,
+    filters.push(
+      {
+        range: {
+          published_at: {
+            lte: endDate || null,
+            gte: startDate || null,
+          },
         },
       },
-    });
+      {
+        term: {
+          is_published: true,
+        },
+      }
+    );
   }
 
   if (type) {
