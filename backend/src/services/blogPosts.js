@@ -287,7 +287,7 @@ export async function createItem(type, post) {
     if (post.metadata.is_tag_description && tagDescription) {
       const { tag, is_series } = tagDescription;
       id = CONTENT_DESCRIPTION_ID_PREFIX;
-      id += is_series ? `{${tag}}` : tag;
+      id += is_series ? `{${tag.toLowerCase()}}` : tag.toLowerCase();
     }
 
     resp = await esClient.index({
@@ -489,7 +489,7 @@ export async function getItems({
     query.body.query.bool.must = {
       multi_match: {
         query: search,
-        fields: ["title", "description", "content"],
+        fields: ["title", "description", "content", "tags"],
       },
     };
   }
