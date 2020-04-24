@@ -2,8 +2,8 @@ import _ from "lodash";
 import url from "url";
 import uid from "uid";
 import express from "express";
-import inbound from "inbound";
 import asyncHandler from "express-async-handler";
+import referrerParser from "@cgamesplay/referer-parser";
 import routingTableRouter from "./routingTable";
 import blogRouter from "./blog";
 import pageRouter from "./page";
@@ -56,15 +56,15 @@ router.use((req, res, next) => {
 // parse referrer
 router.use((req, res, next) => {
   const referrer = req.header("referrer");
-  const href = req.protocol + "://" + req.get("host") + req.originalUrl;
 
-  inbound.referrer.parse(href, referrer, (err, desc) => {
-    req.referrer = desc.referrer;
-    if (referrer) {
-      req.referrer.from_domain = url.parse(referrer).hostname;
-    }
-    next(err);
-  });
+  // skip self-referrals (inter-site browsing, resource loading, ...)
+  if (
+    referrer &&
+    referrer.toLowerCase().indexOf(req.hostname.toLowerCase()) === -1
+  ) {
+    req.referrer = new referrerParser(referrer);
+  }
+  next();
 });
 
 router.use(routingTableRouter);

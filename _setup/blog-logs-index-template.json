@@ -53,25 +53,25 @@
                 },
                 "referrer_parsed": {
                   "properties": {
+                    "full": {
+                      "type": "keyword"
+                    },
                     "path": {
-                      "type": "keyword"
-                    },
-                    "original": {
-                      "type": "keyword"
-                    },
-                    "scheme": {
-                      "type": "keyword"
-                    },
-                    "domain": {
                       "type": "keyword"
                     },
                     "query": {
                       "type": "keyword"
                     },
-                    "type": {
+                    "referer": {
                       "type": "keyword"
                     },
-                    "full": {
+                    "medium": {
+                      "type": "keyword"
+                    },
+                    "search_parameter": {
+                      "type": "keyword"
+                    },
+                    "search_term": {
                       "type": "keyword"
                     }
                   }
