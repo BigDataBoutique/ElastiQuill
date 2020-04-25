@@ -41,7 +41,7 @@ router.get("/auth-sources", function(req, res) {
 
 router.get("/logout", function(req, res) {
   res.clearCookie(AUTH_INFO_TOKEN_COOKIE);
-  res.redirect(BLOG_URL);
+  res.redirect(303, BLOG_URL);
 });
 
 passport.serializeUser((user, done) => done(null, user));

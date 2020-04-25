@@ -105,7 +105,7 @@ router.get(
       });
 
       if (post.slug !== req.params.slug) {
-        res.redirect(blogpostUrl(post));
+        res.redirect(301, blogpostUrl(post));
         return;
       }
 
@@ -190,7 +190,7 @@ router.post(
     );
 
     if (!post.allow_comments) {
-      res.redirect(req.originalUrl);
+      res.redirect(303, req.originalUrl);
       return;
     }
 

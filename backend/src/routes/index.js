@@ -38,16 +38,16 @@ router.get("/robots.txt", (req, res) => {
 
 if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== "/") {
   router.get("/", (req, res) =>
-    res.redirect(config.blog.url + BLOG_ROUTE_PREFIX)
+    res.redirect(301, config.blog.url + BLOG_ROUTE_PREFIX)
   );
 }
 
 // lowercase urls
 router.use((req, res, next) => {
   if (req.method === "GET" && req.path.toLowerCase() !== req.path) {
-    var parsedUrl = url.parse(req.originalUrl);
+    let parsedUrl = url.parse(req.originalUrl);
     parsedUrl.pathname = parsedUrl.pathname.toLowerCase();
-    res.redirect(url.format(parsedUrl));
+    res.redirect(301, url.format(parsedUrl));
   } else {
     next();
   }

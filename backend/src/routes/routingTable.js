@@ -17,11 +17,14 @@ if (routingTable) {
       case "MovedPermanently":
         statusCode = 301;
         break;
+      case "Found":
+        statusCode = 302;
+        break;
       case "SeeOther":
         statusCode = 303;
         break;
       default:
-        statusCode = http_status_code || 301;
+        statusCode = 301;
     }
 
     router.get(route, (req, res) => res.redirect(statusCode, new_route));
