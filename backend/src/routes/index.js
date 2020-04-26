@@ -121,11 +121,11 @@ router.use(
         });
         return {
           recentPosts: items.map(preparePost),
-          allTags: allTags.map(t => ({
+          allTags: allTags.map((t) => ({
             ...t,
             url: tagUrl(t.key),
           })),
-          allSeries: allSeries.map(t => ({
+          allSeries: allSeries.map((t) => ({
             ...t,
             url: seriesUrl(t.key),
           })),

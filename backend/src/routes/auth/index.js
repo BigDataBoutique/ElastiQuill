@@ -29,17 +29,17 @@ if (ADMIN_EMAILS.isEmpty()) {
 router.get(
   "/whoami",
   passport.authenticate("jwt", { session: false }),
-  function(req, res) {
+  function (req, res) {
     updateUserRole(req);
     res.json(req.user);
   }
 );
 
-router.get("/auth-sources", function(req, res) {
+router.get("/auth-sources", function (req, res) {
   res.json(socialAuthSources);
 });
 
-router.get("/logout", function(req, res) {
+router.get("/logout", function (req, res) {
   res.clearCookie(AUTH_INFO_TOKEN_COOKIE);
   res.redirect(303, BLOG_URL);
 });
@@ -197,7 +197,7 @@ export const passportDefaultCallback = (err, req, res, profile, next) => {
   }
 
   let user = null;
-  const profileEmails = profile.emails.map(em => em.value);
+  const profileEmails = profile.emails.map((em) => em.value);
   for (const email of profileEmails) {
     const foundRule =
       ADMIN_EMAILS.match(email) || PUBLISHER_EMAILS.match(email);
@@ -218,7 +218,7 @@ export const passportDefaultCallback = (err, req, res, profile, next) => {
     return;
   }
 
-  req.logIn(user, function(err) {
+  req.logIn(user, function (err) {
     if (err) {
       return next(err);
     }
