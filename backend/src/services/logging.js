@@ -610,20 +610,27 @@ function ecsHttp(req, res) {
 
   if (req.referrer) {
     const referrerRaw = req.header("referrer") || "";
+    const {
+      uri,
+      referer,
+      medium,
+      search_parameter,
+      search_term,
+    } = req.referrer;
 
-    const ignoreDomains = ["127.0.0.1", "0.0.0.0"];
-
-    if (
-      !ignoreDomains.includes(req.get("host")) &&
-      !["direct", "internal"].includes(req.referrer.type)
-    ) {
-      body.http.request.referrer = referrerRaw;
-      body.http.request.referrer_parsed = {
-        ...ecsUrl(req.referrer.from).url,
-        type: req.referrer.type,
-        domain: req.referrer.from_domain,
-      };
-    }
+    body.http.request.referrer = referrerRaw;
+    body.http.request.referrer_parsed = {
+      full: uri.href,
+      domain: uri.hostname,
+      path: uri.pathname,
+      query: uri.query,
+      type: medium,
+      referer,
+      search_parameter,
+      search_term,
+    };
+  } else {
+    body.http.request.referrer = "direct";
   }
 
   return body;
