@@ -195,7 +195,7 @@ export async function getStats({
         },
         referrer_type: {
           terms: {
-            field: "http.request.referrer_parsed.medium",
+            field: "http.request.referrer_parsed.type",
             size: 5,
           },
         },
@@ -624,8 +624,8 @@ function ecsHttp(req, res) {
       domain: uri.hostname,
       path: uri.pathname,
       query: uri.query,
+      type: medium,
       referer,
-      medium,
       search_parameter,
       search_term,
     };

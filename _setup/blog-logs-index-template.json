@@ -68,7 +68,7 @@
                     "referer": {
                       "type": "keyword"
                     },
-                    "medium": {
+                    "type": {
                       "type": "keyword"
                     },
                     "search_parameter": {
