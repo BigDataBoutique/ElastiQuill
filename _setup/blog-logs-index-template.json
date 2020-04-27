@@ -56,6 +56,9 @@
                     "full": {
                       "type": "keyword"
                     },
+                    "domain": {
+                      "type": "keyword"
+                    },
                     "path": {
                       "type": "keyword"
                     },

@@ -195,7 +195,7 @@ export async function getStats({
         },
         referrer_type: {
           terms: {
-            field: "http.request.referrer_parsed.type",
+            field: "http.request.referrer_parsed.medium",
             size: 5,
           },
         },
@@ -621,6 +621,7 @@ function ecsHttp(req, res) {
     body.http.request.referrer = referrerRaw;
     body.http.request.referrer_parsed = {
       full: uri.href,
+      domain: uri.hostname,
       path: uri.pathname,
       query: uri.query,
       referer,
