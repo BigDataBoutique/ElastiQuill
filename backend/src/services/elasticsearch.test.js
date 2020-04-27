@@ -279,7 +279,7 @@ describe("Elasticsearch service", () => {
 
     expect(await setup()).toBeFalsy();
     expect(mockReindex).toHaveBeenCalledTimes(1);
-    expect(mockLogError).toHaveBeenCalledWith("elasticsearch setup", error);
+    expect(mockLogError).toHaveBeenCalledWith("elasticsearch-setup", error);
 
     mockLogError.mockRestore();
     mockReindex.mockRestore();

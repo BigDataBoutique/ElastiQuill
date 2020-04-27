@@ -49,97 +49,97 @@ export async function getVersionString() {
 }
 
 export async function setup() {
-  const status = await getStatus();
-  const esVersion = await getVersionString();
-  const includeTypeName = semver.gte(esVersion, "7.0.0") ? true : undefined;
+  try {
+    const status = await getStatus();
+    const esVersion = await getVersionString();
+    const includeTypeName = semver.gte(esVersion, "7.0.0") ? true : undefined;
 
-  const blogIndexName = getIndexName(BLOG_INDEX, "blog-index.json");
-  if (!status.blogIndex) {
-    const parsed = readIndexFile("blog-index.json", { json: true });
+    await setupRollableIndex({
+      indexPrefix: BLOG_INDEX,
+      indexAliasName: BLOG_INDEX_ALIAS,
+      mappingsFilename: "blog-index.json",
+      indexExists: status.blogIndex,
+      indexUpToDate: status.blogIndexUpToDate,
+      includeTypeName,
+    });
+
+    await setupRollableIndex({
+      indexPrefix: BLOG_COMMENTS_INDEX,
+      indexAliasName: BLOG_COMMENTS_INDEX_ALIAS,
+      mappingsFilename: "blog-comments-index.json",
+      indexExists: status.blogCommentsIndex,
+      indexUpToDate: status.blogCommentsIndexUpToDate,
+      includeTypeName,
+    });
+
+    if (
+      !status.blogLogsIndexTemplate ||
+      !status.blogLogsIndexTemplateUpToDate
+    ) {
+      const parsed = readIndexFile("blog-logs-index-template.json", {
+        json: true,
+      });
+
+      try {
+        const current = await esClient.indices.getTemplate({
+          name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+        });
+        parsed.index_patterns = updateIndexPatterns(
+          current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
+        );
+      } catch (err) {
+        if (err.status != 404) {
+          throw err;
+        }
+        parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
+      }
+
+      await esClient.indices.putTemplate({
+        name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+        body: JSON.stringify(parsed),
+        includeTypeName,
+      });
+    }
+
+    if (!status.ingestPipeline) {
+      await esClient.ingest.putPipeline({
+        id: PIPELINE_NAME,
+        body: await getRequestLogPipelineBody(),
+      });
+    }
+
+    // success
+    return true;
+  } catch (err) {
+    loggingService.logError(loggingService.ES_SETUP_LOGGING_TAG, err);
+    return false;
+  }
+}
+
+async function setupRollableIndex({
+  indexPrefix,
+  indexAliasName,
+  mappingsFilename,
+  indexExists,
+  indexUpToDate,
+  includeTypeName,
+}) {
+  const blogIndexName = getIndexName(indexPrefix, mappingsFilename);
+  if (!indexExists) {
+    const parsed = readIndexFile(mappingsFilename, { json: true });
     parsed.aliases = {
-      [BLOG_INDEX_ALIAS]: {},
+      [indexAliasName]: {},
     };
     await esClient.indices.create({
       index: blogIndexName,
       body: JSON.stringify(parsed),
       includeTypeName,
     });
-  } else if (!status.blogIndexUpToDate) {
-    try {
-      await reindex(BLOG_INDEX_ALIAS, blogIndexName, "blog-index.json", {
-        includeTypeName,
-      });
-    } catch (err) {
-      loggingService.logError("elasticsearch setup", err);
-      return;
-    }
-  }
-
-  const blogCommentsIndexName = getIndexName(
-    BLOG_COMMENTS_INDEX,
-    "blog-comments-index.json"
-  );
-  if (!status.blogCommentsIndex) {
-    const parsed = readIndexFile("blog-comments-index.json", { json: true });
-    parsed.aliases = {
-      [BLOG_COMMENTS_INDEX_ALIAS]: {},
-    };
-    await esClient.indices.create({
-      index: blogCommentsIndexName,
-      body: JSON.stringify(parsed),
-      includeTypeName,
-    });
-  } else if (!status.blogCommentsIndexUpToDate) {
-    try {
-      await reindex(
-        BLOG_COMMENTS_INDEX_ALIAS,
-        blogCommentsIndexName,
-        "blog-comments-index.json",
-        {
-          includeTypeName,
-        }
-      );
-    } catch (err) {
-      loggingService.logError("elasticsearch setup", err);
-      return;
-    }
-  }
-
-  if (!status.blogLogsIndexTemplate || !status.blogLogsIndexTemplateUpToDate) {
-    const parsed = readIndexFile("blog-logs-index-template.json", {
-      json: true,
-    });
-
-    try {
-      const current = await esClient.indices.getTemplate({
-        name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-      });
-      parsed.index_patterns = updateIndexPatterns(
-        current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
-      );
-    } catch (err) {
-      if (err.status != 404) {
-        throw err;
-      }
-      parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
-    }
-
-    await esClient.indices.putTemplate({
-      name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-      body: JSON.stringify(parsed),
+  } else if (!indexUpToDate) {
+    await reindex(indexAliasName, blogIndexName, mappingsFilename, {
       includeTypeName,
     });
   }
-
-  if (!status.ingestPipeline) {
-    await esClient.ingest.putPipeline({
-      id: PIPELINE_NAME,
-      body: await getRequestLogPipelineBody(),
-    });
-  }
-
-  // success
-  return true;
 }
 
 export async function getStatus() {

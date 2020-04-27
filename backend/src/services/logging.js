@@ -18,6 +18,8 @@ const CRAWLER_USER_AGENTS = new Set(
   _.flatMap(crawlers, _.property("instances"))
 );
 
+export const ES_SETUP_LOGGING_TAG = "elasticsearch-setup";
+
 export async function getStatus() {
   const resp = await esClient.search({
     index: LOGS_INDICES_PREFIX + "*",
@@ -497,13 +499,17 @@ async function log({
   tags = [],
 }) {
   try {
-    if (!elasticsearchIsReady) {
-      elasticsearchIsReady = await elasticsearch.isReady();
-      if (!elasticsearchIsReady) {
-        // skip logs if elasticsearch is not configured
-        return;
-      }
-    }
+    const body = composeLogBody({
+      req,
+      res,
+      email,
+      status,
+      took,
+      authMethod,
+      excludeUrl,
+      error,
+      tags,
+    });
 
     // Avoid logging clouds load-balancer healthchecks
     if (
@@ -514,46 +520,16 @@ async function log({
       return;
     }
 
-    const body = {
-      "ecs.version": "1.0.0",
-      "@timestamp": new Date().toISOString(),
-      tags: tags,
-      log: {
-        level: error ? "error" : "info",
-      },
-      ...ecsSource(req, res),
-      ...ecsHttp(req, res),
-
-      took,
-      email,
-      status,
-      auth_method: authMethod,
-      ...(res ? res.locals.logData : {}),
-    };
-
-    if (req) {
-      if (tags.includes("visit")) {
-        body.visitor_id = req.visitorId;
-      }
-
-      if (!excludeUrl) {
-        const url = ecsUrl(
-          req.protocol + "://" + req.get("host") + req.originalUrl
-        );
-        for (const key in url) {
-          body[key] = url[key];
+    // skip logs if elasticsearch is not configured
+    if (!elasticsearchIsReady) {
+      elasticsearchIsReady = await elasticsearch.isReady();
+      if (!elasticsearchIsReady) {
+        // log to console if the log relates to setting up ES
+        if (tags.indexOf(ES_SETUP_LOGGING_TAG) > -1) {
+          console.log(body);
         }
+        return;
       }
-    }
-
-    if (error) {
-      body.error = {
-        message: error.stack,
-      };
-    }
-
-    if (res && res.locals.logData) {
-      body.tags.push.apply(body.tags, _.keys(res.locals.logData));
     }
 
     await esClient.index({
@@ -565,6 +541,62 @@ async function log({
   } catch (error) {
     console.error(error);
   }
+}
+
+function composeLogBody({
+  req,
+  res,
+  email,
+  status,
+  took,
+  authMethod,
+  excludeUrl = false,
+  error = null,
+  tags = [],
+}) {
+  const body = {
+    "ecs.version": "1.0.0",
+    "@timestamp": new Date().toISOString(),
+    tags: tags,
+    log: {
+      level: error ? "error" : "info",
+    },
+    ...ecsSource(req, res),
+    ...ecsHttp(req, res),
+
+    took,
+    email,
+    status,
+    auth_method: authMethod,
+    ...(res ? res.locals.logData : {}),
+  };
+
+  if (req) {
+    if (tags.includes("visit")) {
+      body.visitor_id = req.visitorId;
+    }
+
+    if (!excludeUrl) {
+      const url = ecsUrl(
+        req.protocol + "://" + req.get("host") + req.originalUrl
+      );
+      for (const key in url) {
+        body[key] = url[key];
+      }
+    }
+  }
+
+  if (error) {
+    body.error = {
+      message: error.stack,
+    };
+  }
+
+  if (res && res.locals.logData) {
+    body.tags.push.apply(body.tags, _.keys(res.locals.logData));
+  }
+
+  return body;
 }
 
 function ecsSource(req, res) {
