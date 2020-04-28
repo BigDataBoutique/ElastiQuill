@@ -34,6 +34,11 @@ class HtmlEditor extends Component {
           "h2",
           "h3",
           "quote",
+          {
+            name: "pre",
+            aria: "preformatted code",
+            contentDefault: '<i class="fa fa-code"></i>',
+          },
         ],
       },
     });
