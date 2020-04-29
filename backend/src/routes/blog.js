@@ -43,6 +43,19 @@ router.get(
 );
 router.get("/search", asyncHandler(handlePostsRequest("search")));
 router.get("/search/page/:pageNum", asyncHandler(handlePostsRequest("search")));
+router.get("/:year(\\d+)", asyncHandler(handlePostsRequest("posts")));
+router.get(
+  "/:year(\\d+)/page/:pageNum",
+  asyncHandler(handlePostsRequest("posts"))
+);
+router.get(
+  "/:year(\\d+)/:month(\\d+)",
+  asyncHandler(handlePostsRequest("posts"))
+);
+router.get(
+  "/:year(\\d+)/:month(\\d+)/page/:pageNum",
+  asyncHandler(handlePostsRequest("posts"))
+);
 
 router.get(
   "/rss",
@@ -315,7 +328,7 @@ export default router;
 
 function handlePostsRequest(template) {
   return async (req, res) => {
-    const { pageNum, tag, series } = req.params;
+    const { pageNum, tag, series, year, month } = req.params;
     const pageIndex = _.isUndefined(pageNum) ? 0 : parseFloat(pageNum) - 1;
     const { items, total, totalPages } = await blogPosts.getItems({
       type: "post",
@@ -324,6 +337,8 @@ function handlePostsRequest(template) {
       series,
       pageIndex,
       pageSize: PAGE_SIZE,
+      year: year ? parseInt(year) : undefined,
+      month: month ? parseInt(month) - 1 : undefined,
     });
 
     res.locals.logData = {
@@ -369,6 +384,11 @@ function handlePostsRequest(template) {
         .trim();
     }
 
+    let path = "";
+    if (year) {
+      path += `/${year}${month ? `/${month}` : ""}`;
+    }
+
     res.render(template, {
       tag,
       total,
@@ -384,6 +404,7 @@ function handlePostsRequest(template) {
       nextPage: pageIndex + 1 < totalPages ? pageIndex + 2 : null,
       posts: items.map(preparePost),
       description,
+      blogRoutePrefix: res.locals.blogRoutePrefix + path,
     });
   };
 }
