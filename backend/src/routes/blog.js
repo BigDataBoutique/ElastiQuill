@@ -441,6 +441,9 @@ function parseBlogpostId(id) {
     };
   }
 
+  if (id.endsWith("/")) {
+    id = id.slice(0, -1);
+  }
   return {
     id: blogPosts.BLOGPOST_ID_PREFIX + id,
     isJson: false,
