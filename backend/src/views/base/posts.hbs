@@ -1,6 +1,7 @@
 <div class="container">
   <div class="row">
     <main class="col-md-9">
+      {{#if year}}<h2 class="mt-5">{{#if month}}{{month}}/{{/if}}{{year}}</h2>{{/if}}
       {{#if posts.length}}
         {{#each posts}}
           {{> post this}}
@@ -9,8 +10,8 @@
           Showing {{posts.length}} posts out of {{total}} total, page {{pageNum}}
         </p>
         <p class="blog-pagination">
-          {{#if prevPage}}<a href="{{blogRoutePrefix}}/page/{{prevPage}}">Previous page</a>{{/if}}
-          {{#if nextPage}}<a href="{{blogRoutePrefix}}/page/{{nextPage}}">Next page</a>{{/if}}
+          {{#if prevPage}}<a href="{{blogRoutePrefix}}{{pathPrefix}}/page/{{prevPage}}">Previous page</a>{{/if}}
+          {{#if nextPage}}<a href="{{blogRoutePrefix}}{{pathPrefix}}/page/{{nextPage}}">Next page</a>{{/if}}
         </p>
       {{else}}
         {{> no-content}}
