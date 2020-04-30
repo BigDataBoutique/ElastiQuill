@@ -2,6 +2,7 @@ import _ from "lodash";
 import Joi from "joi";
 import uid from "uid";
 import slugify from "slugify";
+import moment from "moment";
 import { esClient } from "../lib/elasticsearch";
 import * as events from "./events";
 import * as commentsService from "./comments";
@@ -436,6 +437,8 @@ export async function getItems({
   pageIndex,
   pageSize,
   includePrivatePosts,
+  year,
+  month,
 }) {
   const query = {
     index: ES_INDEX,
@@ -481,6 +484,27 @@ export async function getItems({
       },
     },
   };
+
+  if (year) {
+    let startDate = moment(year, "YYYY");
+    let endDate = moment(year + 1, "YYYY");
+    if (!_.isUndefined(month)) {
+      startDate.month(month);
+      endDate
+        .subtract(1, "year")
+        .month(month)
+        .add(1, "month");
+    }
+
+    query.body.query.bool.filter.push({
+      range: {
+        published_at: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+    });
+  }
 
   if (!includePrivatePosts) {
     query.body.query.bool.must_not = {

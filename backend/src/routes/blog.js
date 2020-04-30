@@ -25,9 +25,10 @@ import { config } from "../config";
 
 const router = express.Router();
 
+const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
 const PAGE_SIZE = 10;
 
-events.onChange("post", () => clearPageCache(config.blog["blog-route-prefix"]));
+events.onChange("post", () => clearPageCache(BLOG_ROUTE_PREFIX));
 router.get("/", cachePageHandler(asyncHandler(handlePostsRequest("index"))));
 
 router.get("/page/:pageNum", asyncHandler(handlePostsRequest("posts")));
@@ -43,6 +44,36 @@ router.get(
 );
 router.get("/search", asyncHandler(handlePostsRequest("search")));
 router.get("/search/page/:pageNum", asyncHandler(handlePostsRequest("search")));
+router.get("/:year(\\d+)", asyncHandler(handlePostsRequest("posts")));
+router.get(
+  "/:year(\\d+)/page/:pageNum",
+  asyncHandler(handlePostsRequest("posts"))
+);
+router.get(
+  "/:year(\\d+)/:month(\\d+)",
+  normalizeMonth,
+  asyncHandler(handlePostsRequest("posts"))
+);
+router.get(
+  "/:year(\\d+)/:month(\\d+)/page/:pageNum",
+  normalizeMonth,
+  asyncHandler(handlePostsRequest("posts"))
+);
+
+// redirect */2020/1/* to */2020/01/*
+function normalizeMonth(req, res, next) {
+  const { month } = req.params;
+  if (month.length === 1) {
+    const offset = BLOG_ROUTE_PREFIX.length;
+    const url =
+      req.originalUrl.substring(0, 6 + offset) +
+      _.padStart(month, 2, "0") +
+      req.originalUrl.substring(7 + offset, req.originalUrl.length);
+    res.redirect(301, url);
+  } else {
+    next();
+  }
+}
 
 router.get(
   "/rss",
@@ -315,7 +346,7 @@ export default router;
 
 function handlePostsRequest(template) {
   return async (req, res) => {
-    const { pageNum, tag, series } = req.params;
+    const { pageNum, tag, series, year, month } = req.params;
     const pageIndex = _.isUndefined(pageNum) ? 0 : parseFloat(pageNum) - 1;
     const { items, total, totalPages } = await blogPosts.getItems({
       type: "post",
@@ -324,6 +355,8 @@ function handlePostsRequest(template) {
       series,
       pageIndex,
       pageSize: PAGE_SIZE,
+      year: year ? parseInt(year) : undefined,
+      month: month ? parseInt(month) - 1 : undefined,
     });
 
     res.locals.logData = {
@@ -369,6 +402,15 @@ function handlePostsRequest(template) {
         .trim();
     }
 
+    let pathPrefix = "";
+    if (year) {
+      pathPrefix += `/${year}${month ? `/${month}` : ""}`;
+    }
+
+    if (!items.length) {
+      res.status(404);
+    }
+
     res.render(template, {
       tag,
       total,
@@ -376,6 +418,8 @@ function handlePostsRequest(template) {
       template,
       totalPages,
       tagDescription,
+      month,
+      year,
       searchQuery: req.query.q,
       sidebarWidgetData: res.locals.sidebarWidgetData,
       pageSize: PAGE_SIZE,
@@ -384,6 +428,7 @@ function handlePostsRequest(template) {
       nextPage: pageIndex + 1 < totalPages ? pageIndex + 2 : null,
       posts: items.map(preparePost),
       description,
+      pathPrefix,
     });
   };
 }
