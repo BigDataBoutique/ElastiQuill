@@ -79,7 +79,11 @@ router.get(
   "/rss",
   asyncHandler(async (req, res) => {
     const { items } = await cacheAndReturn("recent-items", async () => {
-      return blogPosts.getItems({ type: "post", pageIndex: 0, pageSize: 10 });
+      return await blogPosts.getItems({
+        type: "post",
+        pageIndex: 0,
+        pageSize: 10,
+      });
     });
 
     const recentPosts = items.map(preparePost);

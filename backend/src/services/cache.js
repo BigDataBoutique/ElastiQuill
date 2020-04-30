@@ -6,61 +6,49 @@ import { config } from "../config";
 
 const CACHE_TTL = _.get(config, "blog.cache-ttl");
 
-const pageCache = new NodeCache();
-const dataCache = new NodeCache();
+export const pageCache = new NodeCache();
+export const dataCache = new NodeCache();
 
 export function cachePageHandler(handler) {
-  if (!CACHE_TTL) {
-    return handler;
-  }
-
   return async (req, res, next) => {
     const { data, timestamp } = await cacheGet(pageCache, req.originalUrl);
 
-    if (data) {
-      res.send(data);
+    if (data && !isExpired(timestamp)) {
+      return res.send(data);
     }
 
-    if (!data || isExpired(timestamp)) {
-      const recordedRes = await recordResponse(handler, req, res, next);
+    const recordedRes = await recordResponse(handler, req, res, next);
 
-      if (!data) {
-        res
-          .status(recordedRes.statusCode)
-          .set(recordedRes.getHeaders())
-          .send(recordedRes.body);
-      }
-
-      if (recordedRes.statusCode.toString().startsWith("2")) {
-        cacheSet(pageCache, req.originalUrl, recordedRes.body);
-      }
+    if (recordedRes.statusCode.toString().startsWith("2")) {
+      cacheSet(pageCache, req.originalUrl, recordedRes.body);
     }
+
+    res
+      .status(recordedRes.statusCode)
+      .set(recordedRes.getHeaders())
+      .send(recordedRes.body);
   };
 }
 
 export async function cacheAndReturn(key, cb) {
   const { data, timestamp } = await cacheGet(dataCache, key);
-  if (data) {
+  if (data && !isExpired(timestamp)) {
     return data;
   }
 
-  if (!data || isExpired(timestamp)) {
-    let newData = null;
-    try {
-      newData = await cb();
-    } catch (err) {
-      if (data) {
-        logging.logError(null, err);
-        return;
-      }
-      throw err;
+  let newData = null;
+  try {
+    newData = await cb();
+  } catch (err) {
+    if (data) {
+      logging.logError(null, err);
+      return;
     }
-
-    cacheSet(dataCache, key, newData);
-    if (!data) {
-      return newData;
-    }
+    throw err;
   }
+
+  cacheSet(dataCache, key, newData);
+  return newData;
 }
 
 export function clearPageCache(url) {
