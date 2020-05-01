@@ -110,11 +110,15 @@ router.post(
   "/:type(post|page)",
   asyncHandler(async (req, res) => {
     try {
+      const email =
+        req.user.authorizedBy === "_all_"
+          ? req.user.emails[0]
+          : req.user.authorizedBy;
       const newId = await blogPosts.createItem(req.params.type, {
         ...req.body,
         author: {
           name: req.user.name,
-          email: req.user.authorizedBy,
+          email,
           website: "",
         },
       });
