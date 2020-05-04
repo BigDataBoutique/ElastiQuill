@@ -137,6 +137,8 @@ app.use(function(err, req, res, _next) {
     console.error(err);
   }
 
+  res.status(err.status || 500);
+
   // set locals, only providing error in development
   if (isDev || err.status === 404) {
     res.locals.message = err.message;
@@ -147,7 +149,6 @@ app.use(function(err, req, res, _next) {
   }
 
   // render the error page
-  res.status(err.status || 500);
   if (err.status === 404) {
     res.render("404");
   } else {
