@@ -17,16 +17,26 @@ export function cachePageHandler(handler) {
       return res.send(data);
     }
 
-    const recordedRes = await recordResponse(handler, req, res, next);
-
-    if (recordedRes.statusCode.toString().startsWith("2")) {
-      cacheSet(pageCache, req.originalUrl, recordedRes.body);
+    try {
+      const recordedRes = await recordResponse(handler, req, res);
+      if (recordedRes.statusCode.toString().startsWith("2")) {
+        cacheSet(pageCache, req.originalUrl, recordedRes.body);
+        res
+          .status(recordedRes.statusCode)
+          .set(recordedRes.getHeaders())
+          .send(recordedRes.body);
+        return;
+      }
+    } catch (err) {
+      if (data) {
+        logging.logError(null, err, req, res);
+      } else {
+        next(err);
+        return;
+      }
     }
 
-    res
-      .status(recordedRes.statusCode)
-      .set(recordedRes.getHeaders())
-      .send(recordedRes.body);
+    res.send(data);
   };
 }
 
@@ -63,7 +73,7 @@ export function clearPageCache(url) {
   });
 }
 
-function recordResponse(handler, req, res, next) {
+function recordResponse(handler, req, res) {
   const chunks = [];
 
   const resMock = new MockExpressResponse();
@@ -94,9 +104,13 @@ function recordResponse(handler, req, res, next) {
     res.render(...args, (err, html) => resMock.send(html));
   };
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     resMock.on("finish", () => resolve(resMock));
-    handler(req, resMock, next);
+    handler(req, resMock, err => {
+      if (err) {
+        reject(err);
+      }
+    });
   });
 }
 
