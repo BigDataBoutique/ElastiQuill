@@ -35,7 +35,9 @@ router.get("/healthz", async (req, res) => {
     try {
       await esClient.ping();
       esConnected = true;
-    } catch (ignored) {}
+    } catch (e) {
+      // ignored
+    }
   }
 
   if (esConnected) {
