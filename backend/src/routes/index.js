@@ -13,6 +13,7 @@ import { authInfoTokenMiddleware } from "./auth";
 import * as blogPosts from "../services/blogPosts";
 import * as logging from "../services/logging";
 import * as cache from "../services/cache";
+import { esClient } from "../lib/elasticsearch";
 import { preparePost, tagUrl, seriesUrl } from "./util";
 import { config } from "../config";
 
@@ -28,8 +29,20 @@ const IS_LOCALHOST = config.blog.url.startsWith("http://localhost");
 
 const router = express.Router();
 
-router.get("/healthz", (req, res) => {
-  res.status(200).json({ status: "ok" });
+let esConnected = false;
+router.get("/healthz", async (req, res) => {
+  if (!esConnected) {
+    try {
+      await esClient.ping();
+      esConnected = true;
+    } catch (ignored) {}
+  }
+
+  if (esConnected) {
+    res.status(200).json({ status: "ok" });
+  } else {
+    res.status(503).json({ status: "ES not accessible" });
+  }
 });
 
 router.get("/robots.txt", (req, res) => {
