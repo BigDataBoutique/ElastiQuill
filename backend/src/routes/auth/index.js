@@ -19,8 +19,8 @@ const ADMIN_EMAILS = config.blog["admin-emails"];
 const PUBLISHER_EMAILS = config.blog["publisher-emails"];
 const JWT_SECRET = config.blog["jwt-secret"];
 const BLOG_URL = config.blog["url"];
-const AUTH_INFO_TOKEN_COOKIE = "auth-info-token";
 const VALID_ROLES = ["admin", "publisher"];
+export const AUTH_INFO_TOKEN_COOKIE = "auth-info-token";
 
 if (ADMIN_EMAILS.isEmpty()) {
   throw new Error("blog.admin-emails configuration variable is not set");
@@ -157,12 +157,7 @@ export function updateUserRole(req) {
 export function updateAuthInfoToken(req, res) {
   let token = req.cookies[AUTH_INFO_TOKEN_COOKIE];
   if (req.user) {
-    token = jwt.sign(
-      {
-        authorizedBy: req.user.authorizedBy,
-      },
-      JWT_SECRET
-    );
+    token = createAuthInfoToken(req.user.authorizedBy);
   }
 
   if (!token) {
@@ -173,6 +168,15 @@ export function updateAuthInfoToken(req, res) {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     sameSite: "Lax",
   });
+}
+
+export function createAuthInfoToken(authorizedBy) {
+  return jwt.sign(
+    {
+      authorizedBy,
+    },
+    JWT_SECRET
+  );
 }
 
 export function restrictRolesMiddleware(...roles) {
