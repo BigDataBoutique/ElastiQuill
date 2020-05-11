@@ -4,17 +4,23 @@ import uid from "uid";
 import express from "express";
 import asyncHandler from "express-async-handler";
 import referrerParser from "@cgamesplay/referer-parser";
+import request from "request";
+import rp from "request-promise";
 import routingTableRouter from "./routingTable";
 import blogRouter from "./blog";
 import pageRouter from "./page";
 import apiRouter from "./api";
 import contactRouter from "./contact";
-import { authInfoTokenMiddleware } from "./auth";
+import {
+  authInfoTokenMiddleware,
+  createAuthInfoToken,
+  AUTH_INFO_TOKEN_COOKIE,
+} from "./auth";
 import * as blogPosts from "../services/blogPosts";
 import * as logging from "../services/logging";
 import * as cache from "../services/cache";
 import { esClient } from "../lib/elasticsearch";
-import { preparePost, tagUrl, seriesUrl } from "./util";
+import { preparePost, tagUrl, seriesUrl, blogpostUrl } from "./util";
 import { config } from "../config";
 
 function ensureNoSlash(str) {
@@ -36,15 +42,49 @@ router.get("/healthz", async (req, res) => {
       await esClient.ping();
       esConnected = true;
     } catch (e) {
-      // ignored
+      res.status(503).json({ status: "ES not accessible" });
+      return;
     }
   }
 
-  if (esConnected) {
-    res.status(200).json({ status: "ok" });
-  } else {
-    res.status(503).json({ status: "ES not accessible" });
+  try {
+    const cookie = request.cookie(
+      `${AUTH_INFO_TOKEN_COOKIE}=${createAuthInfoToken("healthz")}`
+    );
+
+    let urls = [config.blog.url];
+    const { items } = await cache.cacheAndReturn(
+      "healthz-top-post",
+      async () => {
+        return await blogPosts.getItems({
+          type: "post",
+          pageIndex: 0,
+          pageSize: 1,
+        });
+      }
+    );
+    if (items.length) {
+      urls.push(config.blog.url + blogpostUrl(items[0]));
+    }
+
+    const promises = urls.map(url =>
+      rp({
+        url,
+        timeout: 1000,
+        resolveWithFullResponse: true,
+        headers: {
+          Cookie: cookie,
+        },
+      })
+    );
+    await Promise.all(promises);
+  } catch (err) {
+    logging.logError(null, err);
+    res.status(408).json({ status: "request timeout" });
+    return;
   }
+
+  res.status(200).json({ status: "ok" });
 });
 
 router.get("/robots.txt", (req, res) => {
