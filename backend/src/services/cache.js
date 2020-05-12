@@ -13,39 +13,50 @@ export function cachePageHandler(handler) {
   return async (req, res, next) => {
     const { data, timestamp } = await cacheGet(pageCache, req.originalUrl);
 
-    if (data && !isExpired(timestamp)) {
-      return res.send(data);
+    if (data) {
+      res.send(data);
     }
 
-    try {
-      const recordedRes = await recordResponse(handler, req, res);
-      if (recordedRes.statusCode.toString().startsWith("2")) {
-        cacheSet(pageCache, req.originalUrl, recordedRes.body);
-        res
-          .status(recordedRes.statusCode)
-          .set(recordedRes.getHeaders())
-          .send(recordedRes.body);
-        return;
-      }
-    } catch (err) {
-      if (data) {
-        logging.logError(null, err, req, res);
-      } else {
-        next(err);
-        return;
+    if (!data || isExpired(timestamp)) {
+      try {
+        const recordedRes = await recordResponse(handler, req, res);
+
+        if (!data) {
+          res
+            .status(recordedRes.statusCode)
+            .set(recordedRes.getHeaders())
+            .send(recordedRes.body);
+        }
+
+        if (recordedRes.statusCode.toString().startsWith("2")) {
+          cacheSet(pageCache, req.originalUrl, recordedRes.body);
+        }
+      } catch (err) {
+        if (data) {
+          logging.logError(null, err, req, res);
+        } else {
+          next(err);
+          return;
+        }
       }
     }
-
-    res.send(data);
   };
 }
 
 export async function cacheAndReturn(key, cb) {
   const { data, timestamp } = await cacheGet(dataCache, key);
-  if (data && !isExpired(timestamp)) {
+
+  if (data) {
+    if (isExpired(timestamp)) {
+      updateCache(data, key, cb);
+    }
     return data;
   }
 
+  return await updateCache(data, key, cb);
+}
+
+async function updateCache(data, key, cb) {
   let newData = null;
   try {
     newData = await cb();
