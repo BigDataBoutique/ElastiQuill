@@ -48,11 +48,12 @@ router.get("/healthz", async (req, res) => {
   }
 
   try {
+    const baseUrl = `http://localhost:${req.app.get("port")}`;
     const cookie = request.cookie(
       `${AUTH_INFO_TOKEN_COOKIE}=${createAuthInfoToken("healthz")}`
     );
 
-    let urls = [config.blog.url];
+    let urls = [baseUrl];
     const { items } = await cache.cacheAndReturn(
       "healthz-top-post",
       async () => {
@@ -64,7 +65,7 @@ router.get("/healthz", async (req, res) => {
       }
     );
     if (items.length) {
-      urls.push(config.blog.url + blogpostUrl(items[0]));
+      urls.push(baseUrl + blogpostUrl(items[0]));
     }
 
     const promises = urls.map(url =>
