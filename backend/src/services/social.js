@@ -117,7 +117,8 @@ export async function postToLinkedin(
   }
   if (tags && tags.length) {
     commentary.push(
-      tags.map(s => "#" + s.replace(/\s/g, "").toLowerCase()).join(" ")
+      tags.map(s => "#" + s.replace(/[^\d\w]/g, "").toLowerCase())
+          .filter(s => s.length > 0).join(" ")
     );
   }
 
@@ -179,7 +180,8 @@ export function postToTwitter(title, url, imageUrl, tags) {
     let status = `${title} ${url}`;
     if (tags && tags.length) {
       status += ` ${tags
-        .map(s => "#" + s.replace(/\s/g, "").toLowerCase())
+        .map(s => "#" + s.replace(/[^\d\w]/g, "").toLowerCase())
+        .filter(s => s.length > 0)
         .join(" ")}`;
     }
 
