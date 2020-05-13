@@ -95,7 +95,7 @@ router.get(
       generator: "elastic-blog-engine",
     });
 
-    res.type("application/rss+xml");
+    res.type("application/xml");
     recentPosts.forEach(post =>
       rss.item({
         title: post.title,
