@@ -117,8 +117,10 @@ export async function postToLinkedin(
   }
   if (tags && tags.length) {
     commentary.push(
-      tags.map(s => "#" + s.replace(/[^\d\w]/g, "").toLowerCase())
-          .filter(s => s.length > 0).join(" ")
+      tags
+        .map(s => "#" + s.replace(/[^\d\w]/g, "").toLowerCase())
+        .filter(s => s.length > 0)
+        .join(" ")
     );
   }
 
