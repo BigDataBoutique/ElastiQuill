@@ -18,7 +18,6 @@ esClient.ping(
 function initClient() {
   return new elasticsearch.Client({
     hosts: config.elasticsearch.hosts.split(","),
-    sniffOnStart: true,
     requestTimeout: 2500,
     log: "warning",
   });
