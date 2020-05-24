@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 
 import * as api from "../../api";
 import { getJwtToken } from "../../util";
+import CodeBlockButton from "./CodeBlockButton";
 
 import "./add-hr-plugin";
 import "./embeds-patched-plugin";
@@ -34,24 +35,69 @@ class HtmlEditor extends Component {
           "h2",
           "h3",
           "quote",
-          {
-            name: "pre",
-            aria: "preformatted code",
-            contentDefault: '<i class="fa fa-code"></i>',
-          },
+          "codeblock",
         ],
+      },
+      extensions: {
+        codeblock: new CodeBlockButton(),
+      },
+      autoLink: true,
+      paste: {
+        forcePlainText: true,
+        doPaste: function(pastedHTML, pastedPlain, editable) {
+          var paragraphs,
+            html = "",
+            p;
+
+          if (this.cleanPastedHTML && pastedHTML) {
+            return this.cleanPaste(pastedHTML);
+          }
+
+          if (!pastedPlain) {
+            return;
+          }
+
+          if (
+            !(
+              this.getEditorOption("disableReturn") ||
+              (editable && editable.getAttribute("data-disable-return"))
+            )
+          ) {
+            paragraphs = pastedPlain.split(/[\r\n]+/g);
+            // If there are no \r\n in data, don't wrap in <p>
+            if (paragraphs.length > 1) {
+              for (p = 0; p < paragraphs.length; p += 1) {
+                if (paragraphs[p] !== "") {
+                  html +=
+                    MediumEditor.util.htmlEntities(paragraphs[p]) + "<br>";
+                }
+              }
+            } else {
+              html = MediumEditor.util.htmlEntities(paragraphs[0]);
+            }
+          } else {
+            html = MediumEditor.util.htmlEntities(pastedPlain);
+          }
+          MediumEditor.util.insertHTMLCommand(this.document, html);
+        },
       },
     });
 
-    this.container.current.innerHTML = this.props.value;
+    this.container.current.innerHTML = this._stripCodeTag(this.props.value);
 
     this._convertImagesToEmbeds(this.container.current);
 
     this.editor.subscribe("editableInput", (event, editable) => {
       const content = $("<div>" + editable.innerHTML + "</div>");
       content.find(".medium-insert-buttons").remove();
-      const cleanedHtml = content.html();
 
+      // code block (both extension and plugin) currently wrap its content
+      // using PRE instead of PRE + CODE due to issues with medium-editor
+      // https://github.com/yabwe/medium-editor/issues/764
+      // so we need to do some cleanup (PRE + CODE) before saving
+      this._insertCodeTag(content);
+
+      const cleanedHtml = content.html();
       this.props.onChange(cleanedHtml);
     });
 
@@ -102,13 +148,6 @@ class HtmlEditor extends Component {
     });
     $(this.container.current).removeClass("medium-editor-placeholder");
     $(this.container.current).html($(this.container.current).html());
-    $(this.container.current).on("keyup", e => {
-      // space or enter
-      if (e.keyCode !== 13 && e.keyCode !== 32) {
-        return;
-      }
-      $(this.container.current).linkify();
-    });
   }
 
   componentWillUnmount() {
@@ -150,6 +189,39 @@ class HtmlEditor extends Component {
       `)
         );
       });
+  }
+
+  _insertCodeTag(content) {
+    content.find("pre").each(function() {
+      const className = $(this).attr("class");
+      const classes = className ? className.split(" ") : [];
+      const language = classes.find(item => item.startsWith("language-")) || "";
+      $(this).replaceWith(
+        `<pre data-language="${language.substring(
+          9
+        )}"><code class="${language}">${$(this).html()}</code></pre>`
+      );
+    });
+  }
+
+  _stripCodeTag(string) {
+    const content = $("<div>" + string + "</div>");
+
+    content.find("pre code").each(function() {
+      const className = $(this).attr("class");
+      const classes = className ? className.split(" ") : [];
+      const language = classes.find(item => item.startsWith("language-")) || "";
+
+      $(this)
+        .closest("pre")
+        .replaceWith(
+          `<pre class="${language}" data-language="${language.substring(
+            9
+          )}">${$(this).html()}</pre>`
+        );
+    });
+
+    return content.prop("outerHTML");
   }
 }
 
