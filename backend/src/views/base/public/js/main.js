@@ -9,6 +9,10 @@ $(function() {
     $(this).attr("title", new Date($(this).attr("datetime")).toLocaleString());
   });
 
+  $("pre code").each(function() {
+    hljs.highlightBlock($(this)[0]);
+  });
+
   if (window.ELASTIQUILL_ITEM_ID) {
     shareSelectedText(".post-page .post-content", {
       tooltipClass: "elastiquill-share-select-text",

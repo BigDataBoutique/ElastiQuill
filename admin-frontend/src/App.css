@@ -476,6 +476,18 @@ blockquote em {
   margin-left: 8px;
 }
 
+.medium-insert-codeblock-placeholder {
+  position: relative;
+}
+
+.medium-insert-codeblock-placeholder::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: attr(data-placeholder);
+  color: #ccc;
+}
+
 .medium-editor-element a {
   text-decoration: underline;
   color: blue;
@@ -492,11 +504,25 @@ pre {
 }
 
 .content-editor pre {
+  position: relative;
   display: block;
   background-color: #f6f8fa;
   line-height: 1.45;
   border-radius: 3px;
   padding: 10px;
+}
+
+.content-editor pre::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0;
+  right: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: "Source Sans Pro", sans-serif;
+  color: #6b6b6b;
+  border-radius: 3px;
+  padding: 2px;
 }
 
 .dropdown-item:hover {
