@@ -1,5 +1,6 @@
 import _ from "lodash";
 import NodeCache from "node-cache";
+import AsyncLock from "async-lock";
 import MockExpressResponse from "mock-express-response";
 import * as logging from "./logging";
 import { config } from "../config";
@@ -9,19 +10,26 @@ const CACHE_TTL = _.get(config, "blog.cache-ttl");
 export const pageCache = new NodeCache();
 export const dataCache = new NodeCache();
 
+const pageLock = new AsyncLock();
+
 export function cachePageHandler(handler) {
   return async (req, res, next) => {
-    const { data, timestamp } = await cacheGet(pageCache, req.originalUrl);
+    await pageLock.acquire(req.originalUrl, async () => {
+      const { data, timestamp } = await cacheGet(pageCache, req.originalUrl);
+      let responseSent = false;
+      if (data) {
+        res.send(data);
+        responseSent = true;
+      }
 
-    if (data) {
-      res.send(data);
-    }
+      if (responseSent && !isExpired(timestamp)) {
+        return;
+      }
 
-    if (!data || isExpired(timestamp)) {
       try {
         const recordedRes = await recordResponse(handler, req, res);
 
-        if (!data) {
+        if (!responseSent) {
           res
             .status(recordedRes.statusCode)
             .set(recordedRes.getHeaders())
@@ -32,14 +40,13 @@ export function cachePageHandler(handler) {
           cacheSet(pageCache, req.originalUrl, recordedRes.body);
         }
       } catch (err) {
-        if (data) {
+        if (responseSent) {
           logging.logError(null, err, req, res);
         } else {
           next(err);
-          return;
         }
       }
-    }
+    });
   };
 }
 
