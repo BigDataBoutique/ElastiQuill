@@ -53,7 +53,7 @@ router.get("/healthz", async (req, res) => {
       `${AUTH_INFO_TOKEN_COOKIE}=${createAuthInfoToken("healthz")}`
     );
 
-    let urls = [baseUrl];
+    let urls = [baseUrl + BLOG_ROUTE_PREFIX];
     const { items } = await cache.cacheAndReturn(
       "healthz-top-post",
       async () => {
