@@ -64,7 +64,18 @@ if (config.blog.compression) {
   app.use(compression());
 }
 
-app.use(function(req, res, next) {
+// Enable reverse proxy support in Express. This causes the
+// the "X-Forwarded-Proto" header field to be trusted so its
+// value can be used to determine the protocol. See
+// http://expressjs.com/api#app-settings for more details.
+app.enable("trust proxy");
+
+app.use((req, res, next) => {
+  if (config.blog["force-https"] && !req.secure) {
+    res.redirect(301, "https://" + req.headers.host + req.url);
+    return;
+  }
+
   // Protect against Clickjacking attacks
   res.header("X-Frame-Options", "DENY");
   // Block pages from loading when they detect reflected XSS attacks
@@ -78,12 +89,6 @@ app.use(function(req, res, next) {
   );
   next();
 });
-
-// Enable reverse proxy support in Express. This causes the
-// the "X-Forwarded-Proto" header field to be trusted so its
-// value can be used to determine the protocol. See
-// http://expressjs.com/api#app-settings for more details.
-app.enable("trust proxy");
 
 app.use(
   "/favicon.ico",

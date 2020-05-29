@@ -36,6 +36,7 @@ function initConfig() {
     ["blog.description", "BLOG_DESCRIPTION", "Sample description"],
     ["blog.url", "BLOG_URL", "http://localhost:5000"],
     ["blog.compression", "BLOG_COMPRESSION", false],
+    ["blog.force-https", "BLOG_FORCE_HTTPS", false],
     ["blog.cache-ttl", "BLOG_CACHE_TTL", 60],
     ["blog.port", "PORT", "5000"],
     ["blog.admin-emails", "BLOG_ADMIN_EMAILS"],
@@ -111,6 +112,12 @@ function initConfig() {
     throw new Error(`Invalid admin route: "${config.blog["admin-route"]}"`);
   }
   config.blog["blog.admin-route"] = adminRoute;
+
+  if (config.blog.url.startsWith("https://") && !config.blog["force-https"]) {
+    console.warn(
+      "Warning: Using https blog.url but blog.force-https is not enabled."
+    );
+  }
 
   return config;
 }
