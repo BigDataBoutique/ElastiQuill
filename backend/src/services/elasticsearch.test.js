@@ -50,7 +50,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: setupBlogIndexName,
-        })[setupBlogIndexName],
+        }).body[setupBlogIndexName],
         { mappings: setupBlogIndex.mappings }
       )
     ).toBe(true);
@@ -58,7 +58,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: setupBlogCommentsIndexName,
-        })[setupBlogCommentsIndexName],
+        }).body[setupBlogCommentsIndexName],
         { mappings: setupBlogCommentsIndex.mappings }
       )
     ).toBe(true);
@@ -107,7 +107,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: setupBlogIndexName,
-        })[setupBlogIndexName],
+        }).body[setupBlogIndexName],
         { mappings: setupBlogIndex.mappings }
       )
     ).toBe(true);
@@ -115,7 +115,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: setupBlogCommentsIndexName,
-        })[setupBlogCommentsIndexName],
+        }).body[setupBlogCommentsIndexName],
         { mappings: setupBlogCommentsIndex.mappings }
       )
     ).toBe(true);
@@ -169,7 +169,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: blogIndexName,
-        })[blogIndexName],
+        }).body[blogIndexName],
         { mappings: setupBlogIndex.mappings }
       )
     ).toBe(true);
@@ -177,7 +177,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: blogCommentsIndexName,
-        })[blogCommentsIndexName],
+        }).body[blogCommentsIndexName],
         { mappings: setupBlogCommentsIndex.mappings }
       )
     ).toBe(true);
@@ -227,7 +227,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: setupBlogIndexName,
-        })[setupBlogIndexName],
+        }).body[setupBlogIndexName],
         { mappings: setupBlogIndex.mappings }
       )
     ).toBe(true);
@@ -235,7 +235,7 @@ describe("Elasticsearch service", () => {
       mappingsEqual(
         esClient.indices.getMapping({
           index: setupBlogCommentsIndexName,
-        })[setupBlogCommentsIndexName],
+        }).body[setupBlogCommentsIndexName],
         { mappings: setupBlogCommentsIndex.mappings }
       )
     ).toBe(true);

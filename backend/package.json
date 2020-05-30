@@ -22,6 +22,7 @@
   "dependencies": {
     "@babel/runtime": "^7.9.2",
     "@cgamesplay/referer-parser": "^1.0.20200414",
+    "@elastic/elasticsearch": "^7.7.1",
     "@google-cloud/storage": "^3.5.0",
     "@sendgrid/mail": "^6.4.0",
     "akismet-api": "^4.2.0",
@@ -34,7 +35,6 @@
     "crawler-user-agents": "^1.0.78",
     "debug": "4.1.1",
     "dotenv": "^8.2.0",
-    "elasticsearch": "^16.7.1",
     "ellipsize": "^0.1.0",
     "express": "~4.17.1",
     "express-async-handler": "^1.1.4",

@@ -45,8 +45,8 @@ export async function getStatus() {
 
   let logLevel = {};
 
-  if (resp.aggregations && resp.aggregations.log_levels) {
-    logLevel = resp.aggregations.log_levels.buckets.reduce((result, b) => {
+  if (resp.body.aggregations && resp.body.aggregations.log_levels) {
+    logLevel = resp.body.aggregations.log_levels.buckets.reduce((result, b) => {
       return {
         ...result,
         [b.key]: b.doc_count,
@@ -277,27 +277,28 @@ export async function getStats({
     user_agent_os = [],
     user_agent_name = [];
 
-  if (resp.aggregations) {
-    avg_visits_per_day = resp.aggregations.avg_visits_per_day.value;
+  const { aggregations } = resp.body;
+  if (aggregations) {
+    avg_visits_per_day = aggregations.avg_visits_per_day.value;
     avg_visitors_per_day = _.meanBy(
-      _.get(resp.aggregations, visitsPerDayAgg + ".buckets"),
+      _.get(aggregations, visitsPerDayAgg + ".buckets"),
       _.property("visitors.value")
     );
-    referrer_type = resp.aggregations.referrer_type.buckets;
-    referrer_from_domain = resp.aggregations.referrer_from_domain.buckets;
-    user_agent_os = resp.aggregations.user_agent_os.buckets;
-    user_agent_name = resp.aggregations.user_agent_name.buckets;
-    visits_by_date = resp.aggregations.visits_histogram.buckets;
-    views_by_date = resp.aggregations.views_histogram.views.buckets;
-    visits_by_country = resp.aggregations.visits_by_country.buckets;
-    visits_by_location = resp.aggregations.visits_by_location.buckets.map(
+    referrer_type = aggregations.referrer_type.buckets;
+    referrer_from_domain = aggregations.referrer_from_domain.buckets;
+    user_agent_os = aggregations.user_agent_os.buckets;
+    user_agent_name = aggregations.user_agent_name.buckets;
+    visits_by_date = aggregations.visits_histogram.buckets;
+    views_by_date = aggregations.views_histogram.views.buckets;
+    visits_by_country = aggregations.visits_by_country.buckets;
+    visits_by_location = aggregations.visits_by_location.buckets.map(
       bucket => ({
         location: geohash.decode_bbox(bucket.key),
         visits: bucket.doc_count,
       })
     );
 
-    for (const mostViewedPost of resp.aggregations.posts.by_views.buckets) {
+    for (const mostViewedPost of aggregations.posts.by_views.buckets) {
       try {
         most_viewed_post = await blogPosts.getItemById({
           id: mostViewedPost.key,
@@ -312,7 +313,7 @@ export async function getStats({
     }
 
     const largestBucket = _.maxBy(
-      _.get(resp.aggregations, visitsPerDayAgg + ".buckets"),
+      _.get(aggregations, visitsPerDayAgg + ".buckets"),
       b => b.doc_count
     );
     most_busy_day = largestBucket
@@ -323,8 +324,8 @@ export async function getStats({
         }
       : null;
 
-    if (resp.aggregations.posts_visits) {
-      const postsVisitsBuckets = resp.aggregations.posts_visits.visits.buckets;
+    if (aggregations.posts_visits) {
+      const postsVisitsBuckets = aggregations.posts_visits.visits.buckets;
       popular_posts = await blogPosts.getItemsByIds(
         postsVisitsBuckets.map(bucket => bucket.key)
       );
@@ -390,7 +391,7 @@ export async function getLogsByLevel(level) {
     },
   });
 
-  return resp.hits.hits.map(hit => {
+  return resp.body.hits.hits.map(hit => {
     const level = hit._source.log.level;
     let message = "";
     if (level === "error") {
@@ -429,11 +430,11 @@ export async function* allLogsGenerator() {
     },
   });
 
-  while (resp.hits.hits.length) {
-    yield resp.hits.hits;
+  while (resp.body.hits.hits.length) {
+    yield resp.body.hits.hits;
     resp = await esClient.scroll({
       scroll: "10s",
-      scrollId: resp._scroll_id,
+      scrollId: resp.body._scroll_id,
     });
   }
 }

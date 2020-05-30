@@ -36,7 +36,7 @@ router.post(
         const item = await blogPosts.getItemById({ id: req.body["item_id"] });
         recipientEmail = item.author.email;
       } catch (err) {
-        if (err.status !== 404) {
+        if (err.meta.statusCode !== 404) {
           throw err;
         }
       }

@@ -56,8 +56,8 @@ export async function createComment(comment) {
       id: recipientCommentId,
     });
 
-    resp._source.replies = resp._source.replies || [];
-    resp._source.replies.push(body);
+    resp.body._source.replies = resp.body._source.replies || [];
+    resp.body._source.replies.push(body);
 
     await esClient.update({
       index: ES_INDEX,
@@ -65,13 +65,13 @@ export async function createComment(comment) {
       type: "_doc",
       refresh: "wait_for",
       body: {
-        doc: resp._source,
+        doc: resp.body._source,
       },
     });
 
     return {
       newComment: body,
-      repliedToComment: resp._source,
+      repliedToComment: resp.body._source,
     };
   } else {
     const resp = await esClient.index({
@@ -82,7 +82,7 @@ export async function createComment(comment) {
     });
 
     return {
-      newComment: resp._source,
+      newComment: resp.body._source,
       repliedToComment: null,
     };
   }
@@ -126,7 +126,7 @@ export async function getComments({ postIds, disableFiltering }) {
   });
 
   return processComments(
-    resp.hits.hits.map(h => ({
+    resp.body.hits.hits.map(h => ({
       ...h._source,
       id: h._id,
     }))
@@ -147,8 +147,6 @@ export async function getComments({ postIds, disableFiltering }) {
 export async function deletePostComments(id) {
   return await esClient.deleteByQuery({
     index: ES_INDEX,
-    type: "_doc",
-    refresh: "wait_for",
     body: {
       query: {
         bool: {
@@ -170,7 +168,7 @@ export async function updateComment(path, partial) {
     id: path[0],
   });
 
-  let comment = rootComment._source;
+  let comment = rootComment.body._source;
   path.slice(1).forEach(replyId => {
     comment = _.find(comment.replies, ["comment_id", replyId]);
   });
@@ -182,7 +180,7 @@ export async function updateComment(path, partial) {
     id: path[0],
     refresh: "wait_for",
     body: {
-      doc: rootComment._source,
+      doc: rootComment.body._source,
     },
   });
 }
@@ -202,7 +200,7 @@ export async function deleteComment(path) {
     id: path[0],
   });
 
-  let comment = rootComment._source;
+  let comment = rootComment.body._source;
   for (let i = 1; i < path.length; ++i) {
     if (i === path.length - 1) {
       comment.replies = comment.replies.filter(c => c.comment_id !== path[i]);
@@ -217,7 +215,7 @@ export async function deleteComment(path) {
     id: path[0],
     refresh: "wait_for",
     body: {
-      doc: rootComment._source,
+      doc: rootComment.body._source,
     },
   });
 }
@@ -294,22 +292,22 @@ export async function getStats({ startDate, postId, interval = "1d" }) {
   let mostCommentedPosts = [];
   let commentsByDate = [];
 
-  if (resp.aggregations) {
-    const postIdsBuckets = resp.aggregations.post_ids.buckets;
+  if (resp.body.aggregations) {
+    const postIdsBuckets = resp.body.aggregations.post_ids.buckets;
     const posts = await blogPosts.getItemsByIds(postIdsBuckets.map(b => b.key));
     mostCommentedPosts = posts.map(p => ({
       ...p,
       comments_count: _.find(postIdsBuckets, ["key", p.id]).doc_count,
     }));
 
-    commentsByDate = resp.aggregations.comments_histogram.buckets;
+    commentsByDate = resp.body.aggregations.comments_histogram.buckets;
   }
 
   return {
     commentsByDate,
     mostCommentedPosts,
-    recentComments: resp.hits.hits.map(h => ({ ...h._source, id: h._id })),
-    commentsCount: countResp.count,
+    recentComments: resp.body.hits.hits.map(h => ({ ...h._source, id: h._id })),
+    commentsCount: countResp.body.count,
   };
 }
 
@@ -332,11 +330,11 @@ export async function getAllComments() {
   });
 
   let items = [];
-  while (resp.hits.hits.length) {
-    items = items.concat(resp.hits.hits);
+  while (resp.body.hits.hits.length) {
+    items = items.concat(resp.body.hits.hits);
     resp = await esClient.scroll({
       scroll: "10s",
-      scrollId: resp._scroll_id,
+      scrollId: resp.body._scroll_id,
     });
   }
 

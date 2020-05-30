@@ -13,7 +13,7 @@ describe("blogPosts", () => {
         .mockReturnValue("2000-01-01T00:00:00.000Z");
       const savedPost = createFakeSavedPost();
       savedPost._source.is_published = false;
-      jest.spyOn(esClient, "get").mockReturnValue(savedPost);
+      jest.spyOn(esClient, "get").mockReturnValue({ body: savedPost });
       const mockUpdate = jest.spyOn(esClient, "update");
 
       const { id, type, author, ...updatePostPayload } = createFakePost();
@@ -33,7 +33,9 @@ describe("blogPosts", () => {
       jest
         .spyOn(Date.prototype, "toISOString")
         .mockReturnValue("2000-01-01T00:00:00.000Z");
-      jest.spyOn(esClient, "get").mockReturnValue(createFakeSavedPost());
+      jest
+        .spyOn(esClient, "get")
+        .mockReturnValue({ body: createFakeSavedPost() });
       const mockUpdate = jest.spyOn(esClient, "update");
 
       const { id, type, author, ...updatePostPayload } = createFakePost();

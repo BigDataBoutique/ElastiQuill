@@ -374,6 +374,7 @@ function handlePostsRequest(template) {
 
     let tagDescription = null;
 
+    // for posts by series/tags request, look for its content page (if any)
     if (series) {
       try {
         const item = await blogPosts.getItemById({
@@ -381,7 +382,8 @@ function handlePostsRequest(template) {
         });
         tagDescription = preparePage(item);
       } catch (err) {
-        if (err.status !== 404) {
+        // if it's not found (404) do nothing
+        if (err.meta.statusCode !== 404) {
           throw err;
         }
       }
@@ -392,7 +394,8 @@ function handlePostsRequest(template) {
         });
         tagDescription = preparePage(item);
       } catch (err) {
-        if (err.status !== 404) {
+        // if it's not found (404) do nothing
+        if (err.meta.statusCode !== 404) {
           throw err;
         }
       }
