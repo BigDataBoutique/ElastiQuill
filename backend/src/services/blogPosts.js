@@ -203,7 +203,7 @@ export async function getItemById({
     id,
   });
 
-  const item = prepareHit(resp);
+  const item = prepareHit(resp.body);
 
   if (withComments) {
     item.comments = await commentsService.getComments({
@@ -230,7 +230,7 @@ export async function getItemsByIds(ids, withComments = false) {
     },
   });
 
-  const docs = resp.docs.filter(d => d.found).map(prepareHit);
+  const docs = resp.body.docs.filter(d => d.found).map(prepareHit);
 
   if (withComments) {
     const comments = await commentsService.getComments({
@@ -299,7 +299,7 @@ export async function createItem(type, post) {
 
   events.emitCreate(type, query.body);
 
-  return resp._id;
+  return resp.body._id;
 }
 
 export async function deleteItem(id) {
@@ -379,7 +379,7 @@ export async function updateItemPartial(id, update) {
 }
 
 export async function getMoreLikeThis(itemId) {
-  let resp = await esClient.search({
+  const resp = await esClient.search({
     index: ES_INDEX,
     ignore_unavailable: true,
     size: 3,
@@ -400,7 +400,7 @@ export async function getMoreLikeThis(itemId) {
     },
   });
 
-  return resp.hits.hits.map(prepareHit);
+  return resp.body.hits.hits.map(prepareHit);
 }
 
 export async function getAllItems({ type }) {
@@ -418,11 +418,11 @@ export async function getAllItems({ type }) {
   });
 
   const items = [];
-  while (resp.hits.hits.length) {
-    resp.hits.hits.forEach(hit => items.push(hit));
+  while (resp.body.hits.hits.length) {
+    resp.body.hits.hits.forEach(hit => items.push(hit));
     resp = await esClient.scroll({
       scroll: "10s",
-      scrollId: resp._scroll_id,
+      scrollId: resp.body._scroll_id,
     });
   }
 
@@ -540,25 +540,25 @@ export async function getItems({
   }
 
   const resp = await esClient.search(query);
-  const items = resp.hits.hits.map(prepareHit);
+  const items = resp.body.hits.hits.map(prepareHit);
 
   let allSeries = [];
-  if (resp.aggregations) {
-    allSeries = resp.aggregations.series.buckets.map(b => ({
+  if (resp.body.aggregations) {
+    allSeries = resp.body.aggregations.series.buckets.map(b => ({
       ...b,
       key: stripSeriesTag(b.key),
     }));
   }
 
   const total =
-    typeof resp.hits.total === "object"
-      ? resp.hits.total.value
-      : resp.hits.total;
+    typeof resp.body.hits.total === "object"
+      ? resp.body.hits.total.value
+      : resp.body.hits.total;
 
   return {
     items,
     allSeries,
-    allTags: resp.aggregations ? resp.aggregations.tags.buckets : [],
+    allTags: resp.body.aggregations ? resp.body.aggregations.tags.buckets : [],
     total,
     totalPages: Math.ceil(total / pageSize),
   };
@@ -618,8 +618,8 @@ export async function getStats({
   let postsByDate = [],
     postsCount = 0;
 
-  if (resp.aggregations) {
-    postsByDate = resp.aggregations.posts_histogram.buckets;
+  if (resp.body.aggregations) {
+    postsByDate = resp.body.aggregations.posts_histogram.buckets;
     postsCount = _.sumBy(postsByDate, "doc_count");
   }
 
@@ -659,7 +659,7 @@ export async function getAllTags() {
     },
   });
 
-  if (!resp.aggregations) {
+  if (!resp.body.aggregations) {
     return {
       tags: [],
       series: [],
@@ -667,8 +667,10 @@ export async function getAllTags() {
   }
 
   return {
-    tags: resp.aggregations.tags.buckets.map(b => b.key),
-    series: resp.aggregations.series.buckets.map(b => stripSeriesTag(b.key)),
+    tags: resp.body.aggregations.tags.buckets.map(b => b.key),
+    series: resp.body.aggregations.series.buckets.map(b =>
+      stripSeriesTag(b.key)
+    ),
   };
 }
 

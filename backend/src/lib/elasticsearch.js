@@ -1,24 +1,35 @@
-import elasticsearch from "elasticsearch";
+import elasticsearch from "@elastic/elasticsearch";
 import { config } from "../config";
 
 export const esClient = initClient();
 esClient.ping(
+  {},
   {
     requestTimeout: 5000,
   },
-  error => {
+  (error, result) => {
     if (error) {
       console.error("Elasticsearch cluster is down!", error.message);
     } else {
-      console.error("Connected to elasticsearch cluster");
+      console.log("Connected to elasticsearch cluster");
+      if (result.warnings) {
+        console.error("Warnings:", result.warnings);
+      }
     }
   }
 );
 
 function initClient() {
   return new elasticsearch.Client({
-    hosts: config.elasticsearch.hosts.split(","),
+    nodes: config.elasticsearch.hosts.split(",").map(normalizeHost),
     requestTimeout: 2500,
-    log: "warning",
   });
+}
+
+function normalizeHost(host) {
+  const protocol = RegExp("^https?://");
+  if (!protocol.test(host.toLowerCase())) {
+    return "http://" + host;
+  }
+  return host;
 }

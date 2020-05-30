@@ -11,31 +11,37 @@ const setupMock = (indices = {}, docs = {}) => {
 const esMock = {
   Client: () => ({
     cluster: {
-      stats: mockStats,
+      stats: wrapResult(mockStats),
     },
     indices: {
-      exists: mockExists,
-      existsAlias: mockExistsAlias,
-      existsTemplate: mockExistsTemplate,
-      getTemplate: mockGetTemplate,
-      getMapping: mockGetMapping,
-      getAlias: mockGetAlias,
-      create: mockCreate,
-      delete: mockDelete,
-      updateAliases: mockUpdateAliases,
-      putTemplate: mockPutTemplate,
+      exists: wrapResult(mockExists),
+      existsAlias: wrapResult(mockExistsAlias),
+      existsTemplate: wrapResult(mockExistsTemplate),
+      getTemplate: wrapResult(mockGetTemplate),
+      getMapping: wrapResult(mockGetMapping),
+      getAlias: wrapResult(mockGetAlias),
+      create: wrapResult(mockCreate),
+      delete: wrapResult(mockDelete),
+      updateAliases: wrapResult(mockUpdateAliases),
+      putTemplate: wrapResult(mockPutTemplate),
     },
     ingest: {
-      getPipeline: mockGetPipeline,
-      putPipeline: mockPutPipeline,
+      getPipeline: wrapResult(mockGetPipeline),
+      putPipeline: wrapResult(mockPutPipeline),
     },
-    reindex: mockReindex,
+    reindex: wrapResult(mockReindex),
     ping: () => {},
     index: () => {},
     get: () => {},
     update: () => {},
     __setupMock: setupMock,
   }),
+};
+
+const wrapResult = cb => opts => {
+  return {
+    body: cb(opts),
+  };
 };
 
 const mockStats = opts => {

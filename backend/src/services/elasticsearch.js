@@ -34,7 +34,7 @@ export async function isReady() {
 
 export async function getClusterHealth() {
   const resp = await esClient.cluster.health();
-  return resp.status;
+  return resp.body.status;
 }
 
 export async function getVersionString() {
@@ -42,7 +42,7 @@ export async function getVersionString() {
     const clusterStats = await esClient.cluster.stats({
       nodeId: "_local",
     });
-    esVersion = clusterStats.nodes.versions[0];
+    esVersion = clusterStats.body.nodes.versions[0];
   }
 
   return esVersion;
@@ -85,10 +85,10 @@ export async function setup() {
           name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
         });
         parsed.index_patterns = updateIndexPatterns(
-          current[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
+          current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
         );
       } catch (err) {
-        if (err.status != 404) {
+        if (err.meta.statusCode !== 404) {
           throw err;
         }
         parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
@@ -145,10 +145,7 @@ async function setupRollableIndex({
 export async function getStatus() {
   const status = { error: {} };
 
-  status.blogIndex = await esClient.indices.existsAlias({
-    index: "*",
-    name: BLOG_INDEX_ALIAS,
-  });
+  status.blogIndex = await isIndexAliasExist(BLOG_INDEX_ALIAS);
   if (status.blogIndex) {
     status.blogIndexUpToDate = await isIndexUpToDate(
       BLOG_INDEX,
@@ -161,10 +158,7 @@ export async function getStatus() {
     status.error.blogIndex = "Blog index is misconfigured";
   }
 
-  status.blogCommentsIndex = await esClient.indices.existsAlias({
-    index: "*",
-    name: BLOG_COMMENTS_INDEX_ALIAS,
-  });
+  status.blogCommentsIndex = await isIndexAliasExist(BLOG_COMMENTS_INDEX_ALIAS);
   if (status.blogCommentsIndex) {
     status.blogCommentsIndexUpToDate = await isIndexUpToDate(
       BLOG_COMMENTS_INDEX,
@@ -178,9 +172,11 @@ export async function getStatus() {
     status.error.blogCommentsIndex = "Blog comments index is misconfigured";
   }
 
-  status.blogLogsIndexTemplate = await esClient.indices.existsTemplate({
-    name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-  });
+  status.blogLogsIndexTemplate = (
+    await esClient.indices.existsTemplate({
+      name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+    })
+  ).body;
   if (status.blogLogsIndexTemplate) {
     const current = await esClient.indices.getTemplate({
       name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
@@ -190,10 +186,10 @@ export async function getStatus() {
         .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
         .toString("utf-8")
     );
-    validateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
+    validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
     status.blogLogsIndexTemplateUpToDate =
-      mappingsEqual(current[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
-      validateIndexPatterns(current[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
+      mappingsEqual(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
+      validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
   } else {
     status.error.blogLogsIndexTemplate = "Blog logs index is misconfigured";
   }
@@ -203,7 +199,9 @@ export async function getStatus() {
       id: PIPELINE_NAME,
     });
 
-    const currentPipeline = stringifyDeterministic(pipelines[PIPELINE_NAME]);
+    const currentPipeline = stringifyDeterministic(
+      pipelines.body[PIPELINE_NAME]
+    );
     const targetPipeline = stringifyDeterministic(
       await getRequestLogPipelineBody()
     );
@@ -212,7 +210,7 @@ export async function getStatus() {
       status.error.ingestPipeline = "Ingest pipeline is misconfigured";
     }
   } catch (err) {
-    if (err.status === 404) {
+    if (err.meta.statusCode === 404) {
       status.ingestPipeline = false;
       status.error.ingestPipeline = "Ingest pipeline is misconfigured";
     } else {
@@ -304,21 +302,29 @@ export function getIndexName(prefix, filename) {
   return prefix + "-" + mappingId;
 }
 
+async function isIndexAliasExist(alias) {
+  const resp = await esClient.indices.existsAlias({
+    index: "*",
+    name: alias,
+  });
+
+  return resp.body;
+}
+
 async function isIndexUpToDate(index, filename) {
   // check whether index correctly pointing to the latest mapping
   const indexName = getIndexName(index, filename);
   const indexExistForLatestMapping = await esClient.indices.exists({
     index: indexName,
   });
-  if (indexExistForLatestMapping) {
+  if (indexExistForLatestMapping.body) {
     // index for latest mapping exist,
     // but this might be caused by hash collision,
     // compare its mapping properties
-    const currentMapping = (
-      await esClient.indices.getMapping({
-        index: indexName,
-      })
-    )[indexName];
+    const resp = await esClient.indices.getMapping({
+      index: indexName,
+    });
+    const currentMapping = resp.body[indexName];
     const latestMapping = readIndexFile(filename, { json: true });
     delete latestMapping.settings;
 
