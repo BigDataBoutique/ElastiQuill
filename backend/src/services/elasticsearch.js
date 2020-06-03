@@ -190,6 +190,10 @@ export async function getStatus() {
     status.blogLogsIndexTemplateUpToDate =
       mappingsEqual(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
       validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
+    if (!status.blogLogsIndexTemplateUpToDate) {
+      status.error.blogLogsIndexTemplateUpToDate =
+        "Blog logs index is out of date";
+    }
   } else {
     status.error.blogLogsIndexTemplate = "Blog logs index is misconfigured";
   }
