@@ -125,9 +125,7 @@ function recordResponse(handler, req, res) {
   return new Promise((resolve, reject) => {
     resMock.on("finish", () => resolve(resMock));
     handler(req, resMock, err => {
-      if (err) {
-        reject(err);
-      }
+      reject(err);
     });
   });
 }
