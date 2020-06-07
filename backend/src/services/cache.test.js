@@ -78,6 +78,17 @@ describe("cache", () => {
       expect(secondRes._getJSON()).toBe("first");
       expect(thirdRes._getJSON()).toBe("second");
     });
+
+    it("should handle 404 on /:slug route", async () => {
+      // eslint-disable-next-line
+      const middleware = cachePageHandler((req, res, next) => {
+        next();
+      });
+
+      const errorHandler = jest.fn();
+      await middleware(mockReq, firstRes, errorHandler); // initial caching
+      expect(errorHandler).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("cacheAndReturn", () => {
