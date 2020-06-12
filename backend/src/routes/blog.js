@@ -26,7 +26,7 @@ import { config } from "../config";
 const router = express.Router();
 
 const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
-const PAGE_SIZE = 10;
+const PAGE_SIZE = config.blog["posts-page-size"];
 
 events.onChange("post", () => clearPageCache(BLOG_ROUTE_PREFIX));
 router.get("/", cachePageHandler(asyncHandler(handlePostsRequest("index"))));
