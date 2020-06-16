@@ -176,7 +176,7 @@ router.use(
         const { items, allTags, allSeries } = await blogPosts.getItems({
           type: "post",
           pageIndex: 0,
-          pageSize: 10,
+          pageSize: config.blog["posts-page-size"],
         });
         return {
           recentPosts: items.map(preparePost),
