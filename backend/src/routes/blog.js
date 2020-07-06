@@ -202,6 +202,26 @@ router.get(
             property: "article:author",
             content: post.author.name,
           },
+          {
+            property: "twitter:title",
+            content: post.title,
+          },
+          {
+            property: "twitter:description",
+            content: post.description,
+          },
+          {
+            property: "twitter:url",
+            content: canonicalUrl,
+          },
+          {
+            property: "twitter:image",
+            content: post.metadata.header_image_url,
+          },
+          {
+            property: "twitter:card",
+            content: "summary_large_image",
+          },
         ],
       });
     })
