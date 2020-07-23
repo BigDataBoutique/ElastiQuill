@@ -115,7 +115,7 @@ class BaseItemsPage extends Component {
         return item.description || content;
       }
 
-      const el = $(content);
+      const el = $("<div>" + content + "</div>");
       el.each(function() {
         $(this).append(" ");
       });
