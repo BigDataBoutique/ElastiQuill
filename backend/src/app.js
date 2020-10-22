@@ -143,14 +143,16 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, _next) {
   const isDev = req.app.get("env") === "development";
 
+  const errStatusCode = err.status || err.meta?.statusCode || 500;
+
   if (isDev) {
     console.error(err);
   }
 
-  res.status(err.status || 500);
+  res.status(errStatusCode);
 
   // set locals, only providing error in development
-  if (isDev || err.status === 404) {
+  if (isDev || errStatusCode === 404) {
     res.locals.message = err.message;
     res.locals.error = err;
   } else {
@@ -159,7 +161,7 @@ app.use(function(err, req, res, _next) {
   }
 
   // render the error page
-  if (err.status === 404) {
+  if (errStatusCode === 404) {
     res.render("404");
   } else {
     res.render("error");
