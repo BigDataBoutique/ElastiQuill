@@ -13,7 +13,7 @@
     "prepare": "npm run snyk-protect",
     "prettier-check": "prettier --check src/** webpack.config.js",
     "lint": "eslint --cache --ext js src",
-    "test": "CONFIG_PATH=../../config.yml SETUP_DIR=../_setup jest"
+    "test": "CONFIG_PATH=../../config.test.yml SETUP_DIR=../_setup jest"
   },
   "repository": {
     "type": "git",
@@ -100,6 +100,7 @@
     "nodemon": "^2.0.3",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
+    "supertest": "^5.0.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-node-externals": "^1.7.2"
