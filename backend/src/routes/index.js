@@ -82,6 +82,8 @@ router.get("/healthz", async (req, res) => {
         resolveWithFullResponse: true,
         headers: {
           Cookie: cookie,
+          // adds flag to skip https redirect incase config.blog.force-https is on
+          "x-healthz-check": true,
         },
       })
     );
