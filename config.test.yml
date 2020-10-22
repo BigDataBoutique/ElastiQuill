@@ -1,0 +1,17 @@
+# This is a sample blog config file
+blog:
+  title: ElastiQuill
+  description: ElastiQuill blog engine demo
+  url: http://localhost:5000
+  port: 5000
+  compression: true
+  jwt-secret: SECRET-KEY
+  admin-emails: test@bigdataboutique.com
+elasticsearch:
+  hosts: localhost:9200,localhost:9201
+  blog-index-name: blog-posts
+  blog-comments-index-name: blog-comments
+  blog-logs-index-name: blog-logs
+credentials:
+  sendgrid: SENDGRID-API-KEY
+  google-analytics-code: ga-abc123

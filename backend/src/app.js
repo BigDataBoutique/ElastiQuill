@@ -71,7 +71,7 @@ if (config.blog.compression) {
 app.enable("trust proxy");
 
 app.use((req, res, next) => {
-  if (config.blog["force-https"] && !req.secure && req.url !== "/healthz") {
+  if (config.blog["force-https"] && !req.secure && req.path !== "/healthz") {
     res.redirect(301, "https://" + req.headers.host + req.url);
     return;
   }
