@@ -143,7 +143,7 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, _next) {
   const isDev = req.app.get("env") === "development";
 
-  const errStatusCode = err.status || err.meta?.statusCode || 500;
+  const errStatusCode = err.status || _.get(err, "meta.statusCode") || 500;
 
   if (isDev) {
     console.error(err);
