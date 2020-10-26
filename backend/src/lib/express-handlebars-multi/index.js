@@ -10,7 +10,7 @@ const debug = require("debug")("express-handlebars-multi");
 const fsp = require("mz/fs");
 const globby = require("globby");
 const handlebars = require("handlebars");
-const mergeArgs = require("merge-args")();
+const mergeArgs = require("../merge-args")();
 const uuidv1 = require("uuid/v1");
 
 // default configuration

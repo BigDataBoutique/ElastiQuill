@@ -12,6 +12,7 @@ import setup from "./setup";
 import dump from "./dump";
 import logs from "./logs";
 import auth, { updateAuthInfoToken, updateUserRole } from "./auth";
+import { getErrorStatus } from "../util";
 
 import * as loggingService from "../services/logging";
 import * as elasticsearch from "../services/elasticsearch";
@@ -49,7 +50,8 @@ router.use("/dump", dump);
 router.use("/logs", logs);
 
 router.use((err, req, res) => {
-  res.status(err.status || 500).json({
+  const errStatusCode = getErrorStatus(err);
+  res.status(errStatusCode).json({
     error: err.message ? err.message : err.toString(),
   });
 
