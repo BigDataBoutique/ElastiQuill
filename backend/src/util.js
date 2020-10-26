@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export class EmailString {
   constructor(emailString) {
     this.rules = [];
@@ -45,4 +47,8 @@ export class EmailString {
     }
     return false;
   }
+}
+
+export function getErrorStatus(err) {
+  return err.status || _.get(err, "meta.statusCode") || 500;
 }
