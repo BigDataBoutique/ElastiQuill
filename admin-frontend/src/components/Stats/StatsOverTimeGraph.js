@@ -239,7 +239,7 @@ class StatsOverTimeGraph extends React.Component {
         i <= today.getTime();
         i += ONE_DAY
       ) {
-        data.push({ x: new Date(i), y: 0 });
+        data.push({ x: this._normalizeDate(new Date(i)), y: 0 });
       }
     } else {
       startDate.setDate(1);
@@ -247,7 +247,7 @@ class StatsOverTimeGraph extends React.Component {
       let date = moment(startDate);
       while (date.toDate().getTime() < today.getTime()) {
         date.add(1, "months");
-        data.push({ x: date.toDate(), y: 0 });
+        data.push({ x: this._normalizeDate(date.toDate()), y: 0 });
       }
     }
 
