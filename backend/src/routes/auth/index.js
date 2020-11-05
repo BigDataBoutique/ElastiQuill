@@ -188,7 +188,9 @@ export function restrictRolesMiddleware(...roles) {
 
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      next(new Error("You are not allowed to access this API."));
+      const error = new Error("You are not allowed to access this API.");
+      error.status = 403;
+      next(error);
       return;
     }
     next();
