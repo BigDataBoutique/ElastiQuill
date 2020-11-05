@@ -140,16 +140,18 @@ class Status extends React.Component {
           >
             <div style={{ opacity: 0.75 }}>
               Admin login enabled for:{" "}
-              {admin.rules.indexOf("_all_") > -1 ? (
-                <pre style={{ color: colors.success }}>everyone</pre>
-              ) : (
-                admin.rules.map((em, i) => (
-                  <pre style={{ color: colors.success }} key={i}>
-                    {em}
-                    {admin.rules.length - 1 === i ? "" : ", "}
-                  </pre>
-                ))
-              )}
+              <div style={{ whiteSpace: "break-spaces" }}>
+                {admin.rules.indexOf("_all_") > -1 ? (
+                  <pre style={{ color: colors.success }}>everyone</pre>
+                ) : (
+                  admin.rules.map((em, i) => (
+                    <pre style={{ color: colors.success }} key={i}>
+                      {em}
+                      {admin.rules.length - 1 === i ? "" : ", "}
+                    </pre>
+                  ))
+                )}
+              </div>
             </div>
           </div>
           <hr className="m-0" />
