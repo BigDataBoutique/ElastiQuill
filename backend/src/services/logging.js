@@ -17,6 +17,7 @@ const LOGS_PERIOD = config.elasticsearch["blog-logs-period"];
 const CRAWLER_USER_AGENTS = new Set(
   _.flatMap(crawlers, _.property("instances"))
 );
+const EXCLUDED_ERRORS_STATUS_CODE = [403];
 
 export const ES_SETUP_LOGGING_TAG = "elasticsearch-setup";
 
@@ -38,6 +39,13 @@ export async function getStatus() {
       aggs: {
         log_levels: {
           terms: { field: "log.level" },
+          aggs: {
+            status_code: {
+              terms: {
+                field: "http.response.status_code",
+              },
+            },
+          },
         },
       },
     },
@@ -47,9 +55,15 @@ export async function getStatus() {
 
   if (resp.body.aggregations && resp.body.aggregations.log_levels) {
     logLevel = resp.body.aggregations.log_levels.buckets.reduce((result, b) => {
+      const count = _.sumBy(
+        b.status_code.buckets.filter(
+          item => !EXCLUDED_ERRORS_STATUS_CODE.includes(parseInt(item.key))
+        ),
+        "doc_count"
+      );
       return {
         ...result,
-        [b.key]: b.doc_count,
+        [b.key]: count,
       };
     }, {});
   }
@@ -391,26 +405,35 @@ export async function getLogsByLevel(level) {
     },
   });
 
-  return resp.body.hits.hits.map(hit => {
-    const level = hit._source.log.level;
-    let message = "";
-    if (level === "error") {
-      message = hit._source.error.message;
-    } else {
-      if (hit._source.tags.includes("auth")) {
-        message = `${hit._source.email} - ${hit._source.status}`;
-      } else if (hit._source.tags.includes("visit")) {
-        message = hit._source.url.full;
+  return resp.body.hits.hits
+    .map(hit => {
+      const level = hit._source.log.level;
+      let message = "";
+      if (level === "error") {
+        message = hit._source.error.message;
+      } else {
+        if (hit._source.tags.includes("auth")) {
+          message = `${hit._source.email} - ${hit._source.status}`;
+        } else if (hit._source.tags.includes("visit")) {
+          message = hit._source.url.full;
+        }
       }
-    }
 
-    return {
-      level,
-      message,
-      timestamp: hit._source["@timestamp"],
-      tags: hit._source.tags,
-    };
-  });
+      return {
+        level,
+        message,
+        timestamp: hit._source["@timestamp"],
+        tags: hit._source.tags,
+        statusCode: _.get(hit._source, "http.response.status_code"),
+      };
+    })
+    .filter(log => {
+      // exclude some errors (not categorized as blog errors)
+      return (
+        log.level !== "error" ||
+        !EXCLUDED_ERRORS_STATUS_CODE.includes(log.statusCode)
+      );
+    });
 }
 
 export async function* allLogsGenerator() {
