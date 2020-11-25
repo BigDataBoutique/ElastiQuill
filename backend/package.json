@@ -74,7 +74,7 @@
     "sanitize-html": "^2.0.0",
     "semver": "^6.2.0",
     "slugify": "^1.4.0",
-    "snyk": "^1.379.0",
+    "snyk": "^1.425.4",
     "truncate-html": "^1.0.3",
     "twitter": "^1.7.1",
     "uid": "0.0.2",
