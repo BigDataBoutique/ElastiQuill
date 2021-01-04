@@ -7,7 +7,7 @@ import $ from "jquery";
   var pluginName = "mediumInsert",
     addonName = "AddHr", // first char is uppercase
     defaults = {
-      label: "<span>---</span>",
+      label: '<span class="fa fa-minus"></span>',
     };
 
   /**

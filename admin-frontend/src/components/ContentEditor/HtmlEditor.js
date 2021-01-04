@@ -6,11 +6,13 @@ import PropTypes from "prop-types";
 
 import * as api from "../../api";
 import { getJwtToken } from "../../util";
-import CodeBlockButton from "./CodeBlockButton";
-
-import "./add-hr-plugin";
-import "./embeds-patched-plugin";
-import "./add-code-block-plugin";
+// medium editor extensions (shown on text highlight)
+import CodeBlockButton from "./MediumEditorExtension/CodeBlockButton";
+import AutoList from "./MediumEditorExtension/AutoList";
+// medium editor insert plugins (shown on new line (+))
+import "./MediumEditorInsertPlugin/add-hr-plugin";
+import "./MediumEditorInsertPlugin/embeds-patched-plugin";
+import "./MediumEditorInsertPlugin/add-code-block-plugin";
 
 class HtmlEditor extends Component {
   constructor(props) {
@@ -36,10 +38,13 @@ class HtmlEditor extends Component {
           "h3",
           "quote",
           "codeblock",
+          "unorderedlist",
+          "orderedlist",
         ],
       },
       extensions: {
         codeblock: new CodeBlockButton(),
+        autolist: new AutoList(),
       },
       autoLink: true,
       paste: {
