@@ -83,13 +83,21 @@ class HtmlEditor extends Component {
       },
     });
 
-    this.container.current.innerHTML = this._stripCodeTag(this.props.value);
+    let html = this._stripCodeTag(this.props.value);
+    html = this._stripUnwantedSpanTag(html);
+    this.container.current.innerHTML = html;
 
     this._convertImagesToEmbeds(this.container.current);
 
     this.editor.subscribe("editableInput", (event, editable) => {
       const content = $("<div>" + editable.innerHTML + "</div>");
       content.find(".medium-insert-buttons").remove();
+
+      // there's a contenteditable issue which causes some text to be wrapped
+      // by unwanted/useless span tag
+      // https://github.com/yabwe/medium-editor/issues/543
+      // we need to clean those tags to prevent it messing with post styles
+      this._stripUnwantedSpanTag(content);
 
       // code block (both extension and plugin) currently wrap its content
       // using PRE instead of PRE + CODE due to issues with medium-editor
@@ -222,6 +230,22 @@ class HtmlEditor extends Component {
     });
 
     return content.prop("outerHTML");
+  }
+
+  _stripUnwantedSpanTag(content) {
+    if (typeof content === "string") {
+      const modifiedContent = $("<div>" + content + "</div>");
+      modifiedContent
+        .find("span[style]")
+        .contents()
+        .unwrap();
+      return modifiedContent.prop("outerHTML");
+    } else {
+      content
+        .find("span[style]")
+        .contents()
+        .unwrap();
+    }
   }
 }
 
