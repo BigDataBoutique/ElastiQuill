@@ -1,0 +1,8 @@
+/*
+ * hack to hide orderedlist and unorderedlist button from the toolbar
+ * without disabling the autolist functionality
+*/
+.medium-editor-toolbar-actions li:nth-child(9),
+.medium-editor-toolbar-actions li:nth-child(10) {
+  display: none;
+}

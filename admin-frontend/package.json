@@ -36,6 +36,7 @@
     "markdown-it": "^10.0.0",
     "md5": "^2.2.1",
     "medium-editor": "^5.23.3",
+    "medium-editor-tables": "github:yabwe/medium-editor-tables#0.6.2",
     "mobx": "^5.13.0",
     "mobx-react": "^5.4.3",
     "moment": "^2.24.0",

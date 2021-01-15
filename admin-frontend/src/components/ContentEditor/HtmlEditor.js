@@ -7,12 +7,16 @@ import PropTypes from "prop-types";
 import * as api from "../../api";
 import { getJwtToken } from "../../util";
 // medium editor extensions (shown on text highlight)
+import MediumEditorTable from "medium-editor-tables";
 import CodeBlockButton from "./MediumEditorExtension/CodeBlockButton";
 import AutoList from "./MediumEditorExtension/AutoList";
 // medium editor insert plugins (shown on new line (+))
 import "./MediumEditorInsertPlugin/add-hr-plugin";
 import "./MediumEditorInsertPlugin/embeds-patched-plugin";
 import "./MediumEditorInsertPlugin/add-code-block-plugin";
+
+import "medium-editor-tables/dist/css/medium-editor-tables.min.css";
+import "./HtmlEditor.css";
 
 class HtmlEditor extends Component {
   constructor(props) {
@@ -38,13 +42,21 @@ class HtmlEditor extends Component {
           "h3",
           "quote",
           "codeblock",
+          // when changing the order of the buttons or adding new
+          // buttons before 'unorderedlist', update the index of
+          // unorderedlist and orderedlist in HtmlEditor.css
           "unorderedlist",
           "orderedlist",
+          "table",
         ],
       },
       extensions: {
         codeblock: new CodeBlockButton(),
         autolist: new AutoList(),
+        table: new MediumEditorTable({
+          contentDefault: '<i class="fa fa-table"></i>',
+          contentFa: '<i class="fa fa-table"></i>',
+        }),
       },
       autoLink: true,
       paste: {
