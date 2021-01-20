@@ -10,6 +10,8 @@ import { getJwtToken } from "../../util";
 import MediumEditorTable from "medium-editor-tables";
 import CodeBlockButton from "./MediumEditorExtension/CodeBlockButton";
 import AutoList from "./MediumEditorExtension/AutoList";
+import Anchor from "./MediumEditorExtension/Anchor";
+import AutoLink from "./MediumEditorExtension/AutoLink";
 // medium editor insert plugins (shown on new line (+))
 import "./MediumEditorInsertPlugin/add-hr-plugin";
 import "./MediumEditorInsertPlugin/embeds-patched-plugin";
@@ -51,14 +53,19 @@ class HtmlEditor extends Component {
         ],
       },
       extensions: {
+        anchor: new Anchor({
+          targetCheckbox: true,
+          targetCheckboxText: "Open in new window",
+          targetCheckboxDefaultChecked: true,
+        }),
         codeblock: new CodeBlockButton(),
         autolist: new AutoList(),
         table: new MediumEditorTable({
           contentDefault: '<i class="fa fa-table"></i>',
           contentFa: '<i class="fa fa-table"></i>',
         }),
+        autoLink: new AutoLink({ targetBlank: true }),
       },
-      autoLink: true,
       paste: {
         forcePlainText: true,
         doPaste: function(pastedHTML, pastedPlain, editable) {
