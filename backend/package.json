@@ -38,7 +38,7 @@
     "ellipsize": "^0.1.0",
     "express": "~4.17.1",
     "express-async-handler": "^1.1.4",
-    "globby": "9.2.0",
+    "globby": "10.0.0",
     "handlebars": "^4.7.7",
     "html-to-text": "^6.0.0",
     "http-errors": "~1.7.3",
