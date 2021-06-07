@@ -60,7 +60,7 @@
     "react-vis": "^1.11.7",
     "reactstrap": "^8.0.1",
     "snyk": "^1.518.0",
-    "turndown": "^5.0.3",
+    "turndown": "^6.0.0",
     "typeface-source-sans-pro": "^1.1.5",
     "uuid": "^3.3.2"
   },
