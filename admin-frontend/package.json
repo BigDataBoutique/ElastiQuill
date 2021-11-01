@@ -19,13 +19,13 @@
   },
   "keywords": [],
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.9.0",
     "blueimp-file-upload": "^9.32.0",
     "bootstrap": "^4.3.1",
-    "classnames": "^2.2.6",
-    "cookie": "^0.4.0",
-    "copy-to-clipboard": "^3.2.0",
-    "flag-icon-css": "^3.3.0",
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "classnames": "^2.3.1",
+    "cookie": "^0.4.1",
+    "copy-to-clipboard": "^3.3.1",
+    "flag-icon-css": "^4.1.4",
     "handlebars": "^4.7.7",
     "i18n-iso-countries": "^4.2.0",
     "jquery": "^3.5.0",
@@ -59,10 +59,10 @@
     "react-toastify": "^5.3.2",
     "react-vis": "^1.11.7",
     "reactstrap": "^8.0.1",
-    "snyk": "^1.685.0",
     "turndown": "^6.0.0",
     "typeface-source-sans-pro": "^1.1.5",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "snyk": "^1.749.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.5.5",
