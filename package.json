@@ -4,5 +4,8 @@
     "prettier-check": "./scripts/prettier-check.sh",
     "lint": "./scripts/lint.sh",
     "test": "./scripts/test.sh"
+  },
+  "dependencies": {
+    "babel-merge": "^3.0.0"
   }
 }
