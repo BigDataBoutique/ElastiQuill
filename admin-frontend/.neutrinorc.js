@@ -1,25 +1,23 @@
-const {merge} = require('@neutrinojs/compile-loader');
+const merge = require('babel-merge');
 const path = require('path');
+const react = require('@neutrinojs/react');
 
 module.exports = {
   options: {
     root: __dirname
   },
   use: [
-    [
-      '@neutrinojs/react',
-      {
-        html: {
-          title: 'Admin Panel',
-          favicon: './src/assets/img/favicon.ico'
-        },
-        devServer: {
-          proxy: {
-            '/api': 'http://localhost:5000'
-          }
+    react({
+      html: {
+        title: 'Admin Panel',
+        favicon: './src/assets/img/favicon.ico'
+      },
+      devServer: {
+        proxy: {
+          '/api': 'http://localhost:5000'
         }
       }
-    ],
+    }),
     neutrino => {
       neutrino.config.performance.hints(false);
 
