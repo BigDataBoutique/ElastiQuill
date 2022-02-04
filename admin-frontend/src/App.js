@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "flag-icon-css/css/flag-icon.min.css";
+import "flag-icon-css/css/flag-icons.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "typeface-source-sans-pro";
 import "./App.css";
