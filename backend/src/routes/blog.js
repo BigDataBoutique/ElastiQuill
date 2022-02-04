@@ -429,7 +429,8 @@ function handlePostsRequest(template) {
         .trim();
     }
 
-    let pathPrefix = "";
+    // Check if it's from a tag, add tagged to prefix to stick with tags
+    let pathPrefix = tag ? `/tagged/${tag}` : "";
     if (year) {
       pathPrefix += `/${year}${month ? `/${month}` : ""}`;
     }
