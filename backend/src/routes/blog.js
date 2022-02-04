@@ -372,9 +372,10 @@ function handlePostsRequest(template) {
   return async (req, res) => {
     const { pageNum, tag, series, year, month } = req.params;
     const pageIndex = _.isUndefined(pageNum) ? 0 : parseFloat(pageNum) - 1;
+    const search = _.isEmpty(req.query.q) ? null : req.query.q;
     const { items, total, totalPages } = await blogPosts.getItems({
       type: "post",
-      search: _.isEmpty(req.query.q) ? null : req.query.q,
+      search,
       tag,
       series,
       pageIndex,
@@ -429,8 +430,20 @@ function handlePostsRequest(template) {
         .trim();
     }
 
-    // Check if it's from a tag, add tagged to prefix to stick with tags
-    let pathPrefix = tag ? `/tagged/${tag}` : "";
+    let pathPrefix = "";
+    let pathPostfix = "";
+
+    // Prepend relevant prefix to path.
+
+    if (tag) {
+      pathPrefix = `/tagged/${tag}`;
+    } else if (series) {
+      pathPrefix = `/series/${series}`;
+    } else if (search) {
+      pathPrefix = "/search";
+      pathPostfix = "?q=" + search;
+    }
+
     if (year) {
       pathPrefix += `/${year}${month ? `/${month}` : ""}`;
     }
@@ -448,7 +461,7 @@ function handlePostsRequest(template) {
       tagDescription,
       month,
       year,
-      searchQuery: req.query.q,
+      searchQuery: search,
       sidebarWidgetData: res.locals.sidebarWidgetData,
       pageSize: PAGE_SIZE,
       pageNum: pageIndex + 1,
@@ -457,6 +470,7 @@ function handlePostsRequest(template) {
       posts: items.map(preparePost),
       description,
       pathPrefix,
+      pathPostfix,
     });
   };
 }

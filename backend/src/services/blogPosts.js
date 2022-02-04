@@ -385,16 +385,23 @@ export async function getMoreLikeThis(itemId) {
     size: 3,
     body: {
       query: {
-        more_like_this: {
-          fields: ["title", "content"],
-          like: [
+        bool: {
+          must: [
             {
-              _index: ES_INDEX,
-              _id: itemId,
+              more_like_this: {
+                fields: ["title", "content"],
+                like: [
+                  {
+                    _index: ES_INDEX,
+                    _id: itemId,
+                  },
+                ],
+                min_term_freq: 1,
+                max_query_terms: 12,
+              },
             },
           ],
-          min_term_freq: 1,
-          max_query_terms: 12,
+          filter: [{ term: { is_published: true } }],
         },
       },
     },
