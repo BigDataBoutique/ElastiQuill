@@ -502,7 +502,7 @@ export async function logVisit(req, res, took) {
     res,
     took,
     tags: ["visit"],
-    message: `Visit to ${req?.originalUrl}`,
+    message: `Visit to ` + (req && req.originalUrl ? req.originalUrl : ""),
   });
 }
 
