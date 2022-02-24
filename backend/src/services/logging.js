@@ -497,12 +497,16 @@ export async function logVisit(req, res, took) {
     return;
   }
 
-  await log({ req, res, took, tags: ["visit"] });
+  await log({
+    req,
+    res,
+    took,
+    tags: ["visit"],
+    message: `Visit to ${req?.originalUrl}`,
+  });
 }
 
 export async function logError(errorScope, error, req, res) {
-  console.error("logError", error);
-
   await log({
     req,
     res,
@@ -521,6 +525,7 @@ async function log({
   excludeUrl = false,
   error = null,
   tags = [],
+  message = null,
 }) {
   try {
     const body = composeLogBody({
@@ -533,13 +538,19 @@ async function log({
       excludeUrl,
       error,
       tags,
+      message,
     });
+
+    if (error) {
+      console.log(JSON.stringify(body));
+    }
 
     // Avoid logging clouds load-balancer healthchecks
     if (
       req &&
       req.get("User-Agent") &&
-      req.get("User-Agent").startsWith("GoogleHC/")
+      (req.get("User-Agent").startsWith("kube-probe/") ||
+        req.get("User-Agent").startsWith("GoogleHC/"))
     ) {
       return;
     }
@@ -577,17 +588,19 @@ function composeLogBody({
   excludeUrl = false,
   error = null,
   tags = [],
+  message = null,
+  level = "info",
 }) {
   const body = {
     "ecs.version": "1.0.0",
     "@timestamp": new Date().toISOString(),
     tags: tags,
     log: {
-      level: error ? "error" : "info",
+      level: error ? "error" : level,
     },
     ...ecsSource(req, res),
     ...ecsHttp(req, res),
-
+    message,
     took,
     email,
     status,
@@ -611,9 +624,18 @@ function composeLogBody({
   }
 
   if (error) {
-    body.error = {
-      message: error.stack,
-    };
+    let errorMessage;
+    if (_.isError(error) && error.stack) {
+      errorMessage = error.stack;
+    } else {
+      try {
+        errorMessage = JSON.stringify(error);
+      } catch (ignored) {
+        errorMessage = error.toString();
+      }
+    }
+
+    body.error = { message: errorMessage };
   }
 
   if (res && res.locals.logData) {
