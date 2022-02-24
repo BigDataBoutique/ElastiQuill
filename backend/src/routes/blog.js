@@ -448,7 +448,7 @@ function handlePostsRequest(template) {
       pathPrefix += `/${year}${month ? `/${month}` : ""}`;
     }
 
-    if (!items.length) {
+    if (!items.length && template !== "index") {
       res.status(404);
     }
 
