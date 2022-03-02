@@ -11,7 +11,11 @@ module.exports = {
   },
   externals: [nodeExternals()],
   mode: "production",
-  plugins: [new CopyWebpackPlugin([{ from: "./src/views", to: "views" }])],
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [{ from: "./src/views", to: "views" }],
+    }),
+  ],
   output: {
     filename: "server.js",
     path: path.resolve(__dirname, "dist"),
