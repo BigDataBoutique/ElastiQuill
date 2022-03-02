@@ -1,12 +1,12 @@
-import _ from "lodash";
 import Joi from "joi";
-import uid from "uid";
-import slugify from "slugify";
+import _ from "lodash";
 import moment from "moment";
+import slugify from "slugify";
+import { uid } from "uid";
 import { esClient } from "../lib/elasticsearch";
-import * as events from "./events";
 import * as commentsService from "./comments";
 import { BLOG_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
+import * as events from "./events";
 
 export const BLOGPOST_ID_PREFIX = "blogpost-";
 export const CONTENT_DESCRIPTION_ID_PREFIX = "content:description:";
