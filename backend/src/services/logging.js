@@ -1,11 +1,10 @@
+import crawlers from "crawler-user-agents";
 import _ from "lodash";
-import url from "url";
 import moment from "moment";
 import geohash from "ngeohash";
-import crawlers from "crawler-user-agents";
-
-import { esClient } from "../lib/elasticsearch";
+import url from "url";
 import { config } from "../config";
+import { esClient } from "../lib/elasticsearch";
 import * as blogPosts from "./blogPosts";
 import * as elasticsearch from "./elasticsearch";
 
@@ -502,7 +501,7 @@ export async function logVisit(req, res, took) {
     res,
     took,
     tags: ["visit"],
-    message: `Visit to ` + (req && req.originalUrl ? req.originalUrl : ""),
+    message: `Visit to ${req?.originalUrl}`,
   });
 }
 
