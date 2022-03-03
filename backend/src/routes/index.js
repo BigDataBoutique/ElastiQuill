@@ -1,27 +1,27 @@
-import _ from "lodash";
-import url from "url";
-import uid from "uid";
+import referrerParser from "@cgamesplay/referer-parser";
 import express from "express";
 import asyncHandler from "express-async-handler";
-import referrerParser from "@cgamesplay/referer-parser";
+import _ from "lodash";
 import request from "request";
 import rp from "request-promise";
-import routingTableRouter from "./routingTable";
-import blogRouter from "./blog";
-import pageRouter from "./page";
+import { uid } from "uid";
+import url from "url";
+import { config } from "../config";
+import { esClient } from "../lib/elasticsearch";
+import * as blogPosts from "../services/blogPosts";
+import * as cache from "../services/cache";
+import * as logging from "../services/logging";
 import apiRouter from "./api";
-import contactRouter from "./contact";
 import {
   authInfoTokenMiddleware,
-  createAuthInfoToken,
   AUTH_INFO_TOKEN_COOKIE,
+  createAuthInfoToken,
 } from "./auth";
-import * as blogPosts from "../services/blogPosts";
-import * as logging from "../services/logging";
-import * as cache from "../services/cache";
-import { esClient } from "../lib/elasticsearch";
-import { preparePost, tagUrl, seriesUrl, blogpostUrl } from "./util";
-import { config } from "../config";
+import blogRouter from "./blog";
+import contactRouter from "./contact";
+import pageRouter from "./page";
+import routingTableRouter from "./routingTable";
+import { blogpostUrl, preparePost, seriesUrl, tagUrl } from "./util";
 
 function ensureNoSlash(str) {
   if (str[str.length - 1] === "/") {

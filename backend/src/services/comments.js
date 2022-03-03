@@ -1,8 +1,8 @@
-import _ from "lodash";
 import Joi from "joi";
-import uid from "uid";
-import * as blogPosts from "./blogPosts";
+import _ from "lodash";
+import { uid } from "uid";
 import { esClient } from "../lib/elasticsearch";
+import * as blogPosts from "./blogPosts";
 import { BLOG_COMMENTS_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
 
 const CreateCommentArgSchema = Joi.object().keys({
