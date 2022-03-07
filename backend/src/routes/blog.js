@@ -110,7 +110,9 @@ router.get(
   })
 );
 
-const BLOGPOST_ROUTE = "/:year(\\d+)/:month(\\d+)/:slug-:id([^-]+$)";
+const BLOGPOST_ROUTE_DATE = "/:year(\\d+)/:month(\\d+)/:slug-:id([^-]+$)";
+const BLOGPOST_ROUTE_NAME = "/:slug-:id([^-]+$)";
+const BLOGPOST_ROUTE = [BLOGPOST_ROUTE_DATE, BLOGPOST_ROUTE_NAME];
 
 router.use(BLOGPOST_ROUTE, (req, res, next) => {
   const { id, isJson } = parseBlogpostId(req.params.id);

@@ -6,6 +6,7 @@ blog:
   port: 5000
   compression: true
   jwt-secret: SECRET-KEY
+  admin-emails: _all_
 elasticsearch:
   hosts: localhost:9200,localhost:9201
   blog-index-name: blog-posts

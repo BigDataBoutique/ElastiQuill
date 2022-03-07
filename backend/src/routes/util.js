@@ -17,6 +17,7 @@ const BLOG_URL = config.blog["url"];
 const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
 const COMMENTS_POST_PERIOD = config.blog["comments-post-period"];
 const DEFAULT_HEADER_IMAGE = config.blog["default-header-image"];
+const BLOG_URL_FORMAT = config.blog["url-format"];
 
 const blogpostMarkdown = new MarkdownIt({
   html: true,
@@ -201,9 +202,10 @@ export function prepareDate(d) {
 
 export function blogpostUrl(post) {
   const id = post.id.split("-")[1];
-  const url = `/${moment(post.published_at).format("YYYY/MM")}/${
-    post.slug
-  }-${id}`;
+  const url =
+    BLOG_URL_FORMAT == "post-name"
+      ? `/${post.slug}-${id}`
+      : `/${moment(post.published_at).format("YYYY/MM")}/${post.slug}-${id}`;
 
   if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== "/") {
     return BLOG_ROUTE_PREFIX + url;
