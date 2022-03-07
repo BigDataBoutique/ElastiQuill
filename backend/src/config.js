@@ -36,6 +36,7 @@ function initConfig() {
     ["blog.title", "BLOG_TITLE", "Sample blog"],
     ["blog.description", "BLOG_DESCRIPTION", "Sample description"],
     ["blog.url", "BLOG_URL", "http://localhost:5000"],
+    ["blog.url-format", "BLOG_URL_FORMAT", "month-and-name"],
     ["blog.compression", "BLOG_COMPRESSION", false],
     ["blog.force-https", "BLOG_FORCE_HTTPS", false],
     ["blog.cache-ttl", "BLOG_CACHE_TTL", 60],
