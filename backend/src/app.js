@@ -22,6 +22,8 @@ app.disable("x-powered-by");
 const BLOG_THEME_PATH = config.blog["theme-path"],
   BLOG_URL = config.blog.url;
 
+const STATICS_ROUTE_PREFIX = config.blog["blog.statics-route-prefix"];
+
 // view engine setup
 
 const viewPaths = [path.join(__dirname, "views/base")];
@@ -101,12 +103,12 @@ app.use(
   express.static(path.join(__dirname, "views/base/public/favicon/favicon.ico"))
 );
 app.use(
-  "/static/base",
+  STATICS_ROUTE_PREFIX + "/base",
   express.static(path.join(__dirname, "views/base/public"))
 );
 if (BLOG_THEME_PATH && fs.existsSync(path.join(BLOG_THEME_PATH, "public"))) {
   app.use(
-    "/static/theme",
+    STATICS_ROUTE_PREFIX + "/theme",
     express.static(path.join(BLOG_THEME_PATH, "public"))
   );
 }

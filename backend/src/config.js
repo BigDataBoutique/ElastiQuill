@@ -46,6 +46,7 @@ function initConfig() {
     ["blog.contact-email", "CONTACT_FORM_SEND_TO"],
     ["blog.theme-path", "BLOG_THEME_PATH"],
     ["blog.theme-caching", "BLOG_THEME_CACHING", true],
+    ["blog.statics-route-prefix", "BLOG_STATICS_ROUTE_PREFIX", "/static"],
     ["blog.routing-table-path", "BLOG_ROUTING_TABLE_PATH"],
     ["blog.jwt-secret", "BLOG_JWT_SECRET"],
     ["blog.blog-route-prefix", "BLOG_ROUTE_PREFIX", "/blog"],
