@@ -158,6 +158,7 @@ app.use(function(err, req, res, _next) {
   if (isDev || errStatusCode === 404) {
     res.locals.message = err.message;
     res.locals.error = err;
+    res.set("X-Original-Url", req.path);
   } else {
     res.locals.message = "Server Error";
     loggingService.logError(null, err, req, res);
