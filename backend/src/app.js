@@ -78,7 +78,8 @@ app.use((req, res, next) => {
     config.blog["force-https"] &&
     !req.secure &&
     req.path !== "/healthz" &&
-    !req.header("x-healthz-check")
+    !req.header("x-healthz-check") &&
+    !req.headers.host.startsWith("10.")
   ) {
     res.redirect(301, "https://" + req.headers.host + req.url);
     return;
