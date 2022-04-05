@@ -7,6 +7,7 @@ import passport from "passport";
 import compression from "compression";
 import createError from "http-errors";
 import cookieParser from "cookie-parser";
+import parseUrl from "parseurl";
 import exphbs from "./lib/express-handlebars-multi";
 import { config } from "./config";
 import { getErrorStatus } from "./util";
@@ -158,7 +159,12 @@ app.use(function(err, req, res, _next) {
   if (isDev || errStatusCode === 404) {
     res.locals.message = err.message;
     res.locals.error = err;
-    res.set("X-Original-Url", req.path);
+
+    res.set("X-Request-Path", req.path);
+    res.set("X-Request-Url", req.url);
+    res.set("X-Original-Url", req.originalUrl || "");
+    res.set("X-Parsed-Url-Pathname", parseUrl(req).pathname);
+    res.set("X-Parsed-Url-Original-Pathname", parseUrl.original(req).pathname);
   } else {
     res.locals.message = "Server Error";
     loggingService.logError(null, err, req, res);
