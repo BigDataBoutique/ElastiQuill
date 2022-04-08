@@ -110,6 +110,10 @@ function initConfig() {
     config.blog["blog-route-prefix"],
     "/"
   );
+  config.blog["statics-route-prefix"] = _.trimEnd(
+    config.blog["statics-route-prefix"],
+    "/"
+  );
   const adminRoute = _.trimEnd(config.blog["admin-route"], "/");
   if (!adminRoute.length) {
     throw new Error(`Invalid admin route: "${config.blog["admin-route"]}"`);
