@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 
 services:
   blog_es:
@@ -28,14 +28,16 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: http://blog_es:9200
       BLOG_ADMIN_EMAILS: _all_
+      #BLOG_THEME_PATH: /etc/elastiquill-theme
     depends_on:
       - blog_es
     ports:
       - 5000:5000
     volumes:
       - ${PWD}/_k8s:/etc/elastiquill
+      #- ${PWD}/_theme:/etc/elastiquill-theme
 
 networks:
-    default:
-        external:
-            name: blog
+  default:
+    external:
+      name: blog
