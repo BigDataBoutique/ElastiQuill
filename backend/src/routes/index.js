@@ -89,7 +89,7 @@ router.get("/healthz", async (req, res) => {
     );
     await Promise.all(promises);
   } catch (err) {
-    logging.logError(null, JSON.stringify(err));
+    logging.logError(null, err);
     res.status(408).json({ status: "request timeout" });
     return;
   }
