@@ -29,6 +29,8 @@ services:
       ELASTICSEARCH_HOSTS: http://blog_es:9200
       BLOG_ADMIN_EMAILS: _all_
       #BLOG_THEME_PATH: /etc/elastiquill-theme
+      BLOG_THEME_CACHING: "false"
+      BLOG_CACHE_TTL: "0"
     depends_on:
       - blog_es
     ports:
