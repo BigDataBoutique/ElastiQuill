@@ -93,11 +93,11 @@ function initConfig() {
   envOverrides.forEach(override => {
     const [configPath, env, defaultValue] = override;
     if (env && !_.isUndefined(_.get(process.env, env))) {
-      config = _.set(config, configPath, _.get(process.env, env));
+      _.set(config, configPath, _.get(process.env, env));
     }
 
     if (defaultValue && _.isUndefined(_.get(config, configPath))) {
-      config = _.set(config, configPath, defaultValue);
+      _.set(config, configPath, defaultValue);
     }
   });
 

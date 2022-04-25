@@ -23,7 +23,7 @@ app.disable("x-powered-by");
 const BLOG_THEME_PATH = config.blog["theme-path"],
   BLOG_URL = config.blog.url;
 
-const STATICS_ROUTE_PREFIX = config.blog["blog.statics-route-prefix"];
+const STATICS_ROUTE_PREFIX = config.blog["statics-route-prefix"];
 
 // view engine setup
 
