@@ -7,6 +7,7 @@ import { esClient } from "../lib/elasticsearch";
 import * as commentsService from "./comments";
 import { BLOG_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
 import * as events from "./events";
+import * as logging from "./logging";
 
 export const BLOGPOST_ID_PREFIX = "blogpost-";
 export const CONTENT_DESCRIPTION_ID_PREFIX = "content:description:";
@@ -197,25 +198,30 @@ export async function getItemById({
   withComments = false,
   moreLikeThis = false,
 }) {
-  const resp = await esClient.get({
-    index: ES_INDEX,
-    type: "_doc",
-    id,
-  });
-
-  const item = prepareHit(resp.body);
-
-  if (withComments) {
-    item.comments = await commentsService.getComments({
-      postIds: [id],
+  try {
+    const resp = await esClient.get({
+      index: ES_INDEX,
+      type: "_doc",
+      id,
     });
-  }
 
-  if (moreLikeThis) {
-    item.more_like_this = await getMoreLikeThis(id);
-  }
+    const item = prepareHit(resp.body);
 
-  return item;
+    if (withComments) {
+      item.comments = await commentsService.getComments({
+        postIds: [id],
+      });
+    }
+
+    if (moreLikeThis) {
+      item.more_like_this = await getMoreLikeThis(id);
+    }
+
+    return item;
+  } catch (e) {
+    await logging.logError("read_post", e);
+    throw e;
+  }
 }
 
 export async function getItemsByIds(ids, withComments = false) {
@@ -546,29 +552,36 @@ export async function getItems({
     });
   }
 
-  const resp = await esClient.search(query);
-  const items = resp.body.hits.hits.map(prepareHit);
+  try {
+    const resp = await esClient.search(query);
+    const items = resp.body.hits.hits.map(prepareHit);
 
-  let allSeries = [];
-  if (resp.body.aggregations) {
-    allSeries = resp.body.aggregations.series.buckets.map(b => ({
-      ...b,
-      key: stripSeriesTag(b.key),
-    }));
+    let allSeries = [];
+    if (resp.body.aggregations) {
+      allSeries = resp.body.aggregations.series.buckets.map(b => ({
+        ...b,
+        key: stripSeriesTag(b.key),
+      }));
+    }
+
+    const total =
+      typeof resp.body.hits.total === "object"
+        ? resp.body.hits.total.value
+        : resp.body.hits.total;
+
+    return {
+      items,
+      allSeries,
+      allTags: resp.body.aggregations
+        ? resp.body.aggregations.tags.buckets
+        : [],
+      total,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  } catch (e) {
+    await logging.logError("search_posts", e);
+    throw e;
   }
-
-  const total =
-    typeof resp.body.hits.total === "object"
-      ? resp.body.hits.total.value
-      : resp.body.hits.total;
-
-  return {
-    items,
-    allSeries,
-    allTags: resp.body.aggregations ? resp.body.aggregations.tags.buckets : [],
-    total,
-    totalPages: Math.ceil(total / pageSize),
-  };
 }
 
 export async function getStats({

@@ -22,6 +22,7 @@ import {
   PageNotFoundError,
 } from "./util";
 import { config } from "../config";
+import * as logging from "../services/logging";
 
 const router = express.Router();
 
@@ -78,35 +79,40 @@ function normalizeMonth(req, res, next) {
 router.get(
   "/rss",
   asyncHandler(async (req, res) => {
-    const { items } = await cacheAndReturn("recent-items", async () => {
-      return await blogPosts.getItems({
-        type: "post",
-        pageIndex: 0,
-        pageSize: 10,
+    try {
+      const { items } = await cacheAndReturn("recent-items", async () => {
+        return await blogPosts.getItems({
+          type: "post",
+          pageIndex: 0,
+          pageSize: 10,
+        });
       });
-    });
 
-    const recentPosts = items.map(preparePost);
+      const recentPosts = items.map(preparePost);
 
-    const rss = new RSS({
-      title: config.blog.title,
-      description: config.blog.description,
-      site_url: config.blog.url,
-      generator: "elastic-blog-engine",
-    });
+      const rss = new RSS({
+        title: config.blog.title,
+        description: config.blog.description,
+        site_url: config.blog.url,
+        generator: "elastic-blog-engine",
+      });
 
-    res.type("application/xml");
-    recentPosts.forEach(post =>
-      rss.item({
-        title: post.title,
-        description: post.description,
-        url: url.resolve(config.blog.url, post.url),
-        categories: post.tags.map(t => t.key),
-        date: new Date(post.published_at),
-        custom_elements: [{ image: post.metadata.header_image_url }],
-      })
-    );
-    res.send(rss.xml());
+      res.type("application/xml");
+      recentPosts.forEach(post =>
+        rss.item({
+          title: post.title,
+          description: post.description,
+          url: url.resolve(config.blog.url, post.url),
+          categories: post.tags.map(t => t.key),
+          date: new Date(post.published_at),
+          custom_elements: [{ image: post.metadata.header_image_url }],
+        })
+      );
+      res.send(rss.xml());
+    } catch (e) {
+      await logging.logError("rss", e, req, res);
+      throw e;
+    }
   })
 );
 

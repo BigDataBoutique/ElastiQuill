@@ -560,7 +560,7 @@ async function log({
       if (!elasticsearchIsReady) {
         // log to console if the log relates to setting up ES
         if (tags.indexOf(ES_SETUP_LOGGING_TAG) > -1) {
-          console.log(body);
+          console.log(JSON.stringify(body));
         }
         return;
       }
@@ -573,7 +573,7 @@ async function log({
       body,
     });
   } catch (error) {
-    console.error(error);
+    console.error(JSON.stringify(error));
   }
 }
 
