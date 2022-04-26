@@ -94,7 +94,7 @@ router.get(
         title: config.blog.title,
         description: config.blog.description,
         site_url: config.blog.url,
-        generator: "elastic-blog-engine",
+        generator: "elastiquill",
       });
 
       res.type("application/xml");

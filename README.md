@@ -186,7 +186,7 @@ You might need to run the following on your machine if Elasticsearch refuses to 
 To build and run the blog engine in Docker:
 
 ```
-docker build . -t elastic-blog-engine
+docker build . -t elastiquill
 docker run -p 5000:5000 -v /path/to/config.yml:/etc/elastiquill/config.yml elastiquill
 ```
 
