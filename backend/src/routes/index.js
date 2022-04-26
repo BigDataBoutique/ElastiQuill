@@ -75,21 +75,27 @@ router.get("/healthz", async (req, res) => {
       urls.push(baseUrl + blogpostUrl(items[0]));
     }
 
-    const promises = urls.map(url =>
-      rp({
-        url,
-        timeout: 1000,
-        resolveWithFullResponse: true,
-        headers: {
-          Cookie: cookie,
-          // adds flag to skip https redirect incase config.blog.force-https is on
-          "x-healthz-check": true,
-        },
+    await Promise.all(
+      urls.map(async url => {
+        try {
+          return await rp({
+            url,
+            timeout: 5000,
+            resolveWithFullResponse: true,
+            headers: {
+              Cookie: cookie,
+              // adds flag to skip https redirect incase config.blog.force-https is on
+              "x-healthz-check": true,
+            },
+          });
+        } catch (e) {
+          await logging.logError("health", "Failed to fetch " + url);
+          throw e;
+        }
       })
     );
-    await Promise.all(promises);
   } catch (err) {
-    logging.logError(null, err);
+    await logging.logError("health", err);
     res.status(408).json({ status: "request timeout" });
     return;
   }

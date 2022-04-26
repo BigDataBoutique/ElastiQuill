@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import { Button, Spinner } from "reactstrap";
-import uuid from "uuid/v1";
+import { v1 as uuid } from "uuid";
 import { Prompt } from "react-router";
 
 import BaseForm from "./BaseForm";
