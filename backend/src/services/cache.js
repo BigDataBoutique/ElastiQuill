@@ -7,8 +7,8 @@ import { config } from "../config";
 
 const CACHE_TTL = _.get(config, "blog.cache-ttl");
 
-export const pageCache = new NodeCache();
-export const dataCache = new NodeCache();
+export const pageCache = new NodeCache({ enableLegacyCallbacks: true });
+export const dataCache = new NodeCache({ enableLegacyCallbacks: true });
 
 const pageLock = new AsyncLock();
 

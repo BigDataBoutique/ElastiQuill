@@ -2,7 +2,7 @@ import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import AWS from "aws-sdk";
-import uuid from "uuid/v1";
+import { v1 as uuid } from "uuid";
 import multer from "multer";
 import mime from "mime-types";
 import multerS3 from "multer-s3";

@@ -569,7 +569,7 @@ async function log({
     await esClient.index({
       index: logIndexName(),
       type: "_doc",
-      pipeline: req && res ? "request_log" : null,
+      pipeline: req && res ? "request_log" : undefined,
       body,
     });
   } catch (error) {
