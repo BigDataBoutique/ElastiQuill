@@ -12,6 +12,7 @@ const globby = require("globby");
 const handlebars = require("handlebars");
 const mergeArgs = require("../merge-args")();
 const uuidv1 = require("uuid");
+const logging = require("../../services/logging");
 
 // default configuration
 const defaultConfig = {
@@ -126,38 +127,50 @@ function render(file, options, callback) {
           helpers: GLOBAL.helpers,
           partials: partials,
         };
-        // render template
-        var body = template(options, hbsOptions);
-        // get layout from options or default layout
-        var layout = options.layout || GLOBAL.defaultLayout;
-        // use layout if found
-        if (layout && layouts[layout]) {
-          // pass layout contents of template render along with other params
-          options.body = body;
-          // render layout
-          body = layouts[layout](options, hbsOptions);
+        try {
+          // render template
+          var body = template(options, hbsOptions);
+          // get layout from options or default layout
+          var layout = options?.layout || GLOBAL.defaultLayout;
+          // use layout if found
+          if (layout && layouts[layout]) {
+            // pass layout contents of template render along with other params
+            options.body = body;
+            // render layout
+            body = layouts[layout](options, hbsOptions);
+          }
+
+          // async helpers support
+          const helpersPairs = _.toPairs(asyncHelpers).filter(
+            pair => body.indexOf(pair[0]) > -1
+          );
+          return Promise.all(helpersPairs.map(p => p[1])).then(results => {
+            for (let i = 0; i < results.length; ++i) {
+              const key = helpersPairs[i][0];
+              body = body.replace(key, results[i]);
+              delete asyncHelpers[key];
+            }
+
+            // if callback is passed then call with result
+            if (callback) {
+              try {
+                callback(null, body);
+              } catch (e) {
+                logging.logError("rendering-callback", e);
+                // on error resolve with result
+                return body;
+              }
+            } else {
+              // otherwise resolve with result
+              return body;
+            }
+          });
+        } catch (e) {
+          logging.logError("rendering", e);
+          return Promise.reject(e);
         }
-
-        // async helpers support
-        const helpersPairs = _.toPairs(asyncHelpers).filter(
-          pair => body.indexOf(pair[0]) > -1
-        );
-        return Promise.all(helpersPairs.map(p => p[1])).then(results => {
-          for (let i = 0; i < results.length; ++i) {
-            const key = helpersPairs[i][0];
-            body = body.replace(key, results[i]);
-            delete asyncHelpers[key];
-          }
-
-          // if callback is passed then call with result
-          if (callback) {
-            callback(null, body);
-          } else {
-            // otherwise resolve with result
-            return body;
-          }
-        });
       })
+      .catch(o => console.log("rejected", o))
   );
 }
 
@@ -222,7 +235,7 @@ function loadTemplate(file, options) {
     return Promise.resolve(GLOBAL.templates[file]);
   }
   // store promise to load template
-  var promise = (GLOBAL.templates[file] = fsp
+  return (GLOBAL.templates[file] = fsp
     .readFile(file, "utf8")
     // compile template file
     .then(data => {
@@ -232,13 +245,16 @@ function loadTemplate(file, options) {
       }));
       // log which template is rendered
       const loggedTemplate = (...args) => {
-        return template(...args);
+        try {
+          return template(...args);
+        } catch (e) {
+          logging.logError("load-template", e);
+          return Promise.reject(e);
+        }
       };
       // resolve with template
       return loggedTemplate;
     }));
-  // return promise
-  return promise;
 }
 
 /**
@@ -246,6 +262,7 @@ function loadTemplate(file, options) {
  *
  * @param {array|string} dirs
  *
+ * @param options
  * @returns {Promise}
  */
 function loadTemplates(dirs, options) {
@@ -268,10 +285,12 @@ function loadTemplates(dirs, options) {
           .then(files => {
             return loadTemplatesFiles(dir, files, options, templates);
           })
+          .catch(o => console.log("loadTemplates", o))
       );
     })
       // resolve with templates
       .then(() => templates)
+      .catch(o => console.log("loadTemplates", o))
   );
 }
 
@@ -306,7 +325,7 @@ function loadTemplatesFiles(dir, files, options, templates) {
       // once template is loaded replace promise with template
       .then(template => {
         templates[file] = template;
-      }));
+      })).catch(o => console.log("loadTemplatesFiles", o));
     // wait for template to load
     return promise;
   });
