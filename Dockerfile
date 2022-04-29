@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:14.18.2-alpine
 LABEL maintainer="info@bigdataboutique.com"
 
 RUN apk add git
