@@ -45,18 +45,18 @@ router.get(
 );
 router.get("/search", asyncHandler(handlePostsRequest("search")));
 router.get("/search/page/:pageNum", asyncHandler(handlePostsRequest("search")));
-router.get("/:year(\\d+)", asyncHandler(handlePostsRequest("posts")));
+router.get("/:year(2\\d{3,3})", asyncHandler(handlePostsRequest("posts")));
 router.get(
-  "/:year(\\d+)/page/:pageNum",
+  "/:year(2\\d{3,3})/page/:pageNum",
   asyncHandler(handlePostsRequest("posts"))
 );
 router.get(
-  "/:year(\\d+)/:month(\\d+)",
+  "/:year(2\\d{3,3})/:month(\\d{1,2})",
   normalizeMonth,
   asyncHandler(handlePostsRequest("posts"))
 );
 router.get(
-  "/:year(\\d+)/:month(\\d+)/page/:pageNum",
+  "/:year(2\\d{3,3})/:month(\\d{1,2})/page/:pageNum",
   normalizeMonth,
   asyncHandler(handlePostsRequest("posts"))
 );
@@ -116,7 +116,8 @@ router.get(
   })
 );
 
-const BLOGPOST_ROUTE_DATE = "/:year(\\d+)/:month(\\d+)/:slug-:id([^-]+$)";
+const BLOGPOST_ROUTE_DATE =
+  "/:year(2\\d{3,3})/:month(\\d{1,2})/:slug-:id([^-]+$)";
 const BLOGPOST_ROUTE_NAME = "/:slug-:id([^-]+$)";
 const BLOGPOST_ROUTE = [BLOGPOST_ROUTE_DATE, BLOGPOST_ROUTE_NAME];
 
