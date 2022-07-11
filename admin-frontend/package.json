@@ -40,7 +40,7 @@
     "medium-editor-tables": "github:yabwe/medium-editor-tables#0.6.2",
     "mobx": "^5.13.0",
     "mobx-react": "^5.4.3",
-    "moment": "^2.29.3",
+    "moment": "^2.29.4",
     "prop-types": "^15.8.1",
     "query-string": "^7.1.1",
     "react": "^16.8.6",
