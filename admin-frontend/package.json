@@ -30,7 +30,7 @@
     "handlebars": "^4.7.7",
     "i18n-iso-countries": "^7.4.0",
     "jquery": "^3.6.0",
-    "jquery-ui": "^1.13.1",
+    "jquery-ui": "^1.13.2",
     "local-storage": "^1.4.2",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
