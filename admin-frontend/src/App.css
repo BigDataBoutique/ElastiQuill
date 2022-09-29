@@ -525,6 +525,14 @@ pre {
   padding: 2px;
 }
 
+.content-editor #simplemde-editor-1-wrapper .EasyMDEContainer .editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: white;
+  border-bottom: 1px solid #bbb;
+}
+
 .dropdown-item:hover {
   background: #eee;
 }
