@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { inject, observer } from "mobx-react";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
+import _ from "lodash";
 import classnames from "classnames";
 import LoggedInLayout from "../components/LoggedInLayout";
 import CommentsList from "../components/CommentsList";
@@ -12,6 +13,9 @@ import {
   ReferralsStats,
   UserAgentStats,
 } from "../components/Stats";
+import HoverIcon from "../components/Icons/HoverIcon";
+import SvgEdit from "../components/Icons/SvgEdit";
+import SvgNewWindow from "../components/Icons/SvgNewWindow";
 
 @inject("statsStore")
 @withRouter
@@ -25,6 +29,34 @@ class ItemStatsPage extends Component {
       showStats: true,
     };
   }
+
+  _renderLinks = item => {
+    if (!item) return null;
+
+    const url = `${item.url}${
+      _.isEmpty(item.metadata.private_viewing_key)
+        ? ""
+        : "?secret=" + item.metadata.private_viewing_key
+    }`;
+
+    return (
+      <div style={{ display: "flex", marginRight: "10px" }}>
+        <div className="elastiquill-icon-button">
+          <Link
+            to={`/edit/post/${item ? item.id : ""}`}
+            className="btn btn-link"
+          >
+            <HoverIcon icon={SvgEdit} />
+          </Link>
+        </div>
+        <div className="elastiquill-icon-button">
+          <a className="btn btn-link" href={url} target="_blank">
+            <HoverIcon icon={SvgNewWindow} />
+          </a>
+        </div>
+      </div>
+    );
+  };
 
   render() {
     const { item, comments, isLoading } = this.props.statsStore;
@@ -48,6 +80,7 @@ class ItemStatsPage extends Component {
       >
         <div className="elastiquill-content">
           <div className="d-flex justify-content-end">
+            {this._renderLinks(item)}
             <button
               type="button"
               className="btn btn-link"
