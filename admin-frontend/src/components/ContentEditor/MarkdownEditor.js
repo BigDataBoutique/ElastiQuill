@@ -13,6 +13,13 @@ const md = new MarkdownIt({
 });
 
 class MarkdownEditor extends Component {
+  componentDidMount() {
+    const toolbar = document.querySelector(".editor-toolbar");
+    if (toolbar) {
+      toolbar.classList.add("sticky-top");
+    }
+  }
+
   render() {
     return (
       <div
@@ -32,11 +39,20 @@ class MarkdownEditor extends Component {
             renderingConfig: {
               codeSyntaxHighlighting: true,
             },
+            onToggleFullScreen: this._onToggleFullScreen,
           }}
         />
       </div>
     );
   }
+
+  _onToggleFullScreen = goingFullScreen => {
+    if (goingFullScreen) {
+      document.querySelector(".editor-toolbar").classList.remove("sticky-top");
+    } else {
+      document.querySelector(".editor-toolbar").classList.add("sticky-top");
+    }
+  };
 
   _getInstance = instance => {
     let uploadImageUrl = api.uploadImageUrl();
