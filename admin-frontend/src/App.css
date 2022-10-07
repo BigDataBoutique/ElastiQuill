@@ -525,7 +525,7 @@ pre {
   padding: 2px;
 }
 
-.content-editor #simplemde-editor-1-wrapper .EasyMDEContainer .editor-toolbar {
+.content-editor #simplemde-editor-1-wrapper .EasyMDEContainer .sticky-top {
   position: sticky;
   top: 0;
   z-index: 50;
