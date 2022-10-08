@@ -125,9 +125,29 @@ export function preparePost(p) {
     header_image_url: p.metadata.header_image_url || DEFAULT_HEADER_IMAGE,
   };
 
+  function addLinkToHeader(html) {
+    let formattedHtml = html;
+    const headers = formattedHtml.match(/<h[1-6]>(.*?)<\/h[1-6]>/g);
+    if (headers) {
+      headers.forEach(header => {
+        const headerText = header.match(/<h[1-6]>(.*?)<\/h[1-6]>/)[1];
+        const headerId = headerText
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)+/g, "");
+        const newHeader = header.replace(
+          /<h([1-6])>(.*?)<\/h[1-6]>/,
+          `<h$1 id="${headerId}">$2<a href="#${headerId}"><i class="fa fa-link" aria-hidden="true"></i></a></h$1>`
+        );
+        formattedHtml = formattedHtml.replace(header, newHeader);
+      });
+    }
+    return formattedHtml;
+  }
+
   const content =
     p.metadata.content_type === "markdown"
-      ? blogpostMarkdown.render(p.content)
+      ? addLinkToHeader(blogpostMarkdown.render(p.content))
       : p.content;
   const hasDescription =
     _.isString(p.description) && _.trim(p.description).length > 0;
