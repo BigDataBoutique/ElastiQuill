@@ -321,6 +321,35 @@ span.post-quote {
   font-size: 2rem;
 }
 
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.post-content h1 a,
+.post-content h2 a,
+.post-content h3 a,
+.post-content h4 a,
+.post-content h5 a,
+.post-content h6 a {
+  visibility: hidden;
+}
+
+.post-content h1:hover a,
+.post-content h2:hover a,
+.post-content h3:hover a,
+.post-content h4:hover a,
+.post-content h5:hover a,
+.post-content h6:hover a {
+  visibility: visible;
+}
+
 .post-content .video.video-youtube {
   text-align: center;
 }
