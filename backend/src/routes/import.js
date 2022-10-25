@@ -23,11 +23,7 @@ router.post(
         resp.tags = resp.tags.map(t => t.key);
       }
       resp.is_published = publish_now;
-      if (keep_canonical_url) {
-        _.set(resp, "metadata.canonical_url", url);
-      } else {
-        _.set(resp, "metadata", {});
-      }
+      _.set(resp, "metadata.canonical_url", keep_canonical_url ? url : null);
     } catch (err) {
       throw new Error("Failed to fetch " + jsonUrl);
     }
