@@ -461,7 +461,10 @@ export async function getItems({
     body: {
       query: {
         bool: {
-          filter: [{ term: { type } }],
+          filter: [
+            { term: { type } },
+            { range: { published_at: { lte: "now/d" } } },
+          ],
         },
       },
       sort: [
