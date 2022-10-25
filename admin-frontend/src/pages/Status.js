@@ -140,7 +140,10 @@ class Status extends React.Component {
           >
             <div style={{ opacity: 0.75 }}>
               Admin login enabled for:{" "}
-              <div style={{ whiteSpace: "break-spaces" }}>
+              <div
+                className="d-flex flex-wrap h-100 overflow-auto"
+                style={{ maxHeight: "150px" }}
+              >
                 {admin.rules.indexOf("_all_") > -1 ? (
                   <pre style={{ color: colors.success }}>everyone</pre>
                 ) : (
