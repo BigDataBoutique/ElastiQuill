@@ -11,7 +11,9 @@ const router = express.Router();
 router.post(
   "/",
   asyncHandler(async (req, res) => {
-    const url = _.trimEnd(req.body.url, "/");
+    const { url: rawUrl, keep_canonical_url, publish_now } = req.body;
+
+    const url = _.trimEnd(rawUrl, "/");
     const jsonUrl = url.endsWith(".json") ? url : url + ".json";
 
     let resp;
@@ -20,8 +22,12 @@ router.post(
       if (resp.tags) {
         resp.tags = resp.tags.map(t => t.key);
       }
-      resp.is_published = true;
-      _.set(resp, "metadata.canonical_url", url);
+      resp.is_published = publish_now;
+      if (keep_canonical_url) {
+        _.set(resp, "metadata.canonical_url", url);
+      } else {
+        _.set(resp, "metadata", {});
+      }
     } catch (err) {
       throw new Error("Failed to fetch " + jsonUrl);
     }

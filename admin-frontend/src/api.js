@@ -147,7 +147,7 @@ export async function setupElasticsearch() {
   });
 }
 
-export async function importPost(url) {
+export async function importPost(url, keepCanonicalUrl, publishNow) {
   return await authFetchJson(`/api/import`, {
     method: "POST",
     headers: {
@@ -155,6 +155,8 @@ export async function importPost(url) {
     },
     body: JSON.stringify({
       url,
+      keep_canonical_url: keepCanonicalUrl,
+      publish_now: publishNow,
     }),
   });
 }
