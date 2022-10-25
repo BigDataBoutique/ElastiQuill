@@ -173,7 +173,7 @@ router.get(
       const preparedPost = preparePost(post);
 
       let canonicalUrl = _.get(post, "metadata.canonical_url", "");
-      if (!canonicalUrl.length) {
+      if (!canonicalUrl || !canonicalUrl.length) {
         canonicalUrl = url.resolve(config.blog.url, preparedPost.url);
       }
 
