@@ -32,7 +32,7 @@ router.get(
     const type = req.params.type;
     const pageIndex = req.query.page_index || 0;
     const searchQuery = req.query.query.length ? req.query.query : null;
-    const hideUnpublished = req.query.hideUnpublished == "true";
+    const hideUnpublished = req.query.hideUnpublished === "true";
 
     const { items, totalPages } = await blogPosts.getItems({
       type,
