@@ -82,10 +82,10 @@ class Posts extends ItemsStore {
   }
 
   @action
-  async importPost(url) {
+  async importPost(url, keepCanonicalUrl, publishNow) {
     try {
       this.loading("importPost");
-      await api.importPost(url);
+      await api.importPost(url, keepCanonicalUrl, publishNow);
       await this.loadPage(0);
       this.importModalOpen = false;
     } catch (err) {
