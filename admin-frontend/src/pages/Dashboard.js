@@ -16,6 +16,7 @@ import {
   ReferralsStats,
   UserAgentStats,
 } from "../components/Stats";
+import { formatNumbers } from "../util";
 
 @inject("dashboardStore")
 @observer
@@ -75,9 +76,11 @@ class Dashboard extends React.Component {
               {moment(mostBusyDayEver.date).format("DD/MM/YYYY")}
             </h1>
             <h6>
-              {(uniqueVisitorsEnabled
-                ? mostBusyDayEver.visitors.value
-                : mostBusyDayEver.count) +
+              {formatNumbers(
+                uniqueVisitorsEnabled
+                  ? mostBusyDayEver.visitors.value
+                  : mostBusyDayEver.count
+              ) +
                 " " +
                 visitorsStr}
             </h6>
@@ -123,16 +126,22 @@ class Dashboard extends React.Component {
 
     return (
       <Fragment>
-        <div className="elastiquill-header">Overview</div>
+        <div className="elastiquill-header">Overview {typeof postsCount}</div>
         <div
           className="row"
           style={{ minHeight: "124px", marginBottom: "63px", marginLeft: -5 }}
         >
-          {this._renderTextCard("Total blog posts", postsCount || 0)}
-          {this._renderTextCard("Comments on posts", commentsCount || 0)}
+          {this._renderTextCard(
+            "Total blog posts",
+            formatNumbers(postsCount) || 0
+          )}
+          {this._renderTextCard(
+            "Comments on posts",
+            formatNumbers(commentsCount) || 0
+          )}
           {this._renderTextCard(
             `${_.capitalize(visitorsStr)} / day (average)`,
-            _.round(averagePerDay, 1) || 0
+            formatNumbers(_.round(averagePerDay, 1)) || 0
           )}
           {mostBusyDayEverCard}
           {mostViewedCard}

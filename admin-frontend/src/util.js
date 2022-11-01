@@ -67,3 +67,15 @@ function extractJwtFromCookies() {
   }
   return null;
 }
+
+export function formatNumbers(number) {
+  if (!number) return 0;
+
+  const locale =
+    window.navigator.userLanguage || window.navigator.language || "en";
+
+  return Intl.NumberFormat(locale, {
+    notation: "compact",
+    maximumFractionDigits: 2,
+  }).format(number);
+}
