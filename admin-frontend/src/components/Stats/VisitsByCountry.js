@@ -1,6 +1,7 @@
 import React from "react";
 import PropType from "prop-types";
 import countries from "i18n-iso-countries";
+import { formatNumbers } from "../../util";
 
 const VisitsByCountry = ({ data }) => {
   if (!data.length) {
@@ -16,7 +17,9 @@ const VisitsByCountry = ({ data }) => {
             className={"flag-icon flag-icon-" + bucket.key.toLowerCase()}
           ></span>
           {countries.getName(bucket.key, "en")}
-          <span className="float-right text-muted">{bucket.doc_count}</span>
+          <span className="float-right text-muted">
+            {formatNumbers(bucket.doc_count)}
+          </span>
         </div>
       ))}
     </div>
