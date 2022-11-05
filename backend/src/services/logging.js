@@ -81,11 +81,10 @@ export async function getStats({
 
   filters.push({
     bool: {
-      must_not: {
-        term: {
-          "http.request.bot": true,
-        },
-      },
+      must_not: [
+        { term: { "http.request.bot": true } },
+        { term: { "url.path": "/rss" } },
+      ],
     },
   });
 
@@ -197,6 +196,12 @@ export async function getStats({
                 visitors: {
                   cardinality: {
                     field: "visitor_id",
+                  },
+                },
+                top_posts: {
+                  terms: {
+                    field: "url.path",
+                    size: 5,
                   },
                 },
               },
