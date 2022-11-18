@@ -34,7 +34,7 @@
     "local-storage": "^1.4.2",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
-    "markdown-it": "^12.3.2",
+    "markdown-it": "^13.0.1",
     "md5": "^2.3.0",
     "medium-editor": "^5.23.3",
     "medium-editor-tables": "github:yabwe/medium-editor-tables#0.6.2",
