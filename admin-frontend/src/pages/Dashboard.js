@@ -232,12 +232,20 @@ class Dashboard extends React.Component {
           <div className="col-md-6">
             {this._renderSection(
               "Recent comments",
-              <CommentsList comments={recentComments} />
+              <CommentsList
+                comments={recentComments}
+                showButtons
+                requestReload={this._loadData.bind(this)}
+              />
             )}
           </div>
         </div>
       </Fragment>
     );
+  }
+
+  _loadData() {
+    this.props.dashboardStore.loadStats();
   }
 
   _renderStatsList(title, list) {
