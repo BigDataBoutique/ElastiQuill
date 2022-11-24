@@ -57,11 +57,17 @@ router.post(
         }
       }
 
+      const { name, email, subject, content, ...rest } = req.body;
+      const extraContent = Object.entries(rest)
+        .map(([key, value]) => `${key}: ${value}\n`)
+        .join("");
+      const mailContent = content ? `${content}\n\n` : "" + extraContent;
+
       await emails.sendContactMessage({
-        name: req.body["name"],
-        email: req.body["email"],
-        subject: req.body["subject"],
-        content: req.body["content"],
+        name,
+        email,
+        subject,
+        content: mailContent,
         recipient: recipientEmail,
       });
     } catch (err) {
