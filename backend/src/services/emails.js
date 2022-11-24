@@ -54,7 +54,7 @@ export function getStatus() {
   };
 }
 
-export function sendContactMessage(message) {
+export async function sendContactMessage(message) {
   const result = Joi.validate(message, ContactMessageArgSchema);
   if (result.error) {
     throw result.error;
@@ -68,7 +68,7 @@ export function sendContactMessage(message) {
       message.content
     )}</div>`,
   };
-  sgMail.send(msg);
+  return sgMail.send(msg);
 }
 
 export function sendNewCommentNotification(args) {
