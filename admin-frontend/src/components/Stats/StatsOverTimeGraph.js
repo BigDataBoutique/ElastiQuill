@@ -96,7 +96,21 @@ class StatsOverTimeGraph extends React.Component {
     const xDomainStart = _.first(dummyData).x.getTime();
 
     const visitsData = this._prepareHistogram(visitsHistogram, dummyData);
-    const viewsData = this._prepareHistogram(viewsHistogram, dummyData);
+    const viewsData = this._prepareHistogram(
+      viewsHistogram,
+      dummyData,
+      item => ({
+        top_posts: item.top_posts
+          ? item.top_posts.buckets
+              .map(bucket => ({
+                post: bucket.post ? bucket.post.title : "[DELETED]",
+                views: bucket.doc_count,
+              }))
+              .slice()
+              .sort((a, b) => b.views - a.views)
+          : [],
+      })
+    );
     const commentsData = this._prepareHistogram(commentsHistogram);
     const postsData = this._prepareHistogram(
       postsHistogram && postsHistogram.filter(item => item.doc_count)
@@ -189,7 +203,7 @@ class StatsOverTimeGraph extends React.Component {
       <Crosshair values={crosshairValues}>
         <div
           className="rv-crosshair__inner"
-          style={{ minWidth: "150px", zIndex: 99999 }}
+          style={{ minWidth: "200px", zIndex: 99999 }}
         >
           <div className="rv-crosshair__inner__content">
             <div>
@@ -203,12 +217,23 @@ class StatsOverTimeGraph extends React.Component {
                 Visits: {crosshairValues[1].y}
               </div>
               {!this.props.item && (
-                <div
-                  className="rv-crosshair__item"
-                  style={{ color: VIEWS_COLOR }}
-                >
-                  Post views: {crosshairValues[2].y}
-                </div>
+                <>
+                  <div
+                    className="rv-crosshair__item"
+                    style={{ color: VIEWS_COLOR }}
+                  >
+                    Post views: {crosshairValues[2].y}
+                  </div>
+                  {!!crosshairValues[2].top_posts && (
+                    <div style={{ paddingLeft: "6px" }}>
+                      {crosshairValues[2].top_posts.map(post => (
+                        <div key={post.post}>
+                          {post.post}: {post.views}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
               {crosshairValues[3].y > 0 && (
                 <div className="rv-crosshair__item">
@@ -254,7 +279,7 @@ class StatsOverTimeGraph extends React.Component {
     return data;
   }
 
-  _prepareHistogram(histogram, zeroData) {
+  _prepareHistogram(histogram, zeroData, normalizeAdditionalData) {
     if (!histogram) {
       return [];
     }
@@ -262,6 +287,7 @@ class StatsOverTimeGraph extends React.Component {
     let data = histogram.map(item => ({
       x: this._normalizeDate(new Date(item.key)),
       y: item.doc_count,
+      ...(normalizeAdditionalData ? normalizeAdditionalData(item) : {}),
     }));
     if (zeroData) {
       zeroData.forEach(item => {
