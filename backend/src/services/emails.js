@@ -19,7 +19,7 @@ const ContactMessageArgSchema = Joi.object().keys({
     .email()
     .required(),
   subject: Joi.string().required(),
-  content: Joi.string().required(),
+  content: Joi.string(),
   recipient: Joi.string().allow(null),
 });
 
