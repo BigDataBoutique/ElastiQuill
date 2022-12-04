@@ -4,6 +4,7 @@ import asyncHandler from "express-async-handler";
 import * as emails from "../services/emails";
 import * as recaptcha from "../services/recaptcha";
 import * as blogPosts from "../services/blogPosts";
+import * as logging from "../services/logging";
 
 const router = express.Router();
 
@@ -80,7 +81,8 @@ router.post(
         });
         error = "Please fill all required fields";
       } else {
-        throw err;
+        await logging.logError("contact", err);
+        error = "Something went wrong. Try again.";
       }
     }
 
