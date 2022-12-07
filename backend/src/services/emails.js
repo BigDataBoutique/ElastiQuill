@@ -11,7 +11,7 @@ import { config } from "../config";
 const markdown = new MarkdownIt();
 
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(config.credentials.sendgrid);
+sgMail.setApiKey(config.credentials.sendgrid?.trim());
 
 const ContactMessageArgSchema = Joi.object().keys({
   name: Joi.string().required(),
