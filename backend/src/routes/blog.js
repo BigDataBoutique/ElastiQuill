@@ -181,7 +181,6 @@ router.get(
         canonicalUrl,
         sidebarWidgetData: res.locals.sidebarWidgetData,
         headerImageUrl: post.metadata.header_image_url,
-        recaptchaClientKey: recaptcha.clientKey(),
         title: post.title,
         description: post.description,
         metaKeywords: postMetaKeywords(preparedPost),
@@ -368,7 +367,6 @@ router.post(
         error: commentError,
         values: commentError ? req.body : null,
       },
-      recaptchaClientKey: recaptcha.clientKey(),
       metaKeywords: postMetaKeywords(preparedPost),
       post: preparedPost,
     });
