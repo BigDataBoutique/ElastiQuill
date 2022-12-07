@@ -11,6 +11,7 @@ import { esClient } from "../lib/elasticsearch";
 import * as blogPosts from "../services/blogPosts";
 import * as cache from "../services/cache";
 import * as logging from "../services/logging";
+import * as recaptcha from "../services/recaptcha";
 import apiRouter from "./api";
 import {
   authInfoTokenMiddleware,
@@ -207,6 +208,12 @@ router.use(
     next();
   })
 );
+
+// include required local vars
+router.use((req, res, next) => {
+  res.locals.recaptchaClientKey = recaptcha.clientKey();
+  next();
+});
 
 router.use("/contact", contactRouter);
 router.use(BLOG_ROUTE_PREFIX, blogRouter);

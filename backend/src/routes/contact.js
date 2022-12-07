@@ -11,7 +11,6 @@ const router = express.Router();
 router.get("/", (req, res) => {
   res.render("contact", {
     sidebarWidgetData: res.locals.sidebarWidgetData,
-    recaptchaClientKey: recaptcha.clientKey(),
   });
 });
 
@@ -25,7 +24,6 @@ router.post(
           content: req.body["contact-form-initial-value"] + "\n\n",
         },
         sidebarWidgetData: res.locals.sidebarWidgetData,
-        recaptchaClientKey: recaptcha.clientKey(),
       });
       return;
     }
@@ -89,7 +87,6 @@ router.post(
     res.render("contact", {
       validity,
       sidebarWidgetData: res.locals.sidebarWidgetData,
-      recaptchaClientKey: recaptcha.clientKey(),
       error: error,
       values: error ? req.body : null,
       success: !error,
