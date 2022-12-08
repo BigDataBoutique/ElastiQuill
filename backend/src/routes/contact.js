@@ -5,6 +5,7 @@ import * as emails from "../services/emails";
 import * as recaptcha from "../services/recaptcha";
 import * as blogPosts from "../services/blogPosts";
 import * as logging from "../services/logging";
+import { config } from "../config";
 
 const router = express.Router();
 
@@ -58,10 +59,21 @@ router.post(
 
       const { name, email, subject, content, ...rest } = req.body;
       const extraContent = Object.entries(rest)
-        .map(([key, value]) => `${key}: ${value}\n`)
+        .filter(([key]) => key !== "g-recaptcha-response")
+        .map(([key, value]) => `- ${key}: ${value}  \n`)
         .join("");
-      const mailContent = content ? `${content}\n\n` : "" + extraContent;
+      const mailContent = `${content ? `${content}  \n` : ""}${extraContent}`;
 
+      logging.logEmail(
+        {
+          to: recipientEmail || config.blog["contact-email"],
+          from: email,
+          subject,
+          message: mailContent,
+        },
+        req,
+        res
+      );
       await emails.sendContactMessage({
         name,
         email,
