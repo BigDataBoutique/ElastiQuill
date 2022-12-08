@@ -497,6 +497,15 @@ export async function logAuthAttempt(params, req, res) {
   });
 }
 
+export async function logEmail(params, req, res) {
+  await log({
+    req,
+    res,
+    tags: ["email"],
+    message: JSON.stringify(params),
+  });
+}
+
 export async function logVisit(req, res, took) {
   // ignore redirects
   if (res.statusCode === 302) {

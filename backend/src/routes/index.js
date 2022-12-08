@@ -212,6 +212,7 @@ router.use(
 // include required local vars
 router.use((req, res, next) => {
   res.locals.recaptchaClientKey = recaptcha.clientKey();
+  res.locals.contactFormPostUrl = config.blog["contact-form-post-url"];
   next();
 });
 
