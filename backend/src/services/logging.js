@@ -200,7 +200,7 @@ export async function getStats({
                 },
                 top_posts: {
                   terms: {
-                    field: "read_item.id",
+                    field: "read_item.slug",
                     size: 5,
                   },
                 },
@@ -308,23 +308,6 @@ export async function getStats({
     user_agent_name = aggregations.user_agent_name.buckets;
     visits_by_date = aggregations.visits_histogram.buckets;
     views_by_date = aggregations.views_histogram.views.buckets;
-
-    for (let i = 0; i < views_by_date.length; i++) {
-      for (let j = 0; j < views_by_date[i].top_posts.buckets.length; j++) {
-        const bucket = views_by_date[i].top_posts.buckets[j];
-        try {
-          const post = await blogPosts.getItemById({
-            id: bucket.key,
-          });
-          bucket.post = post;
-        } catch (err) {
-          if (err.statusCode !== 404) {
-            throw err;
-          }
-        }
-      }
-    }
-
     visits_by_country = aggregations.visits_by_country.buckets;
     visits_by_location = aggregations.visits_by_location.buckets.map(
       bucket => ({
@@ -338,8 +321,10 @@ export async function getStats({
         most_viewed_post = await blogPosts.getItemById({
           id: mostViewedPost.key,
         });
-        most_viewed_post.views_count = mostViewedPost.doc_count;
-        most_viewed_post.visitors_count = mostViewedPost.visitors.value;
+        if (most_viewed_post) {
+          most_viewed_post.views_count = mostViewedPost.doc_count;
+          most_viewed_post.visitors_count = mostViewedPost.visitors.value;
+        }
       } catch (err) {
         if (err.statusCode !== 404) {
           throw err;

@@ -219,8 +219,11 @@ export async function getItemById({
 
     return item;
   } catch (e) {
-    await logging.logError("read_post", e);
-    throw e;
+    if (e.meta.statusCode !== 404) {
+      await logging.logError("read_post", e);
+      throw e;
+    }
+    return null;
   }
 }
 

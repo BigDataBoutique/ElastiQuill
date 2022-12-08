@@ -103,7 +103,7 @@ class StatsOverTimeGraph extends React.Component {
         top_posts: item.top_posts
           ? item.top_posts.buckets
               .map(bucket => ({
-                post: bucket.post ? bucket.post.title : "[DELETED]",
+                postSlug: bucket.key,
                 views: bucket.doc_count,
               }))
               .slice()
@@ -227,8 +227,8 @@ class StatsOverTimeGraph extends React.Component {
                   {!!crosshairValues[2].top_posts && (
                     <div style={{ paddingLeft: "6px" }}>
                       {crosshairValues[2].top_posts.map(post => (
-                        <div key={post.post}>
-                          {post.post}: {post.views}
+                        <div key={post.postSlug}>
+                          {post.postSlug}: {post.views}
                         </div>
                       ))}
                     </div>
