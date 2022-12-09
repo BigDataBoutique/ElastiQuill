@@ -83,6 +83,9 @@ router.get(
     });
 
     const post = await blogPosts.getItemById({ id: req.params.postId });
+    if (!post) {
+      return res.sendStatus(404);
+    }
     const prepared = preparePost(post);
 
     res.json(
@@ -101,6 +104,9 @@ router.get(
       id: req.params.id,
       withComments,
     });
+    if (!item) {
+      return res.sendStatus(404);
+    }
     item.url = blogpostUrl(item);
     res.json(item);
   })
@@ -123,6 +129,9 @@ router.post(
         },
       });
       const item = await blogPosts.getItemById({ id: newId });
+      if (!item) {
+        return res.sendStatus(404);
+      }
 
       res.json({ error: null, id: newId, url: blogpostUrl(item) });
     } catch (err) {
@@ -147,6 +156,10 @@ router.delete(
   asyncHandler(async (req, res) => {
     try {
       const item = await blogPosts.getItemById({ id: req.params.id });
+      if (!item) {
+        return res.sendStatus(404);
+      }
+
       if (!isItemEditable(item, req.user)) {
         res.sendStatus(400);
         return;
@@ -166,6 +179,10 @@ router.post(
   asyncHandler(async (req, res) => {
     try {
       const item = await blogPosts.getItemById({ id: req.params.id });
+      if (!item) {
+        return res.sendStatus(404);
+      }
+
       if (!isItemEditable(item, req.user)) {
         res.sendStatus(400);
         return;

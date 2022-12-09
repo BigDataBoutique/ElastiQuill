@@ -20,6 +20,9 @@ router.post(
   "/post/linkedin/:id",
   asyncHandler(async (req, res) => {
     const post = await blogPosts.getItemById({ id: req.params.id });
+    if (!post) {
+      return res.sendStatus(404);
+    }
     if (!req.user.connected.linkedin) {
       throw new Error("Linkedin is not connected");
     }
@@ -58,6 +61,9 @@ router.post(
     }
 
     const post = await blogPosts.getItemById({ id: req.params.id });
+    if (!post) {
+      return res.sendStatus(404);
+    }
     const link = config.blog.url + preparePost(post).url;
     try {
       const resp = await social.postToReddit(
@@ -81,6 +87,9 @@ router.post(
   "/post/twitter/:id",
   asyncHandler(async (req, res) => {
     const post = await blogPosts.getItemById({ id: req.params.id });
+    if (!post) {
+      return res.sendStatus(404);
+    }
     const imgUrl = post.metadata && post.metadata.header_image_url;
     const link = config.blog.url + preparePost(post).url;
     try {
@@ -105,6 +114,9 @@ router.post(
   "/post/medium/:id",
   asyncHandler(async (req, res) => {
     const post = await blogPosts.getItemById({ id: req.params.id });
+    if (!post) {
+      return res.sendStatus(404);
+    }
     if (_.get(post, "metadata.medium_crosspost_url")) {
       res.json({
         error: "Item is already cross-posted",

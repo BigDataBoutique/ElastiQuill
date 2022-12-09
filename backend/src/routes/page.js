@@ -12,6 +12,9 @@ hbs.registerAsyncHelper("embedContentPage", async id => {
   let page;
   try {
     page = await blogPosts.getItemById({ id });
+    if (!page) {
+      throw new Error();
+    }
   } catch (err) {
     return `<div class="alert alert-danger">Invalid embed: ${id}</div>`;
   }
@@ -25,6 +28,9 @@ router.get(
       let page;
       try {
         page = await blogPosts.getItemById({ id: req.params.slug });
+        if (!page) {
+          throw new Error();
+        }
       } catch (err) {
         next();
         return;

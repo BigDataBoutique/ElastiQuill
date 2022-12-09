@@ -148,6 +148,9 @@ router.get(
         moreLikeThis: true,
       });
 
+      if (!post) {
+        return res.sendStatus(404);
+      }
       if (post.slug !== req.params.slug) {
         res.redirect(301, blogpostUrl(post));
         return;
@@ -252,6 +255,9 @@ router.post(
       })
     );
 
+    if (!post) {
+      return res.sendStatus(404);
+    }
     if (!post.allow_comments) {
       res.redirect(303, req.originalUrl);
       return;
@@ -360,6 +366,9 @@ router.post(
       })
     );
 
+    if (!preparedPost) {
+      return res.sendStatus(404);
+    }
     res.render("post", {
       sidebarWidgetData: res.locals.sidebarWidgetData,
       comments: {
@@ -408,6 +417,9 @@ function handlePostsRequest(template) {
         const item = await blogPosts.getItemById({
           id: blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + "{" + series + "}",
         });
+        if (!item) {
+          return res.sendStatus(404);
+        }
         tagDescription = preparePage(item);
       } catch (err) {
         // if it's not found (404) do nothing
@@ -420,6 +432,9 @@ function handlePostsRequest(template) {
         const item = await blogPosts.getItemById({
           id: blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + tag,
         });
+        if (!item) {
+          return res.sendStatus(404);
+        }
         tagDescription = preparePage(item);
       } catch (err) {
         // if it's not found (404) do nothing
