@@ -313,6 +313,7 @@ export async function createItem(type, post) {
 
 export async function deleteItem(id) {
   const item = await getItemById({ id });
+  if (!item) return;
   await esClient.delete({
     id,
     index: ES_INDEX,
@@ -355,6 +356,8 @@ export async function updateItem(id, type, post) {
   }
 
   const item = await getItemById({ id });
+  if (!item) return;
+
   if (!item.is_published && post.is_published) {
     doc.published_at = new Date().toISOString();
   }
