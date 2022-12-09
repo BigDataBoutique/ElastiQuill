@@ -84,7 +84,9 @@ router.get(
 
     const post = await blogPosts.getItemById({ id: req.params.postId });
     if (!post) {
-      return res.sendStatus(404);
+      throw {
+        status: 404,
+      };
     }
     const prepared = preparePost(post);
 
@@ -105,7 +107,9 @@ router.get(
       withComments,
     });
     if (!item) {
-      return res.sendStatus(404);
+      throw {
+        status: 404,
+      };
     }
     item.url = blogpostUrl(item);
     res.json(item);

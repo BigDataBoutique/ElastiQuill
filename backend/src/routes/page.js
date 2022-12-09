@@ -29,7 +29,9 @@ router.get(
       try {
         page = await blogPosts.getItemById({ id: req.params.slug });
         if (!page) {
-          throw new Error();
+          throw {
+            status: 404,
+          };
         }
       } catch (err) {
         next();

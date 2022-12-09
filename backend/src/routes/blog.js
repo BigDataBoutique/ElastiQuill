@@ -149,7 +149,9 @@ router.get(
       });
 
       if (!post) {
-        return res.sendStatus(404);
+        throw {
+          status: 404,
+        };
       }
       if (post.slug !== req.params.slug) {
         res.redirect(301, blogpostUrl(post));
@@ -417,10 +419,9 @@ function handlePostsRequest(template) {
         const item = await blogPosts.getItemById({
           id: blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + "{" + series + "}",
         });
-        if (!item) {
-          return res.sendStatus(404);
+        if (item) {
+          tagDescription = preparePage(item);
         }
-        tagDescription = preparePage(item);
       } catch (err) {
         // if it's not found (404) do nothing
         if (err.meta.statusCode !== 404) {
@@ -432,10 +433,9 @@ function handlePostsRequest(template) {
         const item = await blogPosts.getItemById({
           id: blogPosts.CONTENT_DESCRIPTION_ID_PREFIX + tag,
         });
-        if (!item) {
-          return res.sendStatus(404);
+        if (item) {
+          tagDescription = preparePage(item);
         }
-        tagDescription = preparePage(item);
       } catch (err) {
         // if it's not found (404) do nothing
         if (err.meta.statusCode !== 404) {
