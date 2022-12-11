@@ -177,7 +177,7 @@ a.nav-login {
   background-color: #47bea4;
   color: #ffffff;
   margin-left: 1.7rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 p.header-text {
@@ -193,14 +193,14 @@ p.header-text {
 .series-badge {
   background-color: #c7d8fc;
   color: rgb(126, 119, 119);
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 13px;
 }
 
 .tags-badge {
   background-color: rgba(218, 21, 109, 0.04);
   color: #ea3798;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 13px;
 }
 
@@ -214,6 +214,9 @@ p.header-text {
 }
 
 .post-content .post-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   order: 3;
 }
 
@@ -310,15 +313,9 @@ main.post-page {
   font-size: 1.6rem;
 }
 
-.post-page .post-content p,
-.post-page .post-content u {
-  font-size: 2rem;
-}
-
 .post-content a,
 span.post-quote {
   color: #ea3798;
-  font-size: 2rem;
 }
 
 .post-content h1,
@@ -330,6 +327,8 @@ span.post-quote {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .post-content h1 a,
@@ -470,6 +469,7 @@ span.post-quote {
 
 .post-container .post-content img {
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .fancybox-button {
@@ -650,8 +650,12 @@ footer a {
     margin: 0;
   }
 
+  .post-content .post-author__container {
+    margin: 1rem 0;
+  }
+
   .fresh-post .post-content {
-    padding: 1rem 0 1rem 2.5rem;
+    padding: 2rem 0 2rem 2.5rem;
     flex: 1.7;
   }
 }
@@ -671,7 +675,7 @@ footer a {
   }
 
   .post-content {
-    padding: 1rem 0.5rem 1rem 2rem;
+    padding: 2rem;
   }
 
   main.post-page .post-content {
