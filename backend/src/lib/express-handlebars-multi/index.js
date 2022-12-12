@@ -11,7 +11,7 @@ const fsp = require("mz/fs");
 const globby = require("globby");
 const handlebars = require("handlebars");
 const mergeArgs = require("../merge-args")();
-const uuidv1 = require("uuid");
+const { v1: uuidv1 } = require("uuid");
 const logging = require("../../services/logging");
 
 // default configuration
