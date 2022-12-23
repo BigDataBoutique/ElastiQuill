@@ -130,7 +130,7 @@ function recordResponse(handler, req, res) {
   });
 }
 
-export function cacheGet(cache, key) {
+function cacheGet(cache, key) {
   return new Promise(resolve => {
     cache.get(key, (err, value) => {
       if (err) {
@@ -145,14 +145,14 @@ export function cacheGet(cache, key) {
   });
 }
 
-export function cacheSet(cache, key, val) {
+function cacheSet(cache, key, val) {
   cache.set(key, {
     data: val,
     timestamp: new Date().getTime() / 1000,
   });
 }
 
-export function isExpired(timestamp, ttl = CACHE_TTL) {
+function isExpired(timestamp) {
   const now = new Date().getTime() / 1000;
-  return now - timestamp > ttl;
+  return now - timestamp > CACHE_TTL;
 }
