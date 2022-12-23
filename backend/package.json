@@ -99,7 +99,7 @@
     "eslint-plugin-react": "^7.19.0",
     "husky": "^4.2.5",
     "jest": "^25.4.0",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.20",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
     "supertest": "^5.0.0",
