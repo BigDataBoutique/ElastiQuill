@@ -158,7 +158,7 @@ router.get("/sitemap.xml", async (req, res) => {
         );
 
         links.push({
-          url: `${BLOG_ROUTE_PREFIX}/tagged/${tag}`,
+          url: `${BLOG_ROUTE_PREFIX}/tagged/${tag}`.toLowerCase(),
           priority: 0.4,
           lastmod: latestTaggedPostDate,
         });
@@ -170,7 +170,7 @@ router.get("/sitemap.xml", async (req, res) => {
         );
 
         links.push({
-          url: `${BLOG_ROUTE_PREFIX}/series/${series}`,
+          url: `${BLOG_ROUTE_PREFIX}/series/${series}`.toLowerCase(),
           priority: 0.4,
           lastmod: latestSeriesPostDate,
         });
