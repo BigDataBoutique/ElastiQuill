@@ -46,6 +46,7 @@ export const hbs = exphbs({
     and: (...args) => _.every(args.slice(0, -1)),
     head: xs => xs[0],
     tail: xs => xs.slice(1),
+    includes: (l, s) => _.includes(l, s),
     truncateHtml: require("truncate-html"),
     toLowerCase: s => s.toLowerCase(),
     encodeURI: encodeURIComponent,
