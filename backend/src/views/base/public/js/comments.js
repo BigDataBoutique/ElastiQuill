@@ -6,7 +6,7 @@ function onClickReply(btn) {
     var parents = $(btn).parentsUntil("#comments-container", ".comment");
     var recipientCommentId = parents.eq(parents.length - 1).data("id");
 
-    if (parents.length > 1) {
+    if (parents.length) {
       parents.eq(0).after(commentForm);
     } else {
       $(btn)
@@ -28,21 +28,21 @@ function onClickReply(btn) {
 }
 
 $(function() {
-  if (COMMENTS_RECIPIENT_COMMENT_ID) {
+  if (window.COMMENTS_RECIPIENT_COMMENT_ID) {
     var commentForm = $("#comment-form");
     commentForm.detach();
 
-    var res = $("[data-id=" + COMMENTS_RECIPIENT_COMMENT_ID + "]");
+    var res = $("[data-id=" + window.COMMENTS_RECIPIENT_COMMENT_ID + "]");
     res.find(".replies-container").append(commentForm);
     commentForm
       .find("#recipient-hidden-input")
-      .val(COMMENTS_RECIPIENT_COMMENT_ID);
+      .val(window.COMMENTS_RECIPIENT_COMMENT_ID);
   }
 
-  if (COMMENTS_ERROR.length) {
+  if (window.COMMENTS_ERROR && window.COMMENTS_ERROR.length) {
     $("#comment-form").show();
 
-    if (!COMMENTS_RECIPIENT_COMMENT_ID.length) {
+    if (!window.COMMENTS_RECIPIENT_COMMENT_ID.length) {
       $("#btn-add-comment").hide();
     }
   }
