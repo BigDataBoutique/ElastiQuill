@@ -50,6 +50,10 @@ export const hbs = exphbs({
     truncateHtml: require("truncate-html"),
     toLowerCase: s => s.toLowerCase(),
     encodeURI: encodeURIComponent,
+    replace: function(find, replace, options) {
+      const string = options.fn(this);
+      return string.replace(find, replace);
+    },
   },
   partialDirs: viewPaths
     .map(p => path.join(p, "partials"))
