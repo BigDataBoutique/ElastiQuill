@@ -541,7 +541,7 @@ export async function getItems({
     query.body.query.bool.must = {
       multi_match: {
         query: search,
-        fields: ["title", "description", "content", "tags"],
+        fields: ["title^5", "description^2", "content", "tags"],
       },
     };
   }
