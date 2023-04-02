@@ -109,7 +109,7 @@ router.get("/healthz", async (req, res) => {
 
 router.get("/robots.txt", (req, res) => {
   res.end(
-    `User-agent: *\n" + "Disallow:\n\nSitemap: https://${config.blog["url"]}/sitemap.xml\n`
+    `User-agent: *\nDisallow:\n\nSitemap: ${config.blog["url"]}/sitemap.xml\n`
   );
 });
 
