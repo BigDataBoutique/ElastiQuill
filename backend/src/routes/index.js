@@ -117,97 +117,117 @@ function getLatestPostDate(posts) {
   return new Date(Math.max(...posts.map(post => new Date(post.published_at))));
 }
 
-router.get("/sitemap.xml", async (req, res) => {
-  try {
-    const sitemap = await cache.cacheAndReturn("sitemap", async () => {
-      const posts = await blogPosts.getAllItems({ type: "post" });
-      const contentPages = await blogPosts.getAllItems({ type: "page" });
-      const { tags, series } = await blogPosts.getAllTags();
+async function getSitemap() {
+  return await cache.cacheAndReturn("sitemap", async () => {
+    const posts = await blogPosts.getAllItems({ type: "post" });
+    const contentPages = await blogPosts.getAllItems({ type: "page" });
+    const { tags, series } = await blogPosts.getAllTags();
 
-      const latestPostDate = getLatestPostDate(posts);
+    const latestPostDate = getLatestPostDate(posts);
 
-      let links = [
-        {
-          url: BLOG_ROUTE_PREFIX,
-          priority: 1.0,
-          lastmod: latestPostDate,
-        },
-        {
-          url: "/contact",
-          priority: 0.4,
-          lastmod: latestPostDate,
-        },
-        {
-          url: `${BLOG_ROUTE_PREFIX}/rss`,
-          priority: 0.0,
-          lastmod: latestPostDate,
-        },
-      ];
+    let links = [
+      {
+        url: BLOG_ROUTE_PREFIX,
+        priority: 1.0,
+        lastmod: latestPostDate,
+      },
+      {
+        url: "/contact",
+        priority: 0.4,
+        lastmod: latestPostDate,
+      },
+      {
+        url: `${BLOG_ROUTE_PREFIX}/rss`,
+        priority: 0.0,
+        lastmod: latestPostDate,
+      },
+    ];
 
-      contentPages.forEach(page => {
-        if (!page.metadata.is_embed && !page.metadata.is_tag_description) {
-          links.push({
-            url: `/${page.slug}`,
-            priority: 0.4,
-            lastmod: page.published_at,
-          });
-        }
-      });
-
-      tags.forEach(tag => {
-        const latestTaggedPostDate = getLatestPostDate(
-          posts.filter(post => post.tags && post.tags.includes(tag))
-        );
-
+    contentPages.forEach(page => {
+      if (!page.metadata.is_embed && !page.metadata.is_tag_description) {
         links.push({
-          url: `${BLOG_ROUTE_PREFIX}/tagged/${tag}`.toLowerCase(),
+          url: `/${page.slug}`,
           priority: 0.4,
-          lastmod: latestTaggedPostDate,
+          lastmod: page.published_at,
         });
-      });
-
-      series.forEach(series => {
-        const latestSeriesPostDate = getLatestPostDate(
-          posts.filter(post => post.series && post.series === series)
-        );
-
-        links.push({
-          url: `${BLOG_ROUTE_PREFIX}/series/${series}`.toLowerCase(),
-          priority: 0.4,
-          lastmod: latestSeriesPostDate,
-        });
-      });
-
-      posts.forEach(post => {
-        if (post.is_published) {
-          const postAgeDifMs = new Date() - new Date(post.published_at);
-          const postAgeDate = new Date(postAgeDifMs);
-          const postAge = Math.abs(postAgeDate.getUTCFullYear() - 1970);
-
-          const priority = 0.8 - Math.min(postAge * 0.1, 0.3);
-
-          links.push({
-            url: blogpostUrl(post),
-            priority,
-            lastmod: post.published_at,
-          });
-        }
-      });
-
-      const stream = new SitemapStream({
-        hostname: frontendAddress(),
-        xmlns: {
-          custom: [
-            'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
-            'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"',
-          ],
-        },
-      });
-
-      const buffer = await streamToPromise(Readable.from(links).pipe(stream));
-      return buffer.toString();
+      }
     });
 
+    tags.forEach(tag => {
+      const latestTaggedPostDate = getLatestPostDate(
+        posts.filter(post => post.tags && post.tags.includes(tag))
+      );
+
+      links.push({
+        url: `${BLOG_ROUTE_PREFIX}/tagged/${tag}`.toLowerCase(),
+        priority: 0.4,
+        lastmod: latestTaggedPostDate,
+      });
+    });
+
+    series.forEach(series => {
+      const latestSeriesPostDate = getLatestPostDate(
+        posts.filter(post => post.series && post.series === series)
+      );
+
+      links.push({
+        url: `${BLOG_ROUTE_PREFIX}/series/${series}`.toLowerCase(),
+        priority: 0.4,
+        lastmod: latestSeriesPostDate,
+      });
+    });
+
+    posts.forEach(post => {
+      if (post.is_published) {
+        const postAgeDifMs = new Date() - new Date(post.published_at);
+        const postAgeDate = new Date(postAgeDifMs);
+        const postAge = Math.abs(postAgeDate.getUTCFullYear() - 1970);
+
+        const priority = 0.8 - Math.min(postAge * 0.1, 0.3);
+
+        links.push({
+          url: blogpostUrl(post),
+          priority,
+          lastmod: post.published_at,
+        });
+      }
+    });
+
+    const stream = new SitemapStream({
+      hostname: frontendAddress(),
+      xmlns: {
+        custom: [
+          'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+          'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"',
+        ],
+      },
+    });
+
+    const buffer = await streamToPromise(Readable.from(links).pipe(stream));
+    return buffer.toString();
+  });
+}
+
+router.get("/:prefix/sitemap.xml", async (req, res) => {
+  try {
+    if (`/${req.params.prefix}` === BLOG_ROUTE_PREFIX) {
+      const sitemap = await getSitemap();
+      return res
+        .header("Content-Type", "application/xml")
+        .status(200)
+        .send(sitemap);
+    } else {
+      return res.sendStatus(404);
+    }
+  } catch (error) {
+    logging.logError("sitemap", error);
+    return res.status(500).end();
+  }
+});
+
+router.get("/sitemap.xml", async (req, res) => {
+  try {
+    const sitemap = await getSitemap();
     return res
       .header("Content-Type", "application/xml")
       .status(200)
