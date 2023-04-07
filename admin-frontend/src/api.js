@@ -3,15 +3,26 @@ import md5 from "md5";
 import qs from "query-string";
 import { authFetchJson, getJwtToken } from "./util";
 
-export function logout() {
-  window.location.href = "/api/auth/logout";
+let API_ROUTE_PREFIX = null;
+
+export async function buildApiRoute(route) {
+  if (!API_ROUTE_PREFIX) {
+    API_ROUTE_PREFIX = await authFetchJson("/blog-api-route");
+  }
+  console.log(API_ROUTE_PREFIX + route);
+  return API_ROUTE_PREFIX + route;
+}
+
+export async function logout() {
+  window.location.href = await buildApiRoute("/auth/logout");
 }
 
 // Post
 
 export async function createPost(values) {
+  const apiRoute = await buildApiRoute("/content/post");
   return await createItem(
-    "/api/content/post",
+    apiRoute,
     _.pick(values, [
       "title",
       "content",
@@ -27,12 +38,14 @@ export async function createPost(values) {
 }
 
 export async function deletePost(id) {
-  return await deleteItem("/api/content/post/" + id);
+  const apiRoute = await buildApiRoute(`/content/post/${id}`);
+  return await deleteItem(apiRoute);
 }
 
 export async function updatePost(id, post) {
+  const apiRoute = await buildApiRoute(`/content/post/${id}`);
   return await updateItem(
-    "/api/content/post/" + id,
+    apiRoute,
     _.pick(post, [
       "title",
       "content",
@@ -48,26 +61,31 @@ export async function updatePost(id, post) {
 }
 
 export async function loadPostById(id) {
-  return await authFetchJson(`/api/content/post/${id}`);
+  const apiRoute = await buildApiRoute(`/content/post/${id}`);
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadPosts(pageIndex, queryParams) {
-  return await authFetchJson(
-    `/api/content/post?page_index=${pageIndex}&${qs.stringify(queryParams)}`
+  const apiRoute = await buildApiRoute(
+    `/content/post?page_index=${pageIndex}&${qs.stringify(queryParams)}`
   );
+  return await authFetchJson(apiRoute);
 }
 
 // Comments
 export async function loadComments(postId) {
-  return await authFetchJson(`/api/content/post/${postId}/comment`);
+  const apiRoute = await buildApiRoute(`/content/post/${postId}/comment`);
+  return await authFetchJson(apiRoute);
 }
 
 export async function deleteComment(path) {
-  return await deleteItem(`/api/content/comment/${path.join(",")}`);
+  const apiRoute = await buildApiRoute(`/content/comment/${path.join(",")}`);
+  return await deleteItem(apiRoute);
 }
 
 export async function updateCommentIsSpam(path, isSpam) {
-  return await updateItem(`/api/content/comment/${path.join(",")}`, {
+  const apiRoute = await buildApiRoute(`/content/comment/${path.join(",")}`);
+  return await updateItem(apiRoute, {
     spam: isSpam,
   });
 }
@@ -75,80 +93,94 @@ export async function updateCommentIsSpam(path, isSpam) {
 // Content Page
 
 export async function createContentPage(values) {
-  return await createItem("/api/content/page", values);
+  const apiRoute = await buildApiRoute("/content/page");
+  return await createItem(apiRoute, values);
 }
 
 export async function deleteContentPage(id) {
-  return await deleteItem("/api/content/page/" + id);
+  const apiRoute = await buildApiRoute("/content/page/");
+  return await deleteItem(apiRoute + id);
 }
 
 export async function updateContentPage(id, page) {
+  const apiRoute = await buildApiRoute(`/content/page/${id}`);
   return await updateItem(
-    "/api/content/page/" + id,
+    apiRoute,
     _.pick(page, ["title", "content", "description", "metadata"])
   );
 }
 
 export async function loadContentPages(pageIndex, queryParams) {
-  return await authFetchJson(
-    `/api/content/page?page_index=${pageIndex}&${qs.stringify(queryParams)}`
+  const apiRoute = await buildApiRoute(
+    `/content/page?page_index=${pageIndex}&${qs.stringify(queryParams)}`
   );
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadContentPageById(id) {
-  return await authFetchJson(`/api/content/page/${id}`);
+  const apiRoute = await buildApiRoute(`/content/page/${id}`);
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadAllStats(startDate, interval) {
-  return await authFetchJson(
-    "/api/stats/all?" +
-      qs.stringify({
-        start: startDate ? startDate.toISOString() : 0,
-        interval,
-      })
+  const apiRoute = await buildApiRoute(
+    `/stats/all?${qs.stringify({
+      start: startDate ? startDate.toISOString() : 0,
+      interval,
+    })}`
   );
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadItemStats(itemType, id, startDate, interval) {
-  return await authFetchJson(
-    `/api/stats/all?` +
-      qs.stringify({
-        type: itemType,
-        item_id: id,
-        start: startDate ? startDate.toISOString() : 0,
-        interval,
-      })
+  const apiRoute = await buildApiRoute(
+    `/stats/all?${qs.stringify({
+      type: itemType,
+      item_id: id,
+      start: startDate ? startDate.toISOString() : 0,
+      interval,
+    })}`
   );
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadCommentsStats(postId = null) {
-  return await authFetchJson("/api/stats/comments?post_id=" + (postId || ""));
+  const apiRoute = await buildApiRoute(
+    `/stats/comments?post_id=${postId || ""}`
+  );
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadSocialAvailability() {
-  return await authFetchJson("/api/social/availability");
+  const apiRoute = await buildApiRoute("/social/availability");
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadAllTags() {
-  return await authFetchJson("/api/content/tags");
+  const apiRoute = await buildApiRoute("/content/tags");
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadAuthSources() {
-  return await authFetchJson("/api/auth/auth-sources");
+  const apiRoute = await buildApiRoute("/auth/auth-sources");
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadSetupStatus() {
-  return await authFetchJson("/api/setup/status");
+  const apiRoute = await buildApiRoute("/setup/status");
+  return await authFetchJson(apiRoute);
 }
 
 export async function setupElasticsearch() {
-  return await authFetchJson("/api/setup", {
+  const apiRoute = await buildApiRoute("/setup");
+  return await authFetchJson(apiRoute, {
     method: "POST",
   });
 }
 
 export async function importPost(url, keepCanonicalUrl, publishNow) {
-  return await authFetchJson(`/api/import`, {
+  const apiRoute = await buildApiRoute("/import");
+  return await authFetchJson(apiRoute, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -162,7 +194,8 @@ export async function importPost(url, keepCanonicalUrl, publishNow) {
 }
 
 export async function postItemToSocial(socialKey, itemId, opts) {
-  return await authFetchJson(`/api/social/post/${socialKey}/${itemId}`, {
+  const apiRoute = await buildApiRoute(`/social/post/${socialKey}/${itemId}`);
+  return await authFetchJson(apiRoute, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -171,41 +204,30 @@ export async function postItemToSocial(socialKey, itemId, opts) {
   });
 }
 
-export function postToHackerNews(post) {
-  const shareUrl = `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
-    post.full_url
-  )}&t=${encodeURIComponent(post.title)}`;
-  const win = window.open(shareUrl, "_blank");
-  win.focus();
-}
-
-export function redirectToSocialConnect(socialKey) {
-  window.location.href =
-    "/api/connect/" + socialKey + "?state=" + getJwtToken();
-}
-
 export async function downloadBackup() {
-  const url = "/api/dump/content";
-  await authFetchJson(url, { method: "OPTIONS" });
-  window.location.href = url + "?state=" + getJwtToken();
+  const apiRoute = await buildApiRoute("/dump/content");
+  await authFetchJson(apiRoute, { method: "OPTIONS" });
+  window.location.href = apiRoute + "?state=" + getJwtToken();
 }
 
 export async function downloadLogs() {
-  const url = "/api/dump/logs";
-  await authFetchJson(url, { method: "OPTIONS" });
-  window.location.href = url + "?state=" + getJwtToken();
+  const apiRoute = await buildApiRoute("/dump/logs");
+  await authFetchJson(apiRoute, { method: "OPTIONS" });
+  window.location.href = apiRoute + "?state=" + getJwtToken();
 }
 
 export async function loadStatus() {
-  return await authFetchJson("/api/status");
+  const apiRoute = await buildApiRoute("/status");
+  return await authFetchJson(apiRoute);
 }
 
 export async function loadLogs(level) {
-  return await authFetchJson("/api/logs?level=" + level);
+  const apiRoute = await buildApiRoute("/logs");
+  return await authFetchJson(`${apiRoute}?level=${level}`);
 }
 
-export function uploadImageUrl() {
-  return "/api/uploads/image";
+export async function uploadImageUrl() {
+  return await buildApiRoute("/uploads/image");
 }
 
 export function userAvatarUrl(email) {

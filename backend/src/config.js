@@ -52,6 +52,7 @@ function initConfig() {
     ["blog.jwt-secret", "BLOG_JWT_SECRET"],
     ["blog.blog-route-prefix", "BLOG_ROUTE_PREFIX", "/blog"],
     ["blog.admin-route", "ADMIN_ROUTE", "/admin"],
+    ["blog.api-route", "API_ROUTE", "/api"],
     ["blog.admin-frontend-path", "ADMIN_FRONTEND_PATH", "./build"],
     ["blog.uploads-bucket-prefix", "UPLOADS_BUCKET_PREFIX", ""],
     [

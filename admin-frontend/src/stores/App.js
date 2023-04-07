@@ -20,7 +20,7 @@ class App extends BaseStore {
     this.loading("loadSession");
 
     try {
-      const resp = await authFetch("/api/auth/whoami", {
+      const resp = await authFetch(await api.buildApiRoute("/auth/whoami"), {
         headers: {
           "Content-Type": "application/json; charset=utf-8",
         },
@@ -84,7 +84,7 @@ class App extends BaseStore {
     try {
       this.clearLoginErrors();
 
-      const response = await authFetch("/api/auth/local", {
+      const response = await authFetch(api.buildApiRoute("/auth/local"), {
         method: "POST",
         body: JSON.stringify({ username, password }),
         headers: {

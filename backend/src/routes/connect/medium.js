@@ -4,13 +4,14 @@ import passport from "passport";
 import medium from "medium-sdk";
 import asyncHandler from "express-async-handler";
 
+import { API_ROUTE } from "../index";
 import { getJwtToken, updateJwtToken } from "../auth";
 import { frontendAddress } from "../../app";
 import { config } from "../../config";
 
 const router = express.Router();
 
-const redirectURL = config.blog.url + "/api/connect/medium/callback";
+const redirectURL = config.blog.url + API_ROUTE + "/connect/medium/callback";
 
 router.get(
   "/",

@@ -4,6 +4,7 @@ import querystring from "querystring";
 import asyncHandler from "express-async-handler";
 import request from "request-promise";
 
+import { API_ROUTE } from "../index";
 import { getJwtToken, updateJwtToken } from "../auth";
 import { frontendAddress } from "../../app";
 import { config } from "../../config";
@@ -18,7 +19,8 @@ router.get(
         querystring.stringify({
           response_type: "code",
           client_id: config.credentials.linkedin["client-id"],
-          redirect_uri: config.blog.url + "/api/connect/linkedin/callback",
+          redirect_uri:
+            config.blog.url + API_ROUTE + "/connect/linkedin/callback",
           state: getJwtToken(req),
           scope: "r_liteprofile r_emailaddress w_member_social",
         })
@@ -46,7 +48,8 @@ router.get(
       qs: {
         grant_type: "authorization_code",
         code: req.query.code,
-        redirect_uri: config.blog.url + "/api/connect/linkedin/callback",
+        redirect_uri:
+          config.blog.url + API_ROUTE + "/connect/linkedin/callback",
         client_id: config.credentials.linkedin["client-id"],
         client_secret: config.credentials.linkedin["client-secret"],
       },

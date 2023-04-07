@@ -35,6 +35,7 @@ function ensureNoSlash(str) {
 }
 
 const BLOG_ROUTE_PREFIX = ensureNoSlash(config.blog["blog-route-prefix"] || "");
+export const API_ROUTE = ensureNoSlash(config.blog["api-route"] || "/api");
 const IS_LOCALHOST = config.blog.url.startsWith("http://localhost");
 
 const router = express.Router();
@@ -238,6 +239,10 @@ router.get("/sitemap.xml", async (req, res) => {
   }
 });
 
+router.get("/blog-api-route", async (req, res) => {
+  return res.json(API_ROUTE);
+});
+
 if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== "/") {
   router.get("/", (req, res) =>
     res.redirect(301, config.blog.url + BLOG_ROUTE_PREFIX)
@@ -270,7 +275,7 @@ router.use((req, res, next) => {
 });
 
 router.use(routingTableRouter);
-router.use("/api", apiRouter);
+router.use(API_ROUTE, apiRouter);
 router.use(authInfoTokenMiddleware);
 
 // add visitor cookies
