@@ -687,13 +687,18 @@ function ecsHttp(req, res) {
   if (!req || !res) return {};
 
   const userAgent = req.get("User-Agent");
-
+  const bot = CRAWLER_USER_AGENTS.has(userAgent);
+  const suspiciousPath =
+    req.originalUrl?.includes("/wp") ||
+    req.originalUrl?.endsWith(".zip") ||
+    req.originalUrl?.endsWith(".gz");
   const body = {
     http: {
       request: {
         method: req.method.toLowerCase(),
         user_agent: userAgent,
-        bot: CRAWLER_USER_AGENTS.has(userAgent),
+        suspected_bot: bot || suspiciousPath,
+        bot: bot,
       },
       response: {
         status_code: res.statusCode,
