@@ -14,7 +14,6 @@ module.exports = {
       },
       devServer: {
         proxy: {
-          "/blog-api-route": "http://localhost:5000",
           "/api": "http://localhost:5000",
         },
       },

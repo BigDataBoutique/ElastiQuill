@@ -14,15 +14,16 @@ import { getErrorStatus } from "./util";
 
 export const routingTable = loadRoutingTable(config);
 
+const BLOG_URL = config.blog.url;
+const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
 const ADMIN_ROUTE = config.blog["admin-route"];
+const API_ROUTE = config.blog["api-route"];
 const loggingService = require("./services/logging");
 
 const app = express();
 app.disable("x-powered-by");
 
-const BLOG_THEME_PATH = config.blog["theme-path"],
-  BLOG_URL = config.blog.url;
-
+const BLOG_THEME_PATH = config.blog["theme-path"];
 const STATICS_ROUTE_PREFIX = config.blog["statics-route-prefix"];
 
 // view engine setup
@@ -133,9 +134,24 @@ if (process.env.NODE_ENV === "production") {
     config.blog["admin-frontend-path"]
   );
 
-  app.use(ADMIN_ROUTE, express.static(frontendBuildPath, { index: false }));
-  app.get(ADMIN_ROUTE, function(req, res) {
-    res.sendFile(path.join(frontendBuildPath, "index.html"));
+  app.use(
+    BLOG_ROUTE_PREFIX + ADMIN_ROUTE,
+    express.static(frontendBuildPath, { index: false })
+  );
+  app.get(BLOG_ROUTE_PREFIX + ADMIN_ROUTE, function(req, res) {
+    const filePath = path.join(frontendBuildPath, "index.html");
+    fs.readFile(filePath, "utf-8", (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Internal Server Error");
+      }
+      const withApiRoute = data.replace(
+        "<head>",
+        `<head><script>window.API_ROUTE = "${BLOG_ROUTE_PREFIX +
+          API_ROUTE}";</script>`
+      );
+      res.send(withApiRoute);
+    });
   });
 } else {
   app.use(logger("dev"));

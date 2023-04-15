@@ -27,15 +27,8 @@ import pageRouter from "./page";
 import routingTableRouter from "./routingTable";
 import { blogpostUrl, preparePost, seriesUrl, tagUrl } from "./util";
 
-function ensureNoSlash(str) {
-  if (str[str.length - 1] === "/") {
-    return str.substr(0, -1);
-  }
-  return str;
-}
-
-const BLOG_ROUTE_PREFIX = ensureNoSlash(config.blog["blog-route-prefix"] || "");
-export const API_ROUTE = ensureNoSlash(config.blog["api-route"] || "/api");
+const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
+const API_ROUTE = config.blog["api-route"];
 const IS_LOCALHOST = config.blog.url.startsWith("http://localhost");
 
 const router = express.Router();
@@ -239,14 +232,8 @@ router.get("/sitemap.xml", async (req, res) => {
   }
 });
 
-router.get("/blog-api-route", async (req, res) => {
-  return res.json(API_ROUTE);
-});
-
 if (BLOG_ROUTE_PREFIX.length && BLOG_ROUTE_PREFIX !== "/") {
-  router.get("/", (req, res) =>
-    res.redirect(301, config.blog.url + BLOG_ROUTE_PREFIX)
-  );
+  router.get("/", (req, res) => res.redirect(302, config.blog.url));
 }
 
 // lowercase urls
@@ -275,7 +262,7 @@ router.use((req, res, next) => {
 });
 
 router.use(routingTableRouter);
-router.use(API_ROUTE, apiRouter);
+router.use(BLOG_ROUTE_PREFIX + API_ROUTE, apiRouter);
 router.use(authInfoTokenMiddleware);
 
 // add visitor cookies

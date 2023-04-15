@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
 
-import { API_ROUTE } from "../index";
 import { passportDefaultCallback } from "./index";
 import { config } from "../../config";
 
@@ -11,7 +10,8 @@ export default function(passport, router, handleRequest) {
       {
         clientID: _.get(config, "credentials.google.oauth-client-id"),
         clientSecret: _.get(config, "credentials.google.oauth-client-secret"),
-        callbackURL: config.blog.url + API_ROUTE + "/auth/google/callback",
+        callbackURL:
+          config.blog.url + config.blog["api-route"] + "/auth/google/callback",
       },
       (accessToken, refreshToken, profile, done) => done(null, profile)
     )

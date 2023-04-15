@@ -3,7 +3,6 @@ import passport from "passport";
 import querystring from "querystring";
 import asyncHandler from "express-async-handler";
 
-import { API_ROUTE } from "../index";
 import { getJwtToken, updateJwtToken } from "../auth";
 import { frontendAddress } from "../../app";
 import { config } from "../../config";
@@ -21,7 +20,9 @@ router.get(
           duration: "permanent",
           client_id: config.credentials.reddit["client-id"],
           redirect_uri:
-            config.blog.url + API_ROUTE + "/connect/reddit/callback",
+            config.blog.url +
+            config.blog["api-route"] +
+            "/connect/reddit/callback",
           state: getJwtToken(req),
           scope: "submit",
         })
@@ -44,7 +45,8 @@ router.get(
 
     const resp = await social.fetchRedditAccessToken({
       code: req.query.code,
-      callback: config.blog.url + API_ROUTE + "/connect/reddit/callback",
+      callback:
+        config.blog.url + config.blog["api-route"] + "/connect/reddit/callback",
     });
 
     req.user.connected = req.user.connected || {};

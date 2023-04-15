@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import GoogleButton from "react-google-button";
-import { buildApiRoute } from "../api";
+import { API_ROUTE_PREFIX } from "../api";
 import GitHubLogo from "../assets/img/github-logo.svg";
 
 export default function AuthButtons(props) {
@@ -30,7 +30,7 @@ export default function AuthButtons(props) {
                     width: "100%",
                     border: 0,
                   }}
-                  href={await buildApiRoute("/auth/github")}
+                  href={`${API_ROUTE_PREFIX}/auth/github`}
                 >
                   <img
                     style={{ height: 30, marginRight: 5 }}
@@ -46,7 +46,7 @@ export default function AuthButtons(props) {
               <div key="google" className="col-md">
                 <GoogleButton
                   onClick={async () =>
-                    (location.href = await buildApiRoute("/auth/google"))
+                    (location.href = `${API_ROUTE_PREFIX}/auth/google`)
                   }
                 />
               </div>
@@ -55,7 +55,7 @@ export default function AuthButtons(props) {
             return (
               <div key="anonymous" className="col-md">
                 <a
-                  href={await buildApiRoute("/auth/anonymous")}
+                  href={`${API_ROUTE_PREFIX}/auth/anonymous`}
                   className="btn btn-primary"
                 >
                   Login
