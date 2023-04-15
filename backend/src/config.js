@@ -50,7 +50,7 @@ function initConfig() {
     ["blog.statics-route-prefix", "BLOG_STATICS_ROUTE_PREFIX", "/static"],
     ["blog.routing-table-path", "BLOG_ROUTING_TABLE_PATH"],
     ["blog.jwt-secret", "BLOG_JWT_SECRET"],
-    ["blog.blog-route-prefix", "BLOG_ROUTE_PREFIX", "/blog"],
+    ["blog.blog-route-prefix", "BLOG_ROUTE_PREFIX", ""],
     ["blog.admin-route", "ADMIN_ROUTE", "/admin"],
     ["blog.api-route", "API_ROUTE", "/api"],
     ["blog.admin-frontend-path", "ADMIN_FRONTEND_PATH", "./build"],
@@ -116,11 +116,15 @@ function initConfig() {
     config.blog["statics-route-prefix"],
     "/"
   );
+
   const adminRoute = _.trimEnd(config.blog["admin-route"], "/");
   if (!adminRoute.length) {
     throw new Error(`Invalid admin route: "${config.blog["admin-route"]}"`);
   }
-  config.blog["blog.admin-route"] = adminRoute;
+  config.blog["admin-route"] = adminRoute;
+
+  const apiRoute = _.trimEnd(config.blog["api-route"], "/");
+  config.blog["api-route"] = apiRoute;
 
   if (config.blog.url.startsWith("https://") && !config.blog["force-https"]) {
     console.warn(

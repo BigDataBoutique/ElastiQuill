@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { Strategy as GitHubStrategy } from "passport-github";
 
-import { API_ROUTE } from "../index";
 import { passportDefaultCallback } from "./index";
 import { config } from "../../config";
 
@@ -11,7 +10,8 @@ export default function(passport, router, handleRequest) {
       {
         clientID: _.get(config, "credentials.github.oauth-client-id"),
         clientSecret: _.get(config, "credentials.github.oauth-client-secret"),
-        callbackURL: config.blog.url + API_ROUTE + "/auth/github/callback",
+        callbackURL:
+          config.blog.url + config.blog["api-route"] + "/auth/github/callback",
         scope: "user:email",
       },
       (accessToken, refreshToken, profile, done) => done(null, profile)

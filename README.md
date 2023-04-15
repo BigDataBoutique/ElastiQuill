@@ -40,9 +40,9 @@ First, you will need to have a Google project and to enable Google+ APIs for it.
 Once that is done, go to https://console.developers.google.com/apis/credentials, click Credentials -> OAuth Client ID -> Web Application. Set:
 
 - Authorized JavaScript origins to `hostname`
-- Authorized redirect URIs to `https://hostname/api/auth/google/callback`
+- Authorized redirect URIs to `https://{hostname}{prefix}{api-route}/auth/google/callback`
 
-Where `hostname` is your blog DNS. Copy the Client ID and Client Secret and add them to your `config.yml` file.
+Where `hostname` is your blog DNS, `prefix` is the value of the `blog.blog-route-prefix` configuration and `api-route` the `blog.api-route` configuration. Copy the Client ID and Client Secret and add them to your `config.yml` file.
 
 ### Github
 
@@ -122,7 +122,7 @@ See [config.yml](config.yml) for a sample configuration file.
 | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----------------------- |
 | blog.admin-emails                       | Comma-separated list of admin emails, domains or `_all_`. Emails will be checked to match with Google/Github account email when using SSO on `/admin`                       | `BLOG_ADMIN_EMAILS`              | None. Required.         |
 | blog.jwt-secret                         | A unique string used for encrypting authentication data.                                                                                                                    | `BLOG_JWT_SECRET`                | None. Required.         |
-| blog.url                                | Blog URL                                                                                                                                                                    | `BLOG_URL`                       | `http://localhost:5000` |
+| blog.url                                | Blog URL including the prefix (if any). Should be equivalent to {blog.url.host}{blog-route-prefix}                                                                          | `BLOG_URL`                       | `http://localhost:5000` |
 | blog.url-format                         | Blog URL Format. Default is <blog.url>/year/month/post-slug , can be set to `post-name` to make it <blog.url>/post-slug                                                     | `BLOG_URL_FORMAT`                | `month-and-name`        |
 | blog.title                              | Blog title. Used in `/blog/rss` xml                                                                                                                                         | `BLOG_TITLE`                     | `Sample blog`           |
 | blog.description                        | Blog description. Used in `/blog/rss` xml                                                                                                                                   | `BLOG_DESCRIPTION`               | `Sample description`    |
@@ -136,8 +136,9 @@ See [config.yml](config.yml) for a sample configuration file.
 | blog.contact-form-post-url              | Url to be submitted on contacts form (can be cross-origin)                                                                                                                  | `CONTACT_FORM_POST_URL`          | `/contact`              |
 | blog.theme-path                         | Path to a directory with custom handlebars views. Templates are first searched in this directory, and only then in `views/base`                                             | `BLOG_THEME_PATH`                |                         |
 | blog.theme-caching                      | View template compilation caching. Set this to `false` and `blog.cache-ttl` to 0 for hot-reloading.                                                                         | `BLOG_THEME_CACHING`             | `true`                  |
-| blog.blog-route-prefix                  | Url prefix for all blog posts urls. Does not apply to content page urls                                                                                                     | `BLOG_ROUTE_PREFIX`              | `/blog`                 |
-| blog.admin-route                        | Url under which admin dashboard can be accessed                                                                                                                             | `ADMIN_ROUTE`                    | `/admin`                |
+| blog.blog-route-prefix                  | Url prefix for all blog posts urls. Should be included in `blog.url`. Does not apply to content page urls.                                                                  | `BLOG_ROUTE_PREFIX`              |                         |
+| blog.admin-route                        | Url under which admin dashboard can be accessed. Should be a subpath of `blog.url`.                                                                                         | `ADMIN_ROUTE`                    | `/admin`                |
+| blog.api-route                          | Url under which the admin api can be accessed. Should be a subpath of `blog.url`.                                                                                           | `API_ROUTE`                      | `/api`                  |
 | blog.uploads-bucket-prefix              | Bucket prefix used for uploads                                                                                                                                              | `UPLOADS_BUCKET_PREFIX`          |                         |
 | elasticsearch.hosts                     | Comma-separated list of Elasticsearch hosts                                                                                                                                 | `ELASTICSEARCH_HOSTS`            | `http://localhost:9200` |
 | elasticsearch.blog-index-name           | Elasticsearch index name to store blog posts                                                                                                                                | `BLOG_POSTS_INDEX`               | `blog-posts`            |
