@@ -8,9 +8,9 @@ import compression from "compression";
 import createError from "http-errors";
 import cookieParser from "cookie-parser";
 import parseUrl from "parseurl";
-import exphbs from "./lib/express-handlebars-multi";
+import { create } from "express-handlebars";
 import { config } from "./config";
-import { getErrorStatus } from "./util";
+import { getErrorStatus, copyFilesSync } from "./util";
 
 export const routingTable = loadRoutingTable(config);
 
@@ -28,17 +28,22 @@ const STATICS_ROUTE_PREFIX = config.blog["statics-route-prefix"];
 
 // view engine setup
 
-const viewPaths = [path.join(__dirname, "views/base")];
+const baseViewPath = path.join(__dirname, "views/base");
+const additionalViewPaths = [];
+
 if (BLOG_THEME_PATH) {
   if (fs.existsSync(BLOG_THEME_PATH)) {
     console.log("Theme path configured: " + BLOG_THEME_PATH);
-    viewPaths.unshift(BLOG_THEME_PATH);
+    additionalViewPaths.unshift(BLOG_THEME_PATH);
+    // copying theme layout files into the base layout folder since
+    // express-handlebars doesn't support multiple layout folders
+    copyFilesSync(`${BLOG_THEME_PATH}/layouts`, `${baseViewPath}/layouts`);
   } else {
     console.log("Invalid BLOG_THEME_PATH", BLOG_THEME_PATH, "does not exist");
   }
 }
 
-export const hbs = exphbs({
+export const hbs = create({
   helpers: {
     eq: (arg1, arg2) => arg1 === arg2,
     gt: (arg1, arg2) => arg1 > arg2,
@@ -56,19 +61,17 @@ export const hbs = exphbs({
       return string.replace(find, replace);
     },
   },
-  partialDirs: viewPaths
-    .map(p => path.join(p, "partials"))
-    .filter(p => fs.existsSync(p)),
-  layoutDirs: viewPaths
-    .map(p => path.join(p, "layouts"))
-    .filter(p => fs.existsSync(p)),
+  partialsDir: [baseViewPath, ...additionalViewPaths].map(
+    path => `${path}/partials`
+  ),
+  layoutsDir: `${baseViewPath}/layouts`,
   defaultLayout: "main",
-  ext: ".hbs",
+  extname: ".hbs",
 });
-app.engine("hbs", hbs);
+app.engine("hbs", hbs.engine);
 app.set("view engine", "hbs");
-app.set("views", viewPaths);
 app.set("view cache", !!config.blog["theme-caching"]);
+app.set("views", [...additionalViewPaths, baseViewPath]);
 
 if (config.blog.compression) {
   app.use(compression());

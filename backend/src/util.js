@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import _ from "lodash";
 
 export class EmailString {
@@ -51,4 +53,22 @@ export class EmailString {
 
 export function getErrorStatus(err) {
   return err.status || _.get(err, "meta.statusCode") || 500;
+}
+
+export function copyFilesSync(source, destination) {
+  const files = fs.readdirSync(source);
+
+  for (const file of files) {
+    const sourcePath = path.join(source, file);
+    const destinationPath = path.join(destination, file);
+
+    const stats = fs.statSync(sourcePath);
+
+    if (stats.isFile()) {
+      fs.copyFileSync(sourcePath, destinationPath);
+    } else if (stats.isDirectory()) {
+      fs.mkdirSync(destinationPath, { recursive: true });
+      copyFilesSync(sourcePath, destinationPath);
+    }
+  }
 }

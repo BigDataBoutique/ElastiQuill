@@ -9,11 +9,7 @@ import * as comments from "../services/comments";
 import * as akismet from "../services/akismet";
 import * as emails from "../services/emails";
 import * as events from "../services/events";
-import {
-  cachePageHandler,
-  cacheAndReturn,
-  clearPageCache,
-} from "../services/cache";
+import { cacheAndReturn } from "../services/cache";
 import {
   preparePost,
   preparePage,
@@ -29,8 +25,7 @@ const router = express.Router();
 const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
 const PAGE_SIZE = config.blog["posts-page-size"];
 
-events.onChange("post", () => clearPageCache(BLOG_ROUTE_PREFIX));
-router.get("/", cachePageHandler(asyncHandler(handlePostsRequest("index"))));
+router.get("/", asyncHandler(handlePostsRequest("index")));
 
 router.get("/page/:pageNum", asyncHandler(handlePostsRequest("posts")));
 router.get("/tagged/:tag", asyncHandler(handlePostsRequest("tagged")));
@@ -135,110 +130,107 @@ router.use(BLOGPOST_ROUTE, (req, res, next) => {
   next();
 });
 
-events.onChange("post", post => clearPageCache(blogpostUrl(post)));
 router.get(
   BLOGPOST_ROUTE,
-  cachePageHandler(
-    asyncHandler(async (req, res) => {
-      const { id, isJson } = parseBlogpostId(req.params.id);
+  asyncHandler(async (req, res) => {
+    const { id, isJson } = parseBlogpostId(req.params.id);
 
-      let post = await blogPosts.getItemById({
-        id,
-        withComments: true,
-        moreLikeThis: true,
-      });
+    let post = await blogPosts.getItemById({
+      id,
+      withComments: true,
+      moreLikeThis: true,
+    });
 
-      if (!post) {
-        throw {
-          status: 404,
-        };
+    if (!post) {
+      throw {
+        status: 404,
+      };
+    }
+    if (post.slug !== req.params.slug) {
+      res.redirect(301, blogpostUrl(post));
+      return;
+    }
+
+    if (!_.isEmpty(req.query.secret)) {
+      if (post.draft) {
+        post = _.merge(post, post.draft);
       }
-      if (post.slug !== req.params.slug) {
-        res.redirect(301, blogpostUrl(post));
-        return;
-      }
 
-      if (!_.isEmpty(req.query.secret)) {
-        if (post.draft) {
-          post = _.merge(post, post.draft);
-        }
-
-        if (post.metadata.private_viewing_key !== req.query.secret) {
-          throw new PageNotFoundError();
-        }
-      } else if ("is_published" in post && !post.is_published) {
+      if (post.metadata.private_viewing_key !== req.query.secret) {
         throw new PageNotFoundError();
       }
+    } else if ("is_published" in post && !post.is_published) {
+      throw new PageNotFoundError();
+    }
 
-      if (isJson) {
-        res.json(preparePostJson(post));
-        return;
-      }
+    if (isJson) {
+      res.json(preparePostJson(post));
+      return;
+    }
 
-      const preparedPost = preparePost(post);
+    const preparedPost = preparePost(post);
 
-      let canonicalUrl = _.get(post, "metadata.canonical_url", "");
-      if (!canonicalUrl || !canonicalUrl.length) {
-        canonicalUrl = url.resolve(config.blog.url, preparedPost.url);
-      }
+    let canonicalUrl = _.get(post, "metadata.canonical_url", "");
+    if (!canonicalUrl || !canonicalUrl.length) {
+      canonicalUrl = url.resolve(config.blog.url, preparedPost.url);
+    }
 
-      res.render("post", {
-        canonicalUrl,
-        sidebarWidgetData: res.locals.sidebarWidgetData,
-        headerImageUrl: post.metadata.header_image_url,
-        title: post.title,
-        description: post.description,
-        metaKeywords: postMetaKeywords(preparedPost),
-        post: preparedPost,
-        og: [
-          {
-            property: "og:title",
-            content: post.title,
-          },
-          {
-            property: "og:description",
-            content: post.description,
-          },
-          {
-            property: "og:url",
-            content: canonicalUrl,
-          },
-          {
-            property: "og:image",
-            content: post.metadata.header_image_url,
-          },
-          {
-            property: "og:type",
-            content: "article",
-          },
-          {
-            property: "article:author",
-            content: post.author.name,
-          },
-          {
-            property: "twitter:title",
-            content: post.title,
-          },
-          {
-            property: "twitter:description",
-            content: post.description,
-          },
-          {
-            property: "twitter:url",
-            content: canonicalUrl,
-          },
-          {
-            property: "twitter:image",
-            content: post.metadata.header_image_url,
-          },
-          {
-            property: "twitter:card",
-            content: "summary_large_image",
-          },
-        ],
-      });
-    })
-  )
+    res.render("post", {
+      canonicalUrl,
+      sidebarWidgetData: res.locals.sidebarWidgetData,
+      headerImageUrl: post.metadata.header_image_url,
+      title: post.title,
+      description: post.description,
+      metaKeywords: postMetaKeywords(preparedPost),
+      post: preparedPost,
+      og: [
+        {
+          property: "og:title",
+          content: post.title,
+        },
+        {
+          property: "og:description",
+          content: post.description,
+        },
+        {
+          property: "og:url",
+          content: canonicalUrl,
+        },
+        {
+          property: "og:image",
+          content: post.metadata.header_image_url,
+        },
+        {
+          property: "og:type",
+          content: "article",
+        },
+        {
+          property: "article:author",
+          content: post.author.name,
+        },
+        {
+          property: "twitter:title",
+          content: post.title,
+        },
+        {
+          property: "twitter:description",
+          content: post.description,
+        },
+        {
+          property: "twitter:url",
+          content: canonicalUrl,
+        },
+        {
+          property: "twitter:image",
+          content: post.metadata.header_image_url,
+        },
+        {
+          property: "twitter:card",
+          content: "summary_large_image",
+        },
+      ],
+    });
+  })
 );
 
 router.post(
