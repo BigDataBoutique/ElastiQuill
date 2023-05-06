@@ -189,6 +189,8 @@ app.use(function(err, req, res, _next) {
     res.set("X-Original-Url", req.originalUrl || "");
     res.set("X-Parsed-Url-Pathname", parseUrl(req).pathname);
     res.set("X-Parsed-Url-Original-Pathname", parseUrl.original(req).pathname);
+  } else if (err.name === "TimeoutError") {
+    loggingService.logWarn(`${err.name}: ${err.message}`, [], req, res);
   } else {
     res.locals.message = "Server Error";
     loggingService.logError(null, err, req, res);
