@@ -57,6 +57,8 @@ router.use((err, req, res) => {
 
   if (req.app.get("env") === "development") {
     console.error(err);
+  } else if (err.name === "TimeoutError") {
+    loggingService.logWarn(`${err.name}: ${err.message}`, [], req, res);
   } else {
     loggingService.logError("api", err, req, res);
   }

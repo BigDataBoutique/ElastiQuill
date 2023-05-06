@@ -530,11 +530,22 @@ export async function logError(errorScope, error, req, res) {
   });
 }
 
+export async function logWarn(message, tags, req, res) {
+  await log({
+    req,
+    res,
+    message,
+    tags,
+    level: "warn",
+  });
+}
+
 async function log({
   req,
   res,
   email,
   status,
+  level,
   took,
   authMethod,
   excludeUrl = false,
@@ -548,6 +559,7 @@ async function log({
       res,
       email,
       status,
+      level,
       took,
       authMethod,
       excludeUrl,
