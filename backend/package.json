@@ -53,7 +53,7 @@
     "markdown-it": "^12.3.2",
     "md5": "^2.3.0",
     "medium-sdk": "0.0.4",
-    "merge-args": "0.2.18",
+    "merge-args": "0.3.0",
     "mime-types": "^2.1.35",
     "mock-express-request": "^0.2.2",
     "mock-express-response": "^0.3.0",
