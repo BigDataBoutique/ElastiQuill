@@ -74,7 +74,7 @@
     "request-promise": "^4.2.5",
     "request-promise-native": "^1.0.8",
     "rss": "^1.2.2",
-    "sanitize-html": "^2.11.0",
+    "sanitize-html": "^2.12.1",
     "semver": "^7.5.4",
     "sitemap": "^7.1.1",
     "slugify": "^1.6.6",
