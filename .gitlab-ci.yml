@@ -37,7 +37,7 @@ static-analysis:
 package:
   stage: package
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $STAGING_REGISTRY
   script:
     - docker build --squash -t $CONTAINER_TEST_IMAGE .
     - docker push $CONTAINER_TEST_IMAGE
@@ -52,7 +52,7 @@ release:
   variables:
     GIT_STRATEGY: none
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $STAGING_REGISTRY
   script:
     - IMAGE_NAME=${STAGING_REGISTRY}/bigdataboutique/${CI_PROJECT_NAME}:`date '+%Y-%m-%d-%H%M'`-${CI_COMMIT_SHA:0:9}
     - echo $IMAGE_NAME
@@ -74,7 +74,7 @@ dockerhub:
   variables:
     GIT_STRATEGY: none
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $STAGING_REGISTRY
     - docker login -u $DOCKERHUB_USER -p "$DOCKERHUB_PASSWORD" docker.io
   script:
     - IMAGE_NAME=bigdataboutique/elastiquill:${CI_COMMIT_TAG}
