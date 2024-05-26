@@ -79,7 +79,8 @@ router.get(
         return await blogPosts.getItems({
           type: "post",
           pageIndex: 0,
-          pageSize: 10,
+          pageSize: 20,
+          onlyNotTags: ["announcement", "press release"],
         });
       });
 

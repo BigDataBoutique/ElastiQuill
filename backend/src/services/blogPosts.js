@@ -459,6 +459,7 @@ export async function getItems({
   includePrivatePosts,
   year,
   month,
+  onlyNotTags,
 }) {
   const query = {
     index: ES_INDEX,
@@ -472,6 +473,7 @@ export async function getItems({
             { term: { type } },
             { range: { published_at: { lte: "now/d" } } },
           ],
+          must_not: [],
         },
       },
       sort: [
@@ -559,6 +561,10 @@ export async function getItems({
   if (filterByTags.length) {
     query.body.query.bool.filter.push({
       terms: { "tags.keyword-lowercase": filterByTags },
+    });
+  } else if (onlyNotTags) {
+    query.body.query.bool.must_not.push({
+      terms: { "tags.keyword-lowercase": onlyNotTags },
     });
   }
 
