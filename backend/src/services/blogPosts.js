@@ -532,11 +532,13 @@ export async function getItems({
   }
 
   if (!includePrivatePosts) {
-    query.body.query.bool.must_not = {
-      term: {
-        is_published: false,
+    query.body.query.bool.must_not = [
+      {
+        term: {
+          is_published: false,
+        },
       },
-    };
+    ];
   }
 
   if (search) {
