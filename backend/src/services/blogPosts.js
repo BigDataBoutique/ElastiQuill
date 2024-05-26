@@ -738,7 +738,7 @@ function makeSlug(title) {
   }
 
   return slugify(title, {
-    remove: /[*+~./,()'"!:@^#?$%&\[\]\\`;]/g,
+    remove: /[*+~./,()'"!:@^#?$%&[]\\`;]/g,
     locale: "en",
     lower: true,
   }).substring(0, SLUG_MAX_LENGTH);
