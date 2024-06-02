@@ -1,5 +1,4 @@
 const merge = require("babel-merge");
-const path = require("path");
 const react = require("@neutrinojs/react");
 
 module.exports = {

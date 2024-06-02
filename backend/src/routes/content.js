@@ -12,6 +12,7 @@ import {
   prepareComments,
 } from "./util";
 import { config } from "../config";
+import * as logging from "../services/logging";
 
 const router = express.Router();
 
@@ -148,7 +149,7 @@ router.post(
           error: err.displayName,
         });
       } else {
-        console.error(err);
+        await logging.logError("create-post", err, req, res);
         res.status(500).json({ error: "Server error" });
       }
     }
@@ -172,7 +173,7 @@ router.delete(
       await blogPosts.deleteItem(req.params.id);
       res.json({ error: null });
     } catch (err) {
-      console.error(err);
+      await logging.logError("delete-post", err, req, res);
       res.status(500).json({ error: "Server error" });
     }
   })
@@ -200,7 +201,36 @@ router.post(
           error: err.message,
         });
       } else {
-        console.error(err);
+        await logging.logError("update-post", err, req, res);
+        res.status(500).json({ error: "Server error" });
+      }
+    }
+  })
+);
+
+router.post(
+  "/:type(post|page)/:id/author",
+  asyncHandler(async (req, res) => {
+    try {
+      const item = await blogPosts.getItemById({ id: req.params.id });
+      if (!item) {
+        return res.sendStatus(404);
+      }
+
+      if (!isItemEditable(item, req.user)) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const updated = await blogPosts.updateItemAuthor(item, req.body);
+      res.json({ error: null, author: updated.author });
+    } catch (err) {
+      if (err.isJoi) {
+        res.status(422).json({
+          error: err.message,
+        });
+      } else {
+        await logging.logError("update-post-author", err, req, res);
         res.status(500).json({ error: "Server error" });
       }
     }

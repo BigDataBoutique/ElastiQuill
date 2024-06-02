@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",
-    "start": "webpack-dev-server --mode development --open --port 4000 --host localhost",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --mode development --open --port 4000 --host localhost",
     "snyk-protect": "snyk-protect",
     "prepare": "npm run snyk-protect",
     "prettier-check": "prettier --check src/** webpack.config.js",

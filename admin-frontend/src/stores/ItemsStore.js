@@ -1,5 +1,6 @@
 import { action, observable } from "mobx";
 import BaseStore from "./BaseStore";
+import * as api from "../api";
 
 export default class ItemsStore extends BaseStore {
   @observable
@@ -43,6 +44,9 @@ export default class ItemsStore extends BaseStore {
 
   @observable
   isCreateModalOpen = false;
+
+  @observable
+  modifyAuthorOpenedItem = null;
 
   isSearchResult = false;
 
@@ -129,5 +133,33 @@ export default class ItemsStore extends BaseStore {
     } finally {
       this.loaded(name);
     }
+  }
+
+  @action
+  openAuthorModify(post) {
+    this.modifyAuthorOpenedItem = post;
+  }
+
+  @action
+  closeAuthorModify() {
+    this.modifyAuthorOpenedItem = null;
+  }
+
+  @action
+  saveAuthorDetails(itemId, itemType, name, email) {
+    return api.updateItemAuthor(itemId, itemType, name, email);
+  }
+
+  @action
+  updateItemAuthor(itemId, author) {
+    this.items = this.items.map(item => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          author,
+        };
+      }
+      return item;
+    });
   }
 }

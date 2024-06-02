@@ -15,6 +15,7 @@ import SvgEdit from "../components/Icons/SvgEdit";
 import SvgDelete from "../components/Icons/SvgDelete";
 import SvgNewWindow from "../components/Icons/SvgNewWindow";
 import * as api from "../api";
+import ModifyAuthorModal from "../components/ModifyAuthorModal";
 
 class BaseItemsPage extends Component {
   _renderContent(strings, store) {
@@ -50,6 +51,7 @@ class BaseItemsPage extends Component {
           {isLoading ? "Loading..." : this._renderItems(strings, store)}
         </div>
         {this._renderDeleteItemModal(store)}
+        {this._renderModifyAuthorModal(store)}
       </LoggedInLayout>
     );
   }
@@ -184,14 +186,21 @@ class BaseItemsPage extends Component {
               ))}
           </div>
           <div style={{ marginTop: "auto", display: "flex" }}>
-            <div className="elastiquill-text" style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
               <img
                 style={{ width: 31, height: 31, marginRight: 10 }}
                 className="rounded-circle"
                 src={api.userAvatarUrl(item.author.email)}
                 alt="User Avatar"
               />
-              {item.author.name}
+              <div className="elastiquill-text">{item.author.name}</div>
+              <div
+                onClick={() => this._getStore().openAuthorModify(item)}
+                className="elastiquill-icon-button"
+                style={{ transform: "translateY(-2px)", marginLeft: 8 }}
+              >
+                <HoverIcon icon={SvgEdit} />
+              </div>
             </div>
             <div
               className="elastiquill-text"
@@ -234,7 +243,7 @@ class BaseItemsPage extends Component {
     return (
       <div style={{ marginTop: 10, display: "flex" }}>
         <ButtonGroup>
-          <Button onClick={setPage(-1)} disabled={pageIndex == 0}>
+          <Button onClick={setPage(-1)} disabled={pageIndex === 0}>
             Prev
           </Button>
           <Button onClick={setPage(+1)} disabled={pageIndex + 1 >= totalPages}>
@@ -258,6 +267,19 @@ class BaseItemsPage extends Component {
         isDisabled={store.isItemDeleting}
         submitLabel={store.isItemDeleting ? "Loading..." : "Delete"}
         submitColor="danger"
+      />
+    );
+  }
+
+  _renderModifyAuthorModal(store) {
+    return (
+      <ModifyAuthorModal
+        item={store.modifyAuthorOpenedItem}
+        onClose={() => store.closeAuthorModify()}
+        onConfirm={(itemId, itemType, name, email) =>
+          store.saveAuthorDetails(itemId, itemType, name, email)
+        }
+        updateItem={(itemId, author) => store.updateItemAuthor(itemId, author)}
       />
     );
   }

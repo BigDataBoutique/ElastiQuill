@@ -135,6 +135,25 @@ const UpdatePostArgSchema = Joi.object().keys({
   is_published: Joi.boolean().required(),
 });
 
+const UpdatePostAuthorArgSchema = Joi.object().keys({
+  name: Joi.string()
+    .required()
+    .error(new Error("Name is required")),
+  email: Joi.string()
+    .email()
+    .required()
+    .error(errors => {
+      errors.forEach(err => {
+        if (err.type === "string.email") {
+          err.message = "Email must be a valid email address";
+        } else if (err.type === "any.required") {
+          err.message = "Email is required";
+        }
+      });
+      return errors;
+    }),
+});
+
 // Content pages
 const CreateContentPageArgSchema = Joi.object().keys({
   title: Joi.string().required(),
@@ -289,7 +308,7 @@ export async function createItem(type, post) {
     },
   };
 
-  let resp = null;
+  let resp;
   if (type === "post") {
     resp = await indexWithUniqueId(query);
   } else {
@@ -389,6 +408,33 @@ export async function updateItemPartial(id, update) {
       doc: update,
     },
   });
+}
+
+export async function updateItemAuthor(item, author) {
+  const result = Joi.validate(author, UpdatePostAuthorArgSchema);
+  if (result.error) {
+    throw result.error;
+  }
+
+  const doc = {
+    author,
+    last_edited_at: new Date().toISOString(),
+  };
+
+  await esClient.update({
+    id: item.id,
+    index: ES_INDEX,
+    type: "_doc",
+    refresh: "wait_for",
+    body: {
+      doc,
+    },
+  });
+  const updatedItem = await getItemById({ id: item.id });
+
+  events.emitChange(updatedItem.type, updatedItem);
+
+  return updatedItem;
 }
 
 export async function getMoreLikeThis(itemId) {
