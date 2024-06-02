@@ -1,0 +1,95 @@
+.log-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 5vh;
+  justify-content: center;
+}
+
+.log-modal {
+  max-height: 90vh;
+  max-width: min(90vw, 1900px);
+  border: 1px solid rgb(244, 244, 244);
+  background: #fff;
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.log-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.log-table-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+}
+
+.log-table-row {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.log-table-cell {
+  padding: 8px;
+  border-right: 1px solid rgba(0, 0, 0, 0.02);
+  text-align: left;
+  vertical-align: top;
+}
+
+.log-table-row .log-table-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-table-cell:last-child {
+  border-right: none;
+}
+
+.log-table-header .log-table-cell {
+  font-weight: 600;
+}
+
+.log-table-header .log-table-cell input.filter-input {
+  width: 100%;
+  margin-top: 5px;
+  padding: 4px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.log-table-cell:nth-child(1) {
+  flex: 100;
+}
+
+.log-table-cell:nth-child(2) {
+  flex: 150;
+}
+
+.log-table-cell:nth-child(3) {
+  flex: 180;
+}
+
+.log-table-cell:nth-child(4) {
+  flex: 800;
+}
