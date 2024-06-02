@@ -52,6 +52,11 @@ export async function updatePost(id, post) {
   );
 }
 
+export async function updateItemAuthor(id, type, name, email) {
+  const apiRoute = `${API_ROUTE_PREFIX}/content/${type}/${id}/author`;
+  return await updateItem(apiRoute, { name, email });
+}
+
 export async function loadPostById(id) {
   const apiRoute = `${API_ROUTE_PREFIX}/content/post/${id}`;
   return await authFetchJson(apiRoute);
