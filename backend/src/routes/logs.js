@@ -12,8 +12,15 @@ router.get(
   "/",
   asyncHandler(async (req, res) => {
     const level = req.query.level;
-    const allLogs = await loggingService.getLogsByLevel(level);
-    res.json(allLogs);
+    const page = req.query.page;
+    if (!level || !page || typeof level !== "string" || isNaN(Number(page))) {
+      return res.sendStatus(422);
+    }
+    const { logs, totalPages } = await loggingService.getLogsByLevel(
+      level,
+      page
+    );
+    res.json({ logs, totalPages });
   })
 );
 

@@ -6,6 +6,7 @@ import * as blogPosts from "../services/blogPosts";
 import * as social from "../services/social";
 import { config } from "../config";
 import { preparePost } from "./util";
+import * as logging from "../services/logging";
 
 const router = express.Router();
 
@@ -43,7 +44,7 @@ router.post(
         url: resp.url,
       });
     } catch (err) {
-      console.log(err); // TODO proper error logging
+      await logging.logError("update-linkedin-post", err, req, res);
       res.json({
         error: err,
       });

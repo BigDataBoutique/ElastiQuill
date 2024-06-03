@@ -212,9 +212,9 @@ export async function loadStatus() {
   return await authFetchJson(apiRoute);
 }
 
-export async function loadLogs(level) {
+export async function loadLogs(level, page) {
   const apiRoute = `${API_ROUTE_PREFIX}/logs`;
-  return await authFetchJson(`${apiRoute}?level=${level}`);
+  return await authFetchJson(`${apiRoute}?level=${level}&page=${page}`);
 }
 
 export async function uploadImageUrl() {

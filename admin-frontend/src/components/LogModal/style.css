@@ -123,10 +123,21 @@
 .log-json-modal {
   max-height: 80vh;
   max-width: min(80vw, 1700px);
+  overflow: hidden;
   border: 1px solid rgb(244, 244, 244);
   background: #fff;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.log-json-content {
+  padding: 10px 15px 15px 0;
+  flex: 1;
   overflow: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .log-modal-header {
@@ -146,4 +157,19 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.load-more-button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }

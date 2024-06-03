@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./style.css";
 import ReactModal from "react-modal";
 import PropTypes from "prop-types";
@@ -36,43 +36,83 @@ const LogModal = ({ level, onClose }) => {
   const [filteredData, setFilteredData] = useState([]);
   const [filters, setFilters] = useState(defaultFilters);
   const [jsonOpened, setJsonOpened] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    loadData();
+    loadData(1);
   }, []);
 
-  const loadData = () => {
-    api
-      .loadLogs(level)
-      .then(response => {
-        setData(response);
-        setFilteredData(response);
-        setFilters(defaultFilters);
-      })
-      .catch(err => {
-        toast.error(err.message || "Can't load logs");
-      });
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
+    }
+  }, [data, page, totalPages, loading]);
+
+  const handleScroll = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    if (
+      Math.abs(
+        container.scrollHeight - container.scrollTop - container.clientHeight
+      ) <= 150
+    ) {
+      handleLoadMore();
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (loading) return;
+    if (page < totalPages) {
+      const nextPage = page + 1;
+      await loadData(nextPage);
+    }
+  };
+
+  const loadData = async pageToLoad => {
+    setLoading(true);
+    try {
+      const response = await api.loadLogs(level, pageToLoad);
+      setData(prev => [...prev, ...response.logs]);
+      setFilteredData(prev => [
+        ...prev,
+        ...applyFilters(filters, response.logs),
+      ]);
+      setPage(pageToLoad);
+      setTotalPages(response.totalPages);
+    } catch (err) {
+      toast.error(err.message || "Can't load logs");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFilterChange = e => {
     const { name, value } = e.target;
     const newFilters = { ...filters, [name]: value };
     setFilters(newFilters);
-    const filtered = data.filter(log => {
+    setFilteredData(applyFilters(newFilters, data));
+  };
+
+  const applyFilters = (filters, data) => {
+    return data.filter(log => {
       return (
-        log.level.toLowerCase().includes(newFilters.level.toLowerCase()) &&
+        log.level.toLowerCase().includes(filters.level.toLowerCase()) &&
         log.tags
           .join(" ")
           .toLowerCase()
-          .includes(newFilters.tags.toLowerCase()) &&
+          .includes(filters.tags.toLowerCase()) &&
         moment(log.timestamp)
           .format("LLL")
           .toLowerCase()
-          .includes(newFilters.timestamp.toLowerCase()) &&
-        log.message.toLowerCase().includes(newFilters.message.toLowerCase())
+          .includes(filters.timestamp.toLowerCase()) &&
+        log.message.toLowerCase().includes(filters.message.toLowerCase())
       );
     });
-    setFilteredData(filtered);
   };
 
   return (
@@ -84,7 +124,7 @@ const LogModal = ({ level, onClose }) => {
         onRequestClose={onClose}
       >
         <ModalHeader title={`${level} logs`} onClose={onClose} />
-        <div className="log-table">
+        <div className="log-table" ref={containerRef}>
           <div className="log-table-header">
             <div className="log-table-cell">
               Type
@@ -152,6 +192,16 @@ const LogModal = ({ level, onClose }) => {
               </div>
             ))}
           </div>
+          {(page < totalPages || loading) && (
+            <div className="load-more-wrapper">
+              <button
+                onClick={loading ? null : handleLoadMore}
+                className="load-more-button"
+              >
+                {loading ? "Loading..." : "Load More"}
+              </button>
+            </div>
+          )}
         </div>
       </ReactModal>
       <ReactModal
@@ -164,7 +214,9 @@ const LogModal = ({ level, onClose }) => {
           title="Log Message JSON"
           onClose={() => setJsonOpened(false)}
         />
-        <pre>{JSON.stringify(jsonOpened, null, 4).replace(/\\n/g, "\n")}</pre>
+        <pre className={"log-json-content"}>
+          {JSON.stringify(jsonOpened, null, 4).replace(/\\n/g, "\n")}
+        </pre>
       </ReactModal>
     </>
   );
