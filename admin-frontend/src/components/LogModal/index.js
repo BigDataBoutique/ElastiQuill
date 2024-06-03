@@ -40,6 +40,7 @@ const LogModal = ({ level, onClose }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
+  const updateInitiated = useRef(false);
 
   useEffect(() => {
     loadData(1);
@@ -66,10 +67,12 @@ const LogModal = ({ level, onClose }) => {
   };
 
   const handleLoadMore = async () => {
-    if (loading) return;
+    if (updateInitiated.current) return;
+    updateInitiated.current = true;
     if (page < totalPages) {
       const nextPage = page + 1;
       await loadData(nextPage);
+      updateInitiated.current = false;
     }
   };
 
