@@ -24,129 +24,146 @@ const FilterInput = ({ name, value, onChange, placeholder }) => (
   />
 );
 
+const defaultFilters = {
+  level: "",
+  tags: "",
+  timestamp: "",
+  message: "",
+};
+
 const LogModal = ({ level, onClose }) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [filters, setFilters] = useState({
-    level: "",
-    tags: "",
-    timestamp: "",
-    message: "",
-  });
+  const [filters, setFilters] = useState(defaultFilters);
+  const [jsonOpened, setJsonOpened] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [filters, data]);
-
   const loadData = () => {
     api
       .loadLogs(level)
-      .then(response => setData(response))
+      .then(response => {
+        setData(response);
+        setFilteredData(response);
+        setFilters(defaultFilters);
+      })
       .catch(err => {
         toast.error(err.message || "Can't load logs");
       });
   };
 
-  const applyFilters = () => {
-    let filtered = data.filter(log => {
+  const handleFilterChange = e => {
+    const { name, value } = e.target;
+    const newFilters = { ...filters, [name]: value };
+    setFilters(newFilters);
+    const filtered = data.filter(log => {
       return (
-        log.level.toLowerCase().includes(filters.level.toLowerCase()) &&
+        log.level.toLowerCase().includes(newFilters.level.toLowerCase()) &&
         log.tags
           .join(" ")
           .toLowerCase()
-          .includes(filters.tags.toLowerCase()) &&
+          .includes(newFilters.tags.toLowerCase()) &&
         moment(log.timestamp)
           .format("LLL")
           .toLowerCase()
-          .includes(filters.timestamp.toLowerCase()) &&
-        log.message.toLowerCase().includes(filters.message.toLowerCase())
+          .includes(newFilters.timestamp.toLowerCase()) &&
+        log.message.toLowerCase().includes(newFilters.message.toLowerCase())
       );
     });
     setFilteredData(filtered);
   };
 
-  const handleFilterChange = e => {
-    const { name, value } = e.target;
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
-
   return (
-    <ReactModal
-      className="log-modal"
-      overlayClassName="log-overlay"
-      isOpen={true}
-      onRequestClose={onClose}
-    >
-      <h2 className="mb-4 text-capitalize">{level} logs</h2>
-      <div className="log-table">
-        <div className="log-table-header">
-          <div className="log-table-cell">
-            Type
-            <FilterInput
-              name="level"
-              value={filters.level}
-              onChange={handleFilterChange}
-              placeholder="Filter by type"
-            />
-          </div>
-          <div className="log-table-cell">
-            Tags
-            <FilterInput
-              name="tags"
-              value={filters.tags}
-              onChange={handleFilterChange}
-              placeholder="Filter by tags"
-            />
-          </div>
-          <div className="log-table-cell">
-            Date
-            <FilterInput
-              name="timestamp"
-              value={filters.timestamp}
-              onChange={handleFilterChange}
-              placeholder="Filter by date"
-            />
-          </div>
-          <div className="log-table-cell">
-            Message
-            <FilterInput
-              name="message"
-              value={filters.message}
-              onChange={handleFilterChange}
-              placeholder="Filter by message"
-            />
-          </div>
-        </div>
-        <div className="log-table-body">
-          {filteredData.map((log, index) => (
-            <div className="log-table-row" key={index}>
-              <div
-                className="log-table-cell text-center"
-                style={{ color: colorMappings[log.level] }}
-              >
-                {log.level}
-              </div>
-              <div className="log-table-cell">
-                <pre>{log.tags.join("\n")}</pre>
-              </div>
-              <div className="log-table-cell text-center">
-                {moment(log.timestamp).format("LLL")}
-              </div>
-              <div className="log-table-cell">
-                <pre>{log.message}</pre>
-              </div>
+    <>
+      <ReactModal
+        className="log-modal"
+        overlayClassName="log-overlay"
+        isOpen={true}
+        onRequestClose={onClose}
+      >
+        <h2 className="mb-4 text-capitalize">{level} logs</h2>
+        <div className="log-table">
+          <div className="log-table-header">
+            <div className="log-table-cell">
+              Type
+              <FilterInput
+                name="level"
+                value={filters.level}
+                onChange={handleFilterChange}
+                placeholder="Filter by type"
+              />
             </div>
-          ))}
+            <div className="log-table-cell">
+              Tags
+              <FilterInput
+                name="tags"
+                value={filters.tags}
+                onChange={handleFilterChange}
+                placeholder="Filter by tags"
+              />
+            </div>
+            <div className="log-table-cell">
+              Date
+              <FilterInput
+                name="timestamp"
+                value={filters.timestamp}
+                onChange={handleFilterChange}
+                placeholder="Filter by date"
+              />
+            </div>
+            <div className="log-table-cell">
+              Message
+              <FilterInput
+                name="message"
+                value={filters.message}
+                onChange={handleFilterChange}
+                placeholder="Filter by message"
+              />
+            </div>
+          </div>
+          <div className="log-table-body">
+            {filteredData.map((log, index) => (
+              <div className="log-table-row" key={index}>
+                <div
+                  className="log-table-cell text-center"
+                  style={{ color: colorMappings[log.level] }}
+                >
+                  {log.level}
+                </div>
+                <div className="log-table-cell">
+                  <pre>{log.tags.join("\n")}</pre>
+                </div>
+                <div className="log-table-cell text-center">
+                  {moment(log.timestamp).format("LLL")}
+                </div>
+                <div className="log-table-cell">
+                  <pre>{log.message}</pre>
+                  <div className="log-table-cell-button-wrapper">
+                    <button
+                      onClick={() => setJsonOpened(log)}
+                      className="log-table-cell-button"
+                    >
+                      Show full
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </ReactModal>
+      </ReactModal>
+      <ReactModal
+        className="log-json-modal"
+        overlayClassName="log-json-overlay"
+        isOpen={!!jsonOpened}
+        onRequestClose={() => setJsonOpened(false)}
+      >
+        <h2 className="mb-4 text-capitalize">Full JSON Log</h2>
+        <pre>{JSON.stringify(jsonOpened, null, 4).replace(/\\n/g, "\n")}</pre>
+      </ReactModal>
+    </>
   );
 };
 

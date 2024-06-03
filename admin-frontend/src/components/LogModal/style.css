@@ -12,6 +12,7 @@
 .log-modal {
   max-height: 90vh;
   max-width: min(90vw, 1900px);
+  flex: 1;
   border: 1px solid rgb(244, 244, 244);
   background: #fff;
   padding: 20px;
@@ -50,8 +51,6 @@
 .log-table-cell {
   padding: 8px;
   border-right: 1px solid rgba(0, 0, 0, 0.02);
-  text-align: left;
-  vertical-align: top;
 }
 
 .log-table-row .log-table-cell {
@@ -75,6 +74,7 @@
 }
 
 .text-center {
+  align-items: center;
   text-align: center;
 }
 
@@ -92,4 +92,42 @@
 
 .log-table-cell:nth-child(4) {
   flex: 800;
+}
+
+.log-table-cell-button-wrapper {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.log-table-cell-button {
+  color: #007bff;
+  text-decoration: underline;
+  white-space: nowrap;
+  outline: none;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.log-json-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.log-json-modal {
+  max-height: 80vh;
+  max-width: min(80vw, 1700px);
+  border: 1px solid rgb(244, 244, 244);
+  background: #fff;
+  padding: 20px;
+  overflow: auto;
+}
+
+.log-json-modal pre {
 }
