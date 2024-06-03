@@ -129,5 +129,21 @@
   overflow: auto;
 }
 
-.log-json-modal pre {
+.log-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.log-modal-header h2 {
+  text-transform: capitalize;
+  margin-bottom: 0;
+}
+
+.log-close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }

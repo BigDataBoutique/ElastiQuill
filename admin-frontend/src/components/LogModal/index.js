@@ -83,7 +83,7 @@ const LogModal = ({ level, onClose }) => {
         isOpen={true}
         onRequestClose={onClose}
       >
-        <h2 className="mb-4 text-capitalize">{level} logs</h2>
+        <ModalHeader title={`${level} logs`} onClose={onClose} />
         <div className="log-table">
           <div className="log-table-header">
             <div className="log-table-cell">
@@ -160,12 +160,37 @@ const LogModal = ({ level, onClose }) => {
         isOpen={!!jsonOpened}
         onRequestClose={() => setJsonOpened(false)}
       >
-        <h2 className="mb-4 text-capitalize">Full JSON Log</h2>
+        <ModalHeader
+          title="Log Message JSON"
+          onClose={() => setJsonOpened(false)}
+        />
         <pre>{JSON.stringify(jsonOpened, null, 4).replace(/\\n/g, "\n")}</pre>
       </ReactModal>
     </>
   );
 };
+
+const ModalHeader = ({ title, onClose }) => (
+  <div className="log-modal-header">
+    <h2>{title}</h2>
+    <button className="log-close-button" onClick={onClose}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+      >
+        <path
+          d="M18 6L6 18M6 6l12 12"
+          stroke="#000"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  </div>
+);
 
 LogModal.propTypes = {
   level: PropTypes.oneOf([null, "error", "warn", "info"]),
