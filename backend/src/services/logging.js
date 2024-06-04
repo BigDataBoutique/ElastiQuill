@@ -374,7 +374,9 @@ export async function getStats({
   };
 }
 
-export async function getLogsByLevel(level) {
+export async function getLogsByLevel(level, page) {
+  const PAGE_SIZE = 20;
+  const numericPage = Number(page);
   const query = {
     bool: {
       filter: [
@@ -399,7 +401,8 @@ export async function getLogsByLevel(level) {
 
   let resp = await esClient.search({
     index: LOGS_INDICES_PREFIX + "*",
-    size: 20,
+    from: (numericPage - 1) * PAGE_SIZE,
+    size: PAGE_SIZE,
     ignore_unavailable: true,
     body: {
       query,
@@ -411,7 +414,10 @@ export async function getLogsByLevel(level) {
     },
   });
 
-  return resp.body.hits.hits
+  const totalLogs = resp.body.hits.total.value;
+  const totalPages = Math.ceil(totalLogs / PAGE_SIZE);
+
+  const logs = resp.body.hits.hits
     .map(hit => {
       const level = hit._source.log.level;
       let message = "";
@@ -434,12 +440,16 @@ export async function getLogsByLevel(level) {
       };
     })
     .filter(log => {
-      // exclude some errors (not categorized as blog errors)
       return (
         log.level !== "error" ||
         !EXCLUDED_ERRORS_STATUS_CODE.includes(log.statusCode)
       );
     });
+
+  return {
+    logs,
+    totalPages,
+  };
 }
 
 export async function* allLogsGenerator() {

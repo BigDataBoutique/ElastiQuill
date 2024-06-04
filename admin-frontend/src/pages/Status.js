@@ -32,7 +32,7 @@ class Status extends React.Component {
               {this.state.logLevel && (
                 <LogModal
                   level={this.state.logLevel}
-                  onRequestClose={() => this.setState({ logLevel: null })}
+                  onClose={() => this.setState({ logLevel: null })}
                 />
               )}
             </div>
