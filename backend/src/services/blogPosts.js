@@ -509,8 +509,8 @@ export async function getItems({
 }) {
   const query = {
     index: ES_INDEX,
-    from: pageIndex * pageSize,
-    size: pageSize,
+    from: (pageIndex || 0) * (pageSize || 10),
+    size: pageSize || 10,
     ignore_unavailable: true,
     body: {
       query: {
