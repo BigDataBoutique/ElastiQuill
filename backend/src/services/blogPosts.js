@@ -507,10 +507,17 @@ export async function getItems({
   month,
   onlyNotTags,
 }) {
+  const handleIncorrectNumber = input => {
+    if (input === undefined || input === null) return 0;
+    const numeric = Number(input);
+    if (isNaN(numeric) || numeric < 0) return 0;
+    return numeric;
+  };
+
   const query = {
     index: ES_INDEX,
-    from: (pageIndex || 0) * (pageSize || 10),
-    size: pageSize || 10,
+    from: handleIncorrectNumber(pageIndex) * handleIncorrectNumber(pageSize),
+    size: handleIncorrectNumber(pageSize),
     ignore_unavailable: true,
     body: {
       query: {
