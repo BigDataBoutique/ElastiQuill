@@ -121,7 +121,7 @@ async function getSitemap() {
 
     let links = [
       {
-        url: BLOG_ROUTE_PREFIX,
+        url: BLOG_ROUTE_PREFIX + "/",
         priority: 1.0,
         lastmod: latestPostDate,
       },
