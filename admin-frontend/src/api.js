@@ -217,7 +217,7 @@ export async function loadLogs(level, page) {
   return await authFetchJson(`${apiRoute}?level=${level}&page=${page}`);
 }
 
-export async function uploadImageUrl() {
+export function uploadImageUrl() {
   return `${API_ROUTE_PREFIX}/uploads/image`;
 }
 
