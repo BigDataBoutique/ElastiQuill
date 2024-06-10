@@ -507,17 +507,17 @@ export async function getItems({
   month,
   onlyNotTags,
 }) {
-  const handleIncorrectNumber = input => {
-    if (input === undefined || input === null) return 0;
+  const safeNumber = (input, fallback) => {
+    if (input === undefined || input === null) return fallback;
     const numeric = Number(input);
-    if (isNaN(numeric) || numeric < 0) return 0;
+    if (isNaN(numeric) || numeric < 0) return fallback;
     return numeric;
   };
 
   const query = {
     index: ES_INDEX,
-    from: handleIncorrectNumber(pageIndex) * handleIncorrectNumber(pageSize),
-    size: handleIncorrectNumber(pageSize),
+    from: safeNumber(pageIndex, 0) * safeNumber(pageSize, 10),
+    size: safeNumber(pageSize, 10),
     ignore_unavailable: true,
     body: {
       query: {
