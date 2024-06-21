@@ -595,12 +595,24 @@ export async function getItems({
   }
 
   if (search) {
-    query.body.query.bool.must = {
-      multi_match: {
-        query: search,
-        fields: ["title^5", "description^2", "content", "tags"],
+    query.body.query.bool.must = [
+      {
+        multi_match: {
+          query: search,
+          fields: ["title^5", "description^2", "content", "tags"],
+        },
       },
-    };
+    ];
+    query.body.query.bool.should = [
+      {
+        multi_match: {
+          query: search,
+          type: "phrase",
+          fields: ["title^5", "description^2", "content", "tags"],
+          boost: 2,
+        },
+      },
+    ];
   }
 
   const filterByTags = [];
