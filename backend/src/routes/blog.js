@@ -424,7 +424,7 @@ function handlePostsRequest(template) {
     const { items, total, totalPages } = await blogPosts.getItems({
       type: "post",
       search,
-      tags: [tag],
+      tags: tag ? [tag] : null,
       series,
       pageIndex,
       pageSize: PAGE_SIZE,
