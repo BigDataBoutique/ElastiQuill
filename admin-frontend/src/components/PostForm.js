@@ -109,6 +109,12 @@ class PostForm extends BaseForm {
           })}
         </div>
         <div className="col-6">
+          {this._renderSimpleInput({
+            prop: "metadata.canonical_url",
+            placeholder: "Canonical URL",
+            optional: true,
+            className: "form-control",
+          })}
           {this._renderTagsInput({ label: "Tags", prop: "tags" })}
           {this._renderSeriesPicker({ label: "Series", prop: "series" })}
           {this._renderToggle({
