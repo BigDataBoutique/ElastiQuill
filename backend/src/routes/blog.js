@@ -9,7 +9,7 @@ import * as comments from "../services/comments";
 import * as akismet from "../services/akismet";
 import * as emails from "../services/emails";
 import * as events from "../services/events";
-import { cacheAndReturn } from "../services/cache";
+import { cacheAndReturn, CACHE_KEYS } from "../services/cache";
 import {
   preparePost,
   preparePage,
@@ -75,12 +75,18 @@ router.get(
   "/rss",
   asyncHandler(async (req, res) => {
     try {
-      const { items } = await cacheAndReturn("recent-items", async () => {
+      const filterAnnouncements = "no-announcements" in req.query;
+      const cacheKey = filterAnnouncements
+        ? CACHE_KEYS.RSS_ITEMS_NO_ANNOUNCEMENTS
+        : CACHE_KEYS.RSS_ITEMS;
+      const { items } = await cacheAndReturn(cacheKey, async () => {
         return await blogPosts.getItems({
           type: "post",
           pageIndex: 0,
           pageSize: 20,
-          onlyNotTags: ["announcement", "press release"],
+          onlyNotTags: filterAnnouncements
+            ? ["announcement", "press release"]
+            : null,
         });
       });
 
