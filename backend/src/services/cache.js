@@ -44,3 +44,11 @@ function isExpired(timestamp) {
   const now = new Date().getTime() / 1000;
   return now - timestamp > CACHE_TTL;
 }
+
+export const CACHE_KEYS = {
+  RSS_ITEMS: "recent-items",
+  RSS_ITEMS_NO_ANNOUNCEMENTS: "recent-items-no-announcements",
+  SIDEBAR_WIDGET_DATA: "sidebar-widget-data",
+  HEALTHZ_TOP_POST: "healthz-top-post",
+  SITEMAP: "sitemap",
+};

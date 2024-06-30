@@ -26,6 +26,7 @@ import contactRouter from "./contact";
 import pageRouter from "./page";
 import routingTableRouter from "./routingTable";
 import { blogpostUrl, preparePost, seriesUrl, tagUrl } from "./util";
+import { CACHE_KEYS } from "../services/cache";
 
 const BLOG_ROUTE_PREFIX = config.blog["blog-route-prefix"];
 const API_ROUTE = config.blog["api-route"];
@@ -60,7 +61,7 @@ router.get("/healthz", async (req, res) => {
       `${baseUrl + BLOG_ROUTE_PREFIX}/rss`,
     ];
     const { items } = await cache.cacheAndReturn(
-      "healthz-top-post",
+      CACHE_KEYS.HEALTHZ_TOP_POST,
       async () => {
         return await blogPosts.getItems({
           type: "post",
@@ -112,7 +113,7 @@ function getLatestPostDate(posts) {
 }
 
 async function getSitemap() {
-  return await cache.cacheAndReturn("sitemap", async () => {
+  return await cache.cacheAndReturn(CACHE_KEYS.SITEMAP, async () => {
     const posts = await blogPosts.getAllItems({ type: "post" });
     const contentPages = await blogPosts.getAllItems({ type: "page" });
     const { tags, series } = await blogPosts.getAllTags();
@@ -306,7 +307,7 @@ router.use(
     res.locals.facebookAppId = _.get(config, "credentials.facebook.app-id");
 
     res.locals.sidebarWidgetData = await cache.cacheAndReturn(
-      "sidebar-widget-data",
+      CACHE_KEYS.SIDEBAR_WIDGET_DATA,
       async () => {
         const { items, allTags, allSeries } = await blogPosts.getItems({
           type: "post",

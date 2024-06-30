@@ -9,7 +9,7 @@ import * as comments from "../services/comments";
 import * as akismet from "../services/akismet";
 import * as emails from "../services/emails";
 import * as events from "../services/events";
-import { cacheAndReturn } from "../services/cache";
+import { cacheAndReturn, CACHE_KEYS } from "../services/cache";
 import {
   preparePost,
   preparePage,
@@ -75,14 +75,11 @@ router.get(
   "/rss",
   asyncHandler(async (req, res) => {
     try {
-      const { items } = await cacheAndReturn("recent-items", async () => {
-        return await blogPosts.getItems({
-          type: "post",
-          pageIndex: 0,
-          pageSize: 20,
-          onlyNotTags: ["announcement", "press release"],
-        });
-      });
+      const filterAnnouncements = "no-announcements" in req.query;
+      const tags = parseTags(req.query.c);
+
+      const rssItemsGetter = getRssItemsGetter(tags, filterAnnouncements);
+      const { items } = await rssItemsGetter;
 
       const recentPosts = items.map(preparePost);
 
@@ -111,6 +108,46 @@ router.get(
     }
   })
 );
+
+const getRssItemsGetter = (tags, excludeAnnouncements) => {
+  const announcementTags = ["announcement", "press release"];
+
+  // if not filtering by tags - just returning cached response with or without announcements
+  if (!tags) {
+    const cacheKey = excludeAnnouncements
+      ? CACHE_KEYS.RSS_ITEMS_NO_ANNOUNCEMENTS
+      : CACHE_KEYS.RSS_ITEMS;
+
+    return cacheAndReturn(cacheKey, () => {
+      return blogPosts.getItems({
+        type: "post",
+        pageIndex: 0,
+        pageSize: 20,
+        onlyNotTags: excludeAnnouncements ? announcementTags : null,
+      });
+    });
+  }
+
+  // if filtering by tags - removing announcements tags from tags if needed
+  const finalTags = excludeAnnouncements
+    ? tags.filter(t => !announcementTags.includes(t))
+    : tags;
+  return blogPosts.getItems({
+    type: "post",
+    pageIndex: 0,
+    pageSize: 20,
+    tags: finalTags,
+  });
+};
+
+const parseTags = input => {
+  if (!input || typeof input !== "string") {
+    return null;
+  }
+
+  const tags = input.split(",").map(t => t.trim());
+  return tags.filter(t => t !== "");
+};
 
 const BLOGPOST_ROUTE_DATE =
   "/:year(2\\d{3,3})/:month(\\d{1,2})/:slug-:id([^-]+$)";
@@ -387,7 +424,7 @@ function handlePostsRequest(template) {
     const { items, total, totalPages } = await blogPosts.getItems({
       type: "post",
       search,
-      tag,
+      tags: tag ? [tag] : null,
       series,
       pageIndex,
       pageSize: PAGE_SIZE,
