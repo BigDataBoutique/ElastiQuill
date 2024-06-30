@@ -76,19 +76,10 @@ router.get(
   asyncHandler(async (req, res) => {
     try {
       const filterAnnouncements = "no-announcements" in req.query;
-      const cacheKey = filterAnnouncements
-        ? CACHE_KEYS.RSS_ITEMS_NO_ANNOUNCEMENTS
-        : CACHE_KEYS.RSS_ITEMS;
-      const { items } = await cacheAndReturn(cacheKey, async () => {
-        return await blogPosts.getItems({
-          type: "post",
-          pageIndex: 0,
-          pageSize: 20,
-          onlyNotTags: filterAnnouncements
-            ? ["announcement", "press release"]
-            : null,
-        });
-      });
+      const tags = parseTags(req.query.c);
+
+      const rssItemsGetter = getRssItemsGetter(tags, filterAnnouncements);
+      const { items } = await rssItemsGetter;
 
       const recentPosts = items.map(preparePost);
 
@@ -117,6 +108,46 @@ router.get(
     }
   })
 );
+
+const getRssItemsGetter = (tags, excludeAnnouncements) => {
+  const announcementTags = ["announcement", "press release"];
+
+  // if not filtering by tags - just returning cached response with or without announcements
+  if (!tags) {
+    const cacheKey = excludeAnnouncements
+      ? CACHE_KEYS.RSS_ITEMS_NO_ANNOUNCEMENTS
+      : CACHE_KEYS.RSS_ITEMS;
+
+    return cacheAndReturn(cacheKey, () => {
+      return blogPosts.getItems({
+        type: "post",
+        pageIndex: 0,
+        pageSize: 20,
+        onlyNotTags: excludeAnnouncements ? announcementTags : null,
+      });
+    });
+  }
+
+  // if filtering by tags - removing announcements tags from tags if needed
+  const finalTags = excludeAnnouncements
+    ? tags.filter(t => !announcementTags.includes(t))
+    : tags;
+  return blogPosts.getItems({
+    type: "post",
+    pageIndex: 0,
+    pageSize: 20,
+    tags: finalTags,
+  });
+};
+
+const parseTags = input => {
+  if (!input || typeof input !== "string") {
+    return null;
+  }
+
+  const tags = input.split(",").map(t => t.trim());
+  return tags.filter(t => t !== "");
+};
 
 const BLOGPOST_ROUTE_DATE =
   "/:year(2\\d{3,3})/:month(\\d{1,2})/:slug-:id([^-]+$)";
@@ -393,7 +424,7 @@ function handlePostsRequest(template) {
     const { items, total, totalPages } = await blogPosts.getItems({
       type: "post",
       search,
-      tag,
+      tags: [tag],
       series,
       pageIndex,
       pageSize: PAGE_SIZE,

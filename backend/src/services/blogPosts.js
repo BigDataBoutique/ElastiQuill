@@ -497,7 +497,7 @@ export async function getAllItems({ type }) {
 
 export async function getItems({
   type,
-  tag,
+  tags,
   series,
   search,
   pageIndex,
@@ -615,11 +615,7 @@ export async function getItems({
     ];
   }
 
-  const filterByTags = [];
-
-  if (tag) {
-    filterByTags.push(tag);
-  }
+  const filterByTags = tags || [];
 
   if (series) {
     filterByTags.push("{" + series + "}");
