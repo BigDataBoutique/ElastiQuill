@@ -37,7 +37,7 @@
     "debug": "4.3.4",
     "dotenv": "^16.3.1",
     "ellipsize": "^0.5.1",
-    "express": "~4.19.2",
+    "express": "~4.21.1",
     "express-async-handler": "^1.2.0",
     "express-handlebars": "^7.0.7",
     "globby": "11.1.0",
