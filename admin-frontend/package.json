@@ -24,7 +24,7 @@
     "bootstrap": "^4.3.1",
     "@snyk/protect": "^1.1235.0",
     "classnames": "^2.3.2",
-    "cookie": "^0.5.0",
+    "cookie": "^0.7.0",
     "copy-to-clipboard": "^3.3.3",
     "flag-icon-css": "^4.1.4",
     "handlebars": "^4.7.8",
