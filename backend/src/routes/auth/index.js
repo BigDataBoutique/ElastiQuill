@@ -22,6 +22,14 @@ const BLOG_URL = config.blog["url"];
 const VALID_ROLES = ["admin", "publisher"];
 export const AUTH_INFO_TOKEN_COOKIE = "auth-info-token";
 
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
 if (ADMIN_EMAILS.isEmpty()) {
   throw new Error("blog.admin-emails configuration variable is not set");
 }
