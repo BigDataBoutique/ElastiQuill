@@ -54,7 +54,7 @@ function StatusBadge({ status, error, text, tooltip, color }) {
     >
       <SVG
         style={{ color: color || colorMappings[status], height: 18 }}
-        className="mr-2 flex-grow-0 flex-shrink-0"
+        className="me-2 flex-grow-0 flex-shrink-0"
         src={iconMappings[status]}
         preProcessor={code =>
           code.replace(/fill=".*?"/g, 'fill="currentColor"')

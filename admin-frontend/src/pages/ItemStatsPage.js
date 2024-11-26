@@ -33,7 +33,7 @@ class ItemStatsPage extends Component {
   _renderLinks = item => {
     if (!item) return null;
 
-    const url = `${item.url}${
+    const url = `${item.full_url}${
       _.isEmpty(item.metadata.private_viewing_key)
         ? ""
         : "?secret=" + item.metadata.private_viewing_key
@@ -90,7 +90,7 @@ class ItemStatsPage extends Component {
               Collapse stats
               <FAIcon
                 icon={this.state.showStats ? "angle-down" : "angle-up"}
-                className="ml-2"
+                className="ms-2"
               />
             </button>
           </div>

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import Joi from "joi";
 import express from "express";
-import request from "request-promise";
+import axios from "axios";
 import asyncHandler from "express-async-handler";
 
 import * as blogPosts from "../services/blogPosts";
@@ -16,9 +16,9 @@ router.post(
     const url = _.trimEnd(rawUrl, "/");
     const jsonUrl = url.endsWith(".json") ? url : url + ".json";
 
-    let resp;
     try {
-      resp = JSON.parse(await request.get(jsonUrl));
+      const response = await axios.get(jsonUrl);
+      let resp = response.data;
       if (resp.tags) {
         resp.tags = resp.tags.map(t => t.key);
       }

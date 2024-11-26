@@ -1,6 +1,5 @@
 import _ from "lodash";
-import request from "request-promise";
-
+import axios from "axios";
 import { config } from "../config";
 
 const RECAPTCHA_KEY = _.get(
@@ -23,13 +22,17 @@ export function clientKey() {
 }
 
 export async function verify(code) {
-  const recaptchaResp = JSON.parse(
-    await request.post("https://www.google.com/recaptcha/api/siteverify", {
-      form: {
-        secret: RECAPTCHA_SECRET,
-        response: code,
+  const response = await axios.post(
+    "https://www.google.com/recaptcha/api/siteverify",
+    new URLSearchParams({
+      secret: RECAPTCHA_SECRET,
+      response: code,
+    }),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-    })
+    }
   );
-  return recaptchaResp.success;
+  return response.data.success;
 }

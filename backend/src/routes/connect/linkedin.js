@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import querystring from "querystring";
 import asyncHandler from "express-async-handler";
-import request from "request-promise";
+import axios from "axios";
 
 import { getJwtToken, updateJwtToken } from "../auth";
 import { frontendAddress } from "../../app";
@@ -44,26 +44,28 @@ router.get(
       throw new Error("Linkedin error: " + req.query.error);
     }
 
-    const accessTokenResp = await request({
-      url: "https://www.linkedin.com/oauth/v2/accessToken",
-      qs: {
-        grant_type: "authorization_code",
-        code: req.query.code,
-        redirect_uri:
-          config.blog.url +
-          config.blog["api-route"] +
-          "/connect/linkedin/callback",
-        client_id: config.credentials.linkedin["client-id"],
-        client_secret: config.credentials.linkedin["client-secret"],
-      },
-    });
-
-    const token = JSON.parse(accessTokenResp).access_token;
-    const profile = JSON.parse(
-      await request(
-        "https://api.linkedin.com/v2/me?oauth2_access_token=" + token
-      )
+    const tokenResponse = await axios.get(
+      "https://www.linkedin.com/oauth/v2/accessToken",
+      {
+        params: {
+          grant_type: "authorization_code",
+          code: req.query.code,
+          redirect_uri:
+            config.blog.url +
+            config.blog["api-route"] +
+            "/connect/linkedin/callback",
+          client_id: config.credentials.linkedin["client-id"],
+          client_secret: config.credentials.linkedin["client-secret"],
+        },
+      }
     );
+
+    const token = tokenResponse.data.access_token;
+
+    const profileResponse = await axios.get(
+      `https://api.linkedin.com/v2/me?oauth2_access_token=${token}`
+    );
+    const profile = profileResponse.data;
 
     req.user.connected = req.user.connected || {};
     req.user.connected.linkedin = {

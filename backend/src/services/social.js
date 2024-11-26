@@ -1,8 +1,7 @@
 import _ from "lodash";
-import Twitter from "twitter";
+import { TwitterApi as Twitter } from "twitter-api-v2";
 import medium from "medium-sdk";
-import request from "request-promise";
-
+import axios from "axios";
 import { config } from "../config";
 
 export function getAvailability(connected = {}) {
@@ -68,18 +67,14 @@ export async function postToLinkedin(
   let imageAsset = undefined;
 
   if (imageUrl) {
-    const imageBinary = await request({
-      method: "GET",
-      url: imageUrl,
-      encoding: null,
+    const imageResponse = await axios.get(imageUrl, {
+      responseType: "arraybuffer",
     });
+    const imageBinary = imageResponse.data;
 
-    const resp = await request({
-      method: "POST",
-      url:
-        "https://api.linkedin.com/v2/assets?action=registerUpload&oauth2_access_token=" +
-        accessToken,
-      body: JSON.stringify({
+    const uploadRegisterResponse = await axios.post(
+      `https://api.linkedin.com/v2/assets?action=registerUpload&oauth2_access_token=${accessToken}`,
+      {
         registerUploadRequest: {
           recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
           owner: "urn:li:person:" + authorId,
@@ -90,24 +85,20 @@ export async function postToLinkedin(
             },
           ],
         },
-      }),
-    });
+      }
+    );
 
-    const { value } = JSON.parse(resp);
+    const { value } = uploadRegisterResponse.data;
     imageAsset = value.asset;
 
     const { uploadUrl } = value.uploadMechanism[
       "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
     ];
 
-    await request({
-      method: "POST",
-      url: uploadUrl,
+    await axios.post(uploadUrl, imageBinary, {
       headers: {
         Authorization: "Bearer " + accessToken,
       },
-      body: imageBinary,
-      encoding: null,
     });
   }
 
@@ -124,11 +115,9 @@ export async function postToLinkedin(
     );
   }
 
-  await request({
-    method: "POST",
-    url:
-      "https://api.linkedin.com/v2/ugcPosts?oauth2_access_token=" + accessToken,
-    body: JSON.stringify({
+  await axios.post(
+    `https://api.linkedin.com/v2/ugcPosts?oauth2_access_token=${accessToken}`,
+    {
       author: "urn:li:person:" + authorId,
       lifecycleState: "PUBLISHED",
       specificContent: {
@@ -149,12 +138,14 @@ export async function postToLinkedin(
       visibility: {
         "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
       },
-    }),
-    headers: {
-      "X-Restli-Protocol-Version": "2.0.0",
-      "Content-Type": "application/json",
     },
-  });
+    {
+      headers: {
+        "X-Restli-Protocol-Version": "2.0.0",
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   return { url: null };
 }
@@ -206,32 +197,29 @@ export function postToTwitter(title, url, imageUrl, tags) {
     );
   });
 
-  function uploadImage(imgUrl) {
-    return new Promise(async (resolve, reject) => {
-      let imageBinary = null;
-      try {
-        imageBinary = await request({
-          method: "GET",
-          url: imgUrl,
-          encoding: null,
-        });
-      } catch (err) {
-        reject(err);
-        return;
-      }
+  async function uploadImage(imgUrl) {
+    try {
+      const imageResponse = await axios.get(imgUrl, {
+        responseType: "arraybuffer",
+      });
+      const imageBinary = imageResponse.data;
 
-      twitterClient.post(
-        "media/upload",
-        { media: imageBinary },
-        (error, media) => {
-          if (error) {
-            reject(error);
-            return;
+      return new Promise((resolve, reject) => {
+        twitterClient.post(
+          "media/upload",
+          { media: imageBinary },
+          (error, media) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(media.media_id_string);
           }
-          resolve(media.media_id_string);
-        }
-      );
-    });
+        );
+      });
+    } catch (err) {
+      throw err;
+    }
   }
 }
 
@@ -279,25 +267,25 @@ export async function postToReddit(authData, title, url, subreddit) {
     });
   }
 
-  const submitResp = await request({
-    method: "POST",
-    url: "https://oauth.reddit.com/api/submit",
-    auth: {
-      bearer: authData.token,
-    },
-    headers: {
-      "User-Agent": "elastiquill",
-    },
-    form: {
+  const submitResponse = await axios.post(
+    "https://oauth.reddit.com/api/submit",
+    new URLSearchParams({
       api_type: "json",
       title: title,
       url: url,
       sr: subreddit,
       kind: "link",
-    },
-  });
+    }).toString(),
+    {
+      headers: {
+        Authorization: `Bearer ${authData.token}`,
+        "User-Agent": "elastiquill",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
 
-  const parsed = JSON.parse(submitResp);
+  const parsed = submitResponse.data;
   if (!parsed.json.errors.length) {
     return {
       url: parsed.json.data.url,
@@ -319,17 +307,21 @@ export async function fetchRedditAccessToken({ code, callback, refreshToken }) {
         redirect_uri: callback,
       };
 
-  const resp = await request({
-    form,
-    method: "POST",
-    url: "https://www.reddit.com/api/v1/access_token",
-    auth: {
-      user: config.credentials.reddit["client-id"],
-      pass: config.credentials.reddit["client-secret"],
-    },
-  });
+  const response = await axios.post(
+    "https://www.reddit.com/api/v1/access_token",
+    new URLSearchParams(form).toString(),
+    {
+      auth: {
+        username: config.credentials.reddit["client-id"],
+        password: config.credentials.reddit["client-secret"],
+      },
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
 
-  const parsed = JSON.parse(resp);
+  const parsed = response.data;
   return {
     expiresAt: new Date().getTime() + parsed.expires_in * 1000,
     token: parsed.access_token,

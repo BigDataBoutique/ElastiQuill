@@ -1,6 +1,6 @@
 import $ from "jquery";
 import ls from "local-storage";
-import cookie from "cookie";
+import { parse } from "cookie";
 
 const JWT_TOKEN_KEY = "jwt-token";
 
@@ -61,7 +61,7 @@ $(() => {
 });
 
 function extractJwtFromCookies() {
-  const cookies = cookie.parse(document.cookie);
+  const cookies = parse(document.cookie);
   if (cookies[JWT_TOKEN_KEY]) {
     return cookies[JWT_TOKEN_KEY];
   }

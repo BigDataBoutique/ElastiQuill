@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import moment from "moment";
 import {
-  FlexibleXYPlot,
+  XYPlot,
   XAxis,
   YAxis,
   Borders,
@@ -144,52 +144,66 @@ class StatsOverTimeGraph extends React.Component {
       yDomainEnd = this._getMaxValue(data, yDomainEnd);
     });
 
+    const containerWidth =
+      document.getElementById("chart-container")?.offsetWidth || 800;
+
     return (
-      <FlexibleXYPlot
-        xType="time"
-        yBaseValue={0}
-        xDomain={[xDomainStart, xDomainEnd]}
-        yDomain={[0, yDomainEnd || 10]}
-        height={300}
-        onMouseLeave={() => this.setState({ crosshair: null })}
-      >
-        <VerticalGridLines />
-        <HorizontalGridLines />
-        <MarkSeries
-          onNearestX={onNearestX}
-          color="transparent"
-          data={dummyData}
-        />
-        <LineSeries strokeWidth="4px" color={VISITS_COLOR} data={visitsData} />
-        {!this.props.item && (
-          <LineSeries strokeWidth="4px" color={VIEWS_COLOR} data={viewsData} />
-        )}
-        <Borders
-          style={{
-            bottom: { fill: "#fff" },
-            left: { fill: "#fff" },
-            right: { fill: "#fff" },
-            top: { fill: "#fff" },
-          }}
-        />
-        <XAxis
-          tickTotal={Math.min(
-            7,
-            Math.ceil((xDomainEnd - xDomainStart) / interval)
-          )}
-          tickFormat={x => moment(x).format("DD-MM-YYYY")}
-        />
-        <YAxis />
-        {!this.props.item && (
+      <div id="chart-container" style={{ width: "100%", height: "300px" }}>
+        <XYPlot
+          width={containerWidth}
+          height={300}
+          xType="time"
+          yBaseValue={0}
+          xDomain={[xDomainStart, xDomainEnd]}
+          yDomain={[0, yDomainEnd || 10]}
+          onMouseLeave={() => this.setState({ crosshair: null })}
+        >
+          <VerticalGridLines />
+          <HorizontalGridLines />
           <MarkSeries
-            color={POSTS_COLOR}
-            // we set every post data point on 0 because we only want this series
-            // to mark days where new posts are published, actual post counts should be shown on tooltips
-            data={postsData.map(item => ({ ...item, y: 0 }))}
+            onNearestX={onNearestX}
+            color="transparent"
+            data={dummyData}
           />
-        )}
-        {this._renderCrosshair()}
-      </FlexibleXYPlot>
+          <LineSeries
+            strokeWidth="4px"
+            color={VISITS_COLOR}
+            data={visitsData}
+          />
+          {!this.props.item && (
+            <LineSeries
+              strokeWidth="4px"
+              color={VIEWS_COLOR}
+              data={viewsData}
+            />
+          )}
+          <Borders
+            style={{
+              bottom: { fill: "#fff" },
+              left: { fill: "#fff" },
+              right: { fill: "#fff" },
+              top: { fill: "#fff" },
+            }}
+          />
+          <XAxis
+            tickTotal={Math.min(
+              7,
+              Math.ceil((xDomainEnd - xDomainStart) / interval)
+            )}
+            tickFormat={x => moment(x).format("DD-MM-YYYY")}
+          />
+          <YAxis />
+          {!this.props.item && (
+            <MarkSeries
+              color={POSTS_COLOR}
+              // we set every post data point on 0 because we only want this series
+              // to mark days where new posts are published, actual post counts should be shown on tooltips
+              data={postsData.map(item => ({ ...item, y: 0 }))}
+            />
+          )}
+          {this._renderCrosshair()}
+        </XYPlot>
+      </div>
     );
   }
 

@@ -67,7 +67,6 @@ router.get(
         full_url: url.resolve(config.blog.url, getUrl(it)),
         draft: req.user.emails.includes(it.author.email) ? it.draft : null,
       }));
-
     res.json({
       items: processedItems,
       total_pages: totalPages,
@@ -113,6 +112,7 @@ router.get(
       };
     }
     item.url = blogpostUrl(item);
+    item.full_url = url.resolve(config.blog.url, item.url);
     res.json(item);
   })
 );

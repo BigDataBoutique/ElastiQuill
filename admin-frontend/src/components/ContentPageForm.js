@@ -2,6 +2,7 @@ import _ from "lodash";
 import React, { Fragment } from "react";
 import { Button } from "reactstrap";
 import ReactSelect from "react-select";
+import { v1 as uuid } from "uuid";
 
 import BaseForm from "./BaseForm";
 
@@ -149,7 +150,15 @@ class ContentPageForm extends BaseForm {
       }
     }
 
-    this.props.submit(this.state.formValues);
+    const formValues = {
+      ...this.state.formValues,
+      metadata: {
+        ...this.state.formValues.metadata,
+        private_viewing_key: uuid(),
+      },
+    };
+
+    this.props.submit(formValues);
   }
 }
 

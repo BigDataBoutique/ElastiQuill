@@ -3,7 +3,10 @@ import _ from "lodash";
 import { uid } from "uid";
 import { esClient } from "../lib/elasticsearch";
 import * as blogPosts from "./blogPosts";
-import { BLOG_COMMENTS_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
+import {
+  BLOG_COMMENTS_INDEX_ALIAS as ES_INDEX,
+  addType,
+} from "./elasticsearch";
 
 const CreateCommentArgSchema = Joi.object().keys({
   recipient_comment_id: Joi.string()
@@ -50,36 +53,39 @@ export async function createComment(comment) {
   };
 
   if (recipientCommentId) {
-    const resp = await esClient.get({
-      index: ES_INDEX,
-      type: "_doc",
-      id: recipientCommentId,
-    });
+    const resp = await esClient.get(
+      addType({
+        index: ES_INDEX,
+        id: recipientCommentId,
+      })
+    );
 
     resp.body._source.replies = resp.body._source.replies || [];
     resp.body._source.replies.push(body);
 
-    await esClient.update({
-      index: ES_INDEX,
-      id: recipientCommentId,
-      type: "_doc",
-      refresh: "wait_for",
-      body: {
-        doc: resp.body._source,
-      },
-    });
+    await esClient.update(
+      addType({
+        index: ES_INDEX,
+        id: recipientCommentId,
+        refresh: "wait_for",
+        body: {
+          doc: resp.body._source,
+        },
+      })
+    );
 
     return {
       newComment: body,
       repliedToComment: resp.body._source,
     };
   } else {
-    const resp = await esClient.index({
-      index: ES_INDEX,
-      type: "_doc",
-      refresh: "wait_for",
-      body,
-    });
+    const resp = await esClient.index(
+      addType({
+        index: ES_INDEX,
+        refresh: "wait_for",
+        body,
+      })
+    );
 
     return {
       newComment: resp.body._source,
@@ -282,7 +288,7 @@ export async function getStats({ startDate, postId, interval = "1d" }) {
         comments_histogram: {
           date_histogram: {
             field: "published_at",
-            interval,
+            fixed_interval: interval,
           },
         },
       },

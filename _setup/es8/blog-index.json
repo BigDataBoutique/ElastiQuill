@@ -1,0 +1,81 @@
+{
+  "mappings": {
+    "properties": {
+      "allow_comments": {
+        "type": "boolean"
+      },
+      "author": {
+        "properties": {
+          "name": {
+            "type": "keyword"
+          },
+          "email": {
+            "type": "keyword"
+          },
+          "website": {
+            "type": "keyword"
+          }
+        }
+      },
+      "draft": {
+        "type": "object",
+        "enabled": false
+      },
+      "content": {
+        "type": "text"
+      },
+      "description": {
+        "type": "text"
+      },
+      "metadata": {
+        "type": "object",
+        "enabled": false
+      },
+      "last_edited_at": {
+        "type": "date"
+      },
+      "published_at": {
+        "type": "date"
+      },
+      "slug": {
+        "type": "keyword"
+      },
+      "type": {
+        "type": "keyword",
+        "doc_values": false
+      },
+      "tags": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          },
+          "keyword-lowercase": {
+            "type": "keyword",
+            "normalizer": "keyword_lowercase"
+          }
+        }
+      },
+      "title": {
+        "type": "text"
+      },
+      "is_published": {
+        "type": "boolean",
+        "doc_values": false
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1
+    },
+    "analysis": {
+      "normalizer": {
+        "keyword_lowercase": {
+          "type": "custom",
+          "filter": ["lowercase"]
+        }
+      }
+    }
+  }
+}

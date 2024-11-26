@@ -23,9 +23,13 @@ const BLOG_LOGS_INDEX_PREFIX = _.get(
 const BLOG_LOGS_INDEX_TEMPLATE_NAME = "blog-logs";
 const PIPELINE_NAME = "request_log";
 
+const setupES8SubDir = "es8";
+const setupLegacySubDir = "legacy";
+
 const setupDir = process.env.SETUP_DIR || "./_setup";
 
 let esVersion = null;
+let esMajorVersion = null;
 
 export async function isReady() {
   const status = await getStatus();
@@ -43,21 +47,34 @@ export async function getVersionString() {
       nodeId: "_local",
     });
     esVersion = clusterStats.body.nodes.versions[0];
+    esMajorVersion = parseInt(esVersion.split(".")[0], 10);
   }
 
   return esVersion;
 }
 
+function getSetupFilePath(filename) {
+  const subDir = esMajorVersion >= 8 ? setupES8SubDir : setupLegacySubDir;
+  return path.join(setupDir, subDir, filename);
+}
+
 export async function setup() {
   try {
+    await getVersionString();
     const status = await getStatus();
     const esVersion = await getVersionString();
-    const includeTypeName = semver.gte(esVersion, "7.0.0") ? true : undefined;
+    const includeTypeName =
+      semver.gte(esVersion, "7.0.0") && semver.lt(esVersion, "8.0.0")
+        ? true
+        : undefined;
+
+    const mappingsFilename = "blog-index.json";
+    const commentsMappingsFilename = "blog-comments-index.json";
 
     await setupRollableIndex({
       indexPrefix: BLOG_INDEX,
       indexAliasName: BLOG_INDEX_ALIAS,
-      mappingsFilename: "blog-index.json",
+      mappingsFilename,
       indexExists: status.blogIndex,
       indexUpToDate: status.blogIndexUpToDate,
       includeTypeName,
@@ -66,7 +83,7 @@ export async function setup() {
     await setupRollableIndex({
       indexPrefix: BLOG_COMMENTS_INDEX,
       indexAliasName: BLOG_COMMENTS_INDEX_ALIAS,
-      mappingsFilename: "blog-comments-index.json",
+      mappingsFilename: commentsMappingsFilename,
       indexExists: status.blogCommentsIndex,
       indexUpToDate: status.blogCommentsIndexUpToDate,
       includeTypeName,
@@ -76,17 +93,26 @@ export async function setup() {
       !status.blogLogsIndexTemplate ||
       !status.blogLogsIndexTemplateUpToDate
     ) {
-      const parsed = readIndexFile("blog-logs-index-template.json", {
+      const parsed = await readIndexFile(`blog-logs-index-template.json`, {
         json: true,
       });
 
       try {
-        const current = await esClient.indices.getTemplate({
-          name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-        });
-        parsed.index_patterns = updateIndexPatterns(
-          current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
-        );
+        if (esMajorVersion >= 8) {
+          const current = await esClient.indices.getIndexTemplate({
+            name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+          });
+          parsed.index_patterns = updateIndexPatterns(
+            current.body.index_templates[0].index_template.index_patterns
+          );
+        } else {
+          const current = await esClient.indices.getTemplate({
+            name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+          });
+          parsed.index_patterns = updateIndexPatterns(
+            current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
+          );
+        }
       } catch (err) {
         if (err.meta.statusCode !== 404) {
           throw err;
@@ -94,17 +120,34 @@ export async function setup() {
         parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
       }
 
-      await esClient.indices.putTemplate({
-        name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-        body: JSON.stringify(parsed),
-        includeTypeName,
-      });
+      try {
+        if (esMajorVersion >= 8) {
+          await esClient.indices.putIndexTemplate({
+            name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+            body: parsed,
+          });
+        } else {
+          await esClient.indices.putTemplate({
+            name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+            body: parsed,
+            include_type_name: includeTypeName,
+          });
+        }
+      } catch (err) {
+        console.error(`Failed to update template: ${err.message}`);
+        throw err;
+      }
     }
 
     if (!status.ingestPipeline) {
+      const pipelineFile =
+        esMajorVersion >= 8
+          ? `request-log-pipeline.json`
+          : `legacy-request-log-pipeline.json`;
+
       await esClient.ingest.putPipeline({
         id: PIPELINE_NAME,
-        body: await getRequestLogPipelineBody(),
+        body: readIndexFile(pipelineFile, { json: true }),
       });
     }
 
@@ -145,6 +188,10 @@ async function setupRollableIndex({
 export async function getStatus() {
   const status = { error: {} };
 
+  if (!esVersion) {
+    await getVersionString();
+  }
+
   status.blogIndex = await isIndexAliasExist(BLOG_INDEX_ALIAS);
   if (status.blogIndex) {
     status.blogIndexUpToDate = await isIndexUpToDate(
@@ -172,30 +219,62 @@ export async function getStatus() {
     status.error.blogCommentsIndex = "Blog comments index is misconfigured";
   }
 
-  status.blogLogsIndexTemplate = (
-    await esClient.indices.existsTemplate({
-      name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-    })
-  ).body;
-  if (status.blogLogsIndexTemplate) {
-    const current = await esClient.indices.getTemplate({
-      name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-    });
-    const file = JSON.parse(
-      fs
-        .readFileSync(path.join(setupDir, "blog-logs-index-template.json"))
-        .toString("utf-8")
-    );
-    validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
-    status.blogLogsIndexTemplateUpToDate =
-      mappingsEqual(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
-      validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
-    if (!status.blogLogsIndexTemplateUpToDate) {
+  try {
+    if (esMajorVersion >= 8) {
+      const templateExists = await esClient.indices.existsIndexTemplate({
+        name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+      });
+
+      status.blogLogsIndexTemplate = templateExists.body;
+
+      if (status.blogLogsIndexTemplate) {
+        const current = await esClient.indices.getIndexTemplate({
+          name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+        });
+
+        const file = JSON.parse(
+          fs
+            .readFileSync(getSetupFilePath("blog-logs-index-template.json"))
+            .toString("utf-8")
+        );
+
+        const template = current.body.index_templates[0].index_template;
+        status.blogLogsIndexTemplateUpToDate =
+          mappingsEqual(template, file) && validateIndexPatterns(template);
+      }
+    } else {
+      status.blogLogsIndexTemplate = (
+        await esClient.indices.existsTemplate({
+          name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+        })
+      ).body;
+
+      if (status.blogLogsIndexTemplate) {
+        const current = await esClient.indices.getTemplate({
+          name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+        });
+        const file = JSON.parse(
+          fs
+            .readFileSync(getSetupFilePath("blog-logs-index-template.json"))
+            .toString("utf-8")
+        );
+        validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
+        status.blogLogsIndexTemplateUpToDate =
+          mappingsEqual(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME], file) &&
+          validateIndexPatterns(current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME]);
+      }
+    }
+
+    if (!status.blogLogsIndexTemplate) {
+      status.error.blogLogsIndexTemplate = "Blog logs index is misconfigured";
+    } else if (!status.blogLogsIndexTemplateUpToDate) {
       status.error.blogLogsIndexTemplateUpToDate =
         "Blog logs index is out of date";
     }
-  } else {
-    status.error.blogLogsIndexTemplate = "Blog logs index is misconfigured";
+  } catch (err) {
+    console.error("Error checking template status:", err);
+    status.error.blogLogsIndexTemplate = `Error checking template: ${err.message}`;
+    status.blogLogsIndexTemplate = false;
   }
 
   try {
@@ -226,12 +305,11 @@ export async function getStatus() {
 }
 
 async function getRequestLogPipelineBody() {
-  const esVersion = await getVersionString();
   const legacyLogsPipeline = semver.lt(esVersion, "6.7.0");
   const pipelineFilename =
     (legacyLogsPipeline ? "legacy-" : "") + "request-log-pipeline.json";
   return JSON.parse(
-    fs.readFileSync(path.join(setupDir, pipelineFilename)).toString("utf-8")
+    fs.readFileSync(await getSetupFilePath(pipelineFilename)).toString("utf-8")
   );
 }
 
@@ -243,8 +321,12 @@ export function mappingsEqual(m1, m2) {
 
   function normalizeMapping(m) {
     m = _.cloneDeep(m);
-    if (m.mappings._doc) {
+    if (m.mappings && m.mappings._doc) {
       m.mappings = m.mappings._doc;
+    }
+
+    if (m.mappings && m.mappings.properties) {
+      m.mappings = { properties: m.mappings.properties };
     }
 
     m.aliases = m.aliases || {};
@@ -281,16 +363,25 @@ function updateIndexPatterns(indexPatterns) {
   return patterns;
 }
 
-export function readIndexFile(filename, opts = {}) {
-  const setupDir = process.env.SETUP_DIR || "./_setup";
-  const string = fs
-    .readFileSync(path.join(setupDir, filename))
-    .toString("utf-8");
+export function readIndexFile(fileName, opts = {}) {
+  const filePath = getSetupFilePath(fileName);
 
-  if (opts.json) {
-    return JSON.parse(string);
+  try {
+    const string = fs.readFileSync(filePath).toString("utf-8");
+
+    if (opts.json) {
+      try {
+        const parsed = JSON.parse(string);
+        return parsed;
+      } catch (jsonError) {
+        throw jsonError;
+      }
+    }
+    return string;
+  } catch (err) {
+    console.error(`Failed to read file ${filePath}:`, err);
+    throw err;
   }
-  return string;
 }
 
 function getMappingId(mappingString) {
@@ -298,10 +389,30 @@ function getMappingId(mappingString) {
 }
 
 export function getIndexName(prefix, filename) {
-  let mapping = readIndexFile(filename, { json: true }).mappings;
-  if (mapping._doc) {
-    mapping = mapping._doc;
+  const fileContent = readIndexFile(filename, { json: true });
+
+  let mapping = fileContent.mappings;
+
+  if (esMajorVersion < 8) {
+    if (mapping && mapping._doc) {
+      mapping = mapping._doc;
+    }
   }
+
+  if (mapping && mapping.properties) {
+    mapping = { properties: mapping.properties };
+  }
+
+  if (!mapping || !mapping.properties) {
+    console.error("Invalid mapping structure:", {
+      majorVersion: esMajorVersion,
+      hasMapping: !!mapping,
+      hasProperties: !!(mapping && mapping.properties),
+      mappingKeys: mapping ? Object.keys(mapping) : null,
+    });
+    throw new Error(`Invalid mapping structure in ${filename}`);
+  }
+
   const mappingId = getMappingId(stringifyDeterministic(mapping));
   return prefix + "-" + mappingId;
 }
@@ -394,4 +505,14 @@ async function reindex(sourceIndex, targetIndex, filename, opts = {}) {
       actions: [{ add: { index: targetIndex, alias: sourceIndex } }],
     },
   });
+}
+
+export function addType(indexParams) {
+  // const esVersion = getVersionString();
+  // const majorVersion = parseInt(esVersion.split(".")[0], 10);
+
+  if (esMajorVersion < 7) {
+    indexParams.type = "_doc";
+  }
+  return indexParams;
 }

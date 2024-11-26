@@ -64,7 +64,7 @@ class PostForm extends BaseForm {
       });
     };
 
-    const previewUrl = `${this.props.item.url}${
+    const previewUrl = `${this.props.item.full_url}${
       _.isEmpty(this.props.item.metadata.private_viewing_key)
         ? ""
         : "?secret=" + this.props.item.metadata.private_viewing_key

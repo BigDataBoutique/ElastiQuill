@@ -195,27 +195,27 @@ class Status extends React.Component {
 
           {this._renderLabel({
             label: "Twitter",
-            success: social.twitter !== "not_configured",
+            success: social.twitter.status !== "not_configured",
             image: twitter,
           })}
           {this._renderLabel({
             label: "Reddit",
-            success: social.reddit !== "not_configured",
+            success: social.reddit.status !== "not_configured",
             image: reddit,
           })}
           {this._renderLabel({
             label: "LinkedIn",
-            success: social.linkedin !== "not_configured",
+            success: social.linkedin.status !== "not_configured",
             image: linkedin,
           })}
           {this._renderLabel({
             label: "Medium",
-            success: social.medium !== "not_configured",
+            success: social.medium.status !== "not_configured",
             image: medium,
           })}
           {this._renderLabel({
             label: "Facebook",
-            success: social.facebook !== "not_configured",
+            success: social.facebook.status !== "not_configured",
             image: medium,
           })}
           <hr className="m-0" />
@@ -339,7 +339,7 @@ class Status extends React.Component {
     };
     const text = (
       <>
-        <span className="mr-2">
+        <span className="me-2">
           {logLevel.error ? statusBadgeType.error : statusBadgeType.configured}
         </span>
         {logLevel.error && (
@@ -428,7 +428,7 @@ class Status extends React.Component {
                   style={{ height: 24 }}
                   alt=""
                   src={image}
-                  className="mr-3"
+                  className="me-3"
                 />
               )}
               <h5

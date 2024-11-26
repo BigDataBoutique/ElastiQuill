@@ -81,7 +81,7 @@ class BaseItemsPage extends Component {
   }
 
   _renderLineItem(item) {
-    const url = `${item.url}${
+    const url = `${item.full_url}${
       _.isEmpty(item.metadata.private_viewing_key)
         ? ""
         : "?secret=" + item.metadata.private_viewing_key

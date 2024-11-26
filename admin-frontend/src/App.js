@@ -10,6 +10,7 @@ import { hot } from "react-hot-loader";
 import { reaction } from "mobx";
 import { Provider } from "mobx-react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 
 import PrivateRoute from "./components/PrivateRoute";
 import urls from "./config/urls";
@@ -56,25 +57,27 @@ class App extends Component {
 
     return (
       <Provider {...stores}>
-        <HashRouter>
-          <div id="elastiquill-root">
-            <Switch>
-              <Route path={urls.login} component={pages.Login} />
-              {privateRoutes.map(route => {
-                return (
-                  <PrivateRoute
-                    key={route.path}
-                    exact
-                    path={route.path}
-                    component={route.component}
-                    isLoading={this.state.isLoading}
-                    isAuthenticated={this.state.isAuthenticated}
-                  />
-                );
-              })}
-            </Switch>
-          </div>
-        </HashRouter>
+        <HelmetProvider>
+          <HashRouter>
+            <div id="elastiquill-root">
+              <Switch>
+                <Route path={urls.login} component={pages.Login} />
+                {privateRoutes.map(route => {
+                  return (
+                    <PrivateRoute
+                      key={route.path}
+                      exact
+                      path={route.path}
+                      component={route.component}
+                      isLoading={this.state.isLoading}
+                      isAuthenticated={this.state.isAuthenticated}
+                    />
+                  );
+                })}
+              </Switch>
+            </div>
+          </HashRouter>
+        </HelmetProvider>
       </Provider>
     );
   }
