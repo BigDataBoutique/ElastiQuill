@@ -149,16 +149,26 @@ export function preparePost(p) {
     p.metadata.content_type === "markdown"
       ? addLinkToHeader(blogpostMarkdown.render(p.content))
       : p.content;
+
   const hasDescription =
     _.isString(p.description) && _.trim(p.description).length > 0;
-  const excerpt = hasDescription
-    ? p.description
-    : htmlToText
-        .fromString(content, {
-          ignoreHref: true,
-          ignoreImage: true,
-        })
-        .substring(0, 200) + "...";
+
+  let excerpt;
+  if (hasDescription) {
+    excerpt = p.description;
+  } else {
+    if (htmlToText) {
+      excerpt =
+        htmlToText
+          .fromString(content, {
+            ignoreHref: true,
+            ignoreImage: true,
+          })
+          .substring(0, 200) + "...";
+    } else {
+      excerpt = "";
+    }
+  }
 
   const postUrl = blogpostUrl(p);
 

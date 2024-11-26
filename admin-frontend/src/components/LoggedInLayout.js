@@ -12,7 +12,7 @@ import {
 } from "reactstrap";
 import { Link, Redirect, withRouter } from "react-router-dom";
 import { inject, observer } from "mobx-react/index";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 import FAIcon from "./FAIcon";
 import NavLink from "./NavLink";
@@ -63,6 +63,8 @@ class LoggedInLayout extends Component {
       );
     }
 
+    console.log("this.props:", this.props);
+
     return (
       <Layout>
         <Helmet>
@@ -96,7 +98,7 @@ class LoggedInLayout extends Component {
                 <DropdownMenu right>
                   <DropdownItem header>
                     {this.props.appStore.user.company && (
-                      <strong className="mr-1">
+                      <strong className="me-1">
                         {this.props.appStore.user.company}
                       </strong>
                     )}
@@ -108,7 +110,7 @@ class LoggedInLayout extends Component {
                     onClick={this.handleLogoutClick}
                     className="elastiquill-user-area-logout"
                   >
-                    <FAIcon className="mr-2" icon="power-off" />
+                    <FAIcon className="me-2" icon="power-off" />
                     Logout
                   </DropdownItem>
                 </DropdownMenu>

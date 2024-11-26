@@ -5,7 +5,7 @@ import slugify from "slugify";
 import { uid } from "uid";
 import { esClient } from "../lib/elasticsearch";
 import * as commentsService from "./comments";
-import { BLOG_INDEX_ALIAS as ES_INDEX } from "./elasticsearch";
+import { BLOG_INDEX_ALIAS as ES_INDEX, addType } from "./elasticsearch";
 import * as events from "./events";
 import * as logging from "./logging";
 
@@ -16,7 +16,7 @@ const SERIES_REGEXP_STR = "{.*}";
 const SLUG_MAX_LENGTH = 100;
 
 // Posts
-export const CreatePostArgSchema = Joi.object().keys({
+export const CreatePostArgSchema = Joi.object({
   title: Joi.string().when("is_published", {
     is: false,
     then: Joi.allow(""),
@@ -175,6 +175,9 @@ const CreateContentPageArgSchema = Joi.object().keys({
           is_series: Joi.boolean(),
         })
         .optional(),
+      private_viewing_key: Joi.string()
+        .optional()
+        .allow(null),
     })
     .required(),
   author: Joi.object()
@@ -208,6 +211,9 @@ const UpdateContentPageArgSchema = Joi.object().keys({
           is_series: Joi.boolean(),
         })
         .optional(),
+      private_viewing_key: Joi.string()
+        .optional()
+        .allow(null),
     })
     .required(),
 });
@@ -218,11 +224,12 @@ export async function getItemById({
   moreLikeThis = false,
 }) {
   try {
-    const resp = await esClient.get({
-      index: ES_INDEX,
-      type: "_doc",
-      id,
-    });
+    const resp = await esClient.get(
+      addType({
+        index: ES_INDEX,
+        id,
+      })
+    );
 
     const item = prepareHit(resp.body);
 
@@ -284,16 +291,15 @@ export async function createItem(type, post) {
       break;
   }
 
-  const result = Joi.validate(post, schema);
-  if (result.error) {
-    throw result.error;
+  const { error, value } = schema.validate(post);
+  if (error) {
+    throw error;
   }
 
-  const { tagDescription } = convertToDatastoreFormat(post);
+  const { tagDescription } = convertToDatastoreFormat(value);
 
   const query = {
     index: ES_INDEX,
-    type: "_doc",
     op_type: "create",
     refresh: "wait_for",
     body: {
@@ -310,7 +316,7 @@ export async function createItem(type, post) {
 
   let resp;
   if (type === "post") {
-    resp = await indexWithUniqueId(query);
+    resp = await indexWithUniqueId(addType(query));
   } else {
     let id = query.body.slug;
     if (post.metadata.is_tag_description && tagDescription) {
@@ -319,10 +325,12 @@ export async function createItem(type, post) {
       id += is_series ? `{${tag.toLowerCase()}}` : tag.toLowerCase();
     }
 
-    resp = await esClient.index({
-      ...query,
-      id,
-    });
+    resp = await esClient.index(
+      addType({
+        ...query,
+        id,
+      })
+    );
   }
 
   events.emitCreate(type, query.body);
@@ -334,12 +342,13 @@ export async function deleteItem(id) {
   const item = await getItemById({ id });
   if (!item) return;
 
-  await esClient.delete({
-    id,
-    index: ES_INDEX,
-    type: "_doc",
-    refresh: "wait_for",
-  });
+  await esClient.delete(
+    addType({
+      id,
+      index: ES_INDEX,
+      refresh: "wait_for",
+    })
+  );
 
   if (item.type === "post") {
     await commentsService.deletePostComments(id);
@@ -359,12 +368,12 @@ export async function updateItem(id, type, post) {
       break;
   }
 
-  const result = Joi.validate(post, schema);
-  if (result.error) {
-    throw result.error;
+  const { error, value } = schema.validate(post);
+  if (error) {
+    throw error;
   }
 
-  convertToDatastoreFormat(post);
+  convertToDatastoreFormat(value);
 
   const doc = {
     ...post,
@@ -382,15 +391,16 @@ export async function updateItem(id, type, post) {
     doc.published_at = new Date().toISOString();
   }
 
-  await esClient.update({
-    id,
-    index: ES_INDEX,
-    type: "_doc",
-    refresh: "wait_for",
-    body: {
-      doc,
-    },
-  });
+  await esClient.update(
+    addType({
+      id,
+      index: ES_INDEX,
+      refresh: "wait_for",
+      body: {
+        doc,
+      },
+    })
+  );
   const updatedItem = await getItemById({ id });
 
   events.emitChange(updatedItem.type, updatedItem);
@@ -399,37 +409,39 @@ export async function updateItem(id, type, post) {
 }
 
 export async function updateItemPartial(id, update) {
-  await esClient.update({
-    id,
-    index: ES_INDEX,
-    type: "_doc",
-    refresh: "wait_for",
-    body: {
-      doc: update,
-    },
-  });
+  await esClient.update(
+    addType({
+      id,
+      index: ES_INDEX,
+      refresh: "wait_for",
+      body: {
+        doc: update,
+      },
+    })
+  );
 }
 
 export async function updateItemAuthor(item, author) {
-  const result = Joi.validate(author, UpdatePostAuthorArgSchema);
-  if (result.error) {
-    throw result.error;
+  const { error, value } = UpdatePostAuthorArgSchema.validate(author);
+  if (error) {
+    throw error;
   }
 
   const doc = {
-    author,
+    author: value,
     last_edited_at: new Date().toISOString(),
   };
 
-  await esClient.update({
-    id: item.id,
-    index: ES_INDEX,
-    type: "_doc",
-    refresh: "wait_for",
-    body: {
-      doc,
-    },
-  });
+  await esClient.update(
+    addType({
+      id: item.id,
+      index: ES_INDEX,
+      refresh: "wait_for",
+      body: {
+        doc,
+      },
+    })
+  );
   const updatedItem = await getItemById({ id: item.id });
 
   events.emitChange(updatedItem.type, updatedItem);
@@ -706,7 +718,7 @@ export async function getStats({
         posts_histogram: {
           date_histogram: {
             field: "published_at",
-            interval,
+            fixed_interval: interval,
           },
         },
       },
@@ -779,10 +791,20 @@ async function indexWithUniqueId(indexProps) {
   for (let i = 0; i < MAX_TRIES; ++i) {
     try {
       const id = BLOGPOST_ID_PREFIX + uid(6).toLowerCase();
-      return await esClient.index({
+      const props = {
         ...indexProps,
         id,
-      });
+      };
+
+      // if (!props.index) {
+      //   props.index = ES_INDEX;
+      // }
+
+      // if (!props.body && indexProps.body) {
+      //   props.body = indexProps.body;
+      // }
+
+      return await esClient.index(props);
     } catch (err) {
       if (err.displayName === "Conflict") {
         continue;

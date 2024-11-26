@@ -528,7 +528,7 @@ pre {
 .content-editor #simplemde-editor-1-wrapper .EasyMDEContainer .sticky-top {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 50 !important;
   background-color: white;
   border-bottom: 1px solid #bbb;
 }

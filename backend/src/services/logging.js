@@ -170,7 +170,7 @@ export async function getStats({
         visits_histogram: {
           date_histogram: {
             field: "@timestamp",
-            interval,
+            fixed_interval: interval,
           },
           aggs: {
             visitors: {
@@ -190,7 +190,7 @@ export async function getStats({
             views: {
               date_histogram: {
                 field: "@timestamp",
-                interval,
+                fixed_interval: interval,
               },
               aggs: {
                 visitors: {
@@ -245,7 +245,7 @@ export async function getStats({
     query.body.aggs.visits_per_day = {
       date_histogram: {
         field: "@timestamp",
-        interval: "1d",
+        fixed_interval: "1d",
       },
       aggs: {
         visitors: {
@@ -604,12 +604,13 @@ async function log({
       }
     }
 
-    await esClient.index({
-      index: logIndexName(),
-      type: "_doc",
-      pipeline: req && res ? "request_log" : undefined,
-      body,
-    });
+    await esClient.index(
+      addType({
+        index: logIndexName(),
+        pipeline: req && res ? "request_log" : undefined,
+        body,
+      })
+    );
   } catch (error) {
     console.error(JSON.stringify(error));
   }

@@ -2,8 +2,7 @@ import referrerParser from "@cgamesplay/referer-parser";
 import express from "express";
 import asyncHandler from "express-async-handler";
 import _ from "lodash";
-import request from "request";
-import rp from "request-promise";
+import axios from "axios";
 import { uid } from "uid";
 import url from "url";
 import { SitemapStream, streamToPromise } from "sitemap";
@@ -52,9 +51,7 @@ router.get("/healthz", async (req, res) => {
 
   try {
     const baseUrl = `http://localhost:${req.app.get("port")}`;
-    const cookie = request.cookie(
-      `${AUTH_INFO_TOKEN_COOKIE}=${createAuthInfoToken("healthz")}`
-    );
+    const token = createAuthInfoToken("healthz");
 
     const urls = [
       baseUrl + BLOG_ROUTE_PREFIX,
@@ -74,19 +71,21 @@ router.get("/healthz", async (req, res) => {
       urls.push(baseUrl + blogpostUrl(items[0]));
     }
 
+    const axiosConfig = {
+      timeout: 5000,
+      headers: {
+        Cookie: `${AUTH_INFO_TOKEN_COOKIE}=${token}`,
+        "x-healthz-check": true,
+      },
+      validateStatus: function(status) {
+        return status >= 200 && status < 300;
+      },
+    };
+
     await Promise.all(
       urls.map(async url => {
         try {
-          return await rp({
-            url,
-            timeout: 5000,
-            resolveWithFullResponse: true,
-            headers: {
-              Cookie: cookie,
-              // adds flag to skip https redirect incase config.blog.force-https is on
-              "x-healthz-check": true,
-            },
-          });
+          return await axios.get(url, axiosConfig);
         } catch (e) {
           await logging.logError("health", "Failed to fetch " + url);
           throw e;

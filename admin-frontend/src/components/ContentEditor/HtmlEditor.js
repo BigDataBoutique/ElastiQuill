@@ -27,6 +27,23 @@ class HtmlEditor extends Component {
   }
 
   componentDidMount() {
+    setTimeout(() => {
+      try {
+        this.initializeMediumEditor();
+      } catch (error) {
+        console.error("Error initializing editor:", error);
+        setTimeout(() => {
+          this.initializeMediumEditor();
+        }, 300);
+      }
+    }, 0);
+  }
+
+  initializeMediumEditor() {
+    if (!this.container.current) {
+      return;
+    }
+
     this.editor = new MediumEditor(this.container.current, {
       toolbar: {
         buttons: [
@@ -109,81 +126,86 @@ class HtmlEditor extends Component {
 
     let html = this._stripCodeTag(this.props.value);
     html = this._stripUnwantedSpanTag(html);
-    this.container.current.innerHTML = html;
 
-    this._convertImagesToEmbeds(this.container.current);
+    if (this.container.current) {
+      this.container.current.innerHTML = html;
+      this._convertImagesToEmbeds(this.container.current);
 
-    this.editor.subscribe("editableInput", (event, editable) => {
-      const content = $("<div>" + editable.innerHTML + "</div>");
-      content.find(".medium-insert-buttons").remove();
+      this.editor.subscribe("editableInput", (event, editable) => {
+        const content = $("<div>" + editable.innerHTML + "</div>");
+        content.find(".medium-insert-buttons").remove();
 
-      // there's a contenteditable issue which causes some text to be wrapped
-      // by unwanted/useless span tag
-      // https://github.com/yabwe/medium-editor/issues/543
-      // we need to clean those tags to prevent it messing with post styles
-      this._stripUnwantedSpanTag(content);
+        // there's a contenteditable issue which causes some text to be wrapped
+        // by unwanted/useless span tag
+        // https://github.com/yabwe/medium-editor/issues/543
+        // we need to clean those tags to prevent it messing with post styles
+        this._stripUnwantedSpanTag(content);
 
-      // code block (both extension and plugin) currently wrap its content
-      // using PRE instead of PRE + CODE due to issues with medium-editor
-      // https://github.com/yabwe/medium-editor/issues/764
-      // so we need to do some cleanup (PRE + CODE) before saving
-      this._insertCodeTag(content);
+        // code block (both extension and plugin) currently wrap its content
+        // using PRE instead of PRE + CODE due to issues with medium-editor
+        // https://github.com/yabwe/medium-editor/issues/764
+        // so we need to do some cleanup (PRE + CODE) before saving
+        this._insertCodeTag(content);
 
-      const cleanedHtml = content.html();
-      this.props.onChange(cleanedHtml);
-    });
+        const cleanedHtml = content.html();
+        this.props.onChange(cleanedHtml);
+      });
 
-    let uploadImageUrl = api.uploadImageUrl();
-    if (this.props.blogpostId) {
-      uploadImageUrl += "?post_id=" + this.props.blogpostId;
-    }
+      const uploadImageUrl = this.props.blogpostId
+        ? `${api.uploadImageUrl()}?post_id=${this.props.blogpostId}`
+        : api.uploadImageUrl();
 
-    $(this.container.current).mediumInsert({
-      editor: this.editor,
-      addons: {
-        images: {
-          deleteScript: false,
-          fileUploadOptions: {
-            url: uploadImageUrl,
-            headers: {
-              Authorization: "Bearer " + getJwtToken(),
+      $(this.container.current).mediumInsert({
+        editor: this.editor,
+        addons: {
+          images: {
+            deleteScript: false,
+            fileUploadOptions: {
+              url: uploadImageUrl,
+              headers: {
+                Authorization: "Bearer " + getJwtToken(),
+              },
+              fail: (ev, data) => {
+                const responseJSON = data.response().jqXHR.responseJSON;
+                toast.error(responseJSON.error);
+
+                // Remove image previews
+                $(this.container.current)
+                  .find(".medium-insert-images")
+                  .each(function() {
+                    const img = $(this).find("img");
+                    if (img.length && img.attr("src").startsWith("blob:")) {
+                      setTimeout(() => $(this).remove(), 500);
+                    }
+                  });
+              },
             },
-            fail: (ev, data) => {
-              const responseJSON = data.response().jqXHR.responseJSON;
-              toast.error(responseJSON.error);
-
-              // Remove image previews
-              $(this.container.current)
-                .find(".medium-insert-images")
-                .each(function() {
-                  const img = $(this).find("img");
-                  if (img.length && img.attr("src").startsWith("blob:")) {
-                    setTimeout(() => $(this).remove(), 500);
-                  }
-                });
-            },
+            captions: false,
+            preview: true,
           },
-          captions: false,
-          preview: true,
+          embeds: false,
+          embedsPatched: {
+            styles: false,
+            captions: false,
+            oembedProxy: false,
+          },
+          addHr: {
+            test: true,
+          },
+          addCodeBlock: {},
         },
-        embeds: false,
-        embedsPatched: {
-          styles: false,
-          captions: false,
-          oembedProxy: false,
-        },
-        addHr: {
-          test: true,
-        },
-        addCodeBlock: {},
-      },
-    });
-    $(this.container.current).removeClass("medium-editor-placeholder");
-    $(this.container.current).html($(this.container.current).html());
+      });
+
+      $(this.container.current).removeClass("medium-editor-placeholder");
+      $(this.container.current).html($(this.container.current).html());
+    }
   }
 
   componentWillUnmount() {
-    this.editor.destroy();
+    if (this.editor) {
+      this.editor.destroy();
+      this.editor = null;
+    }
   }
 
   render() {

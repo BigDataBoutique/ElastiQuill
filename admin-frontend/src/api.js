@@ -227,6 +227,14 @@ export function userAvatarUrl(email) {
   )}?size=100&default=identicon`;
 }
 
+export const postToHackerNews = async () => {
+  return null;
+};
+
+export const redirectToSocialConnect = async () => {
+  return null;
+};
+
 async function createItem(url, values) {
   return await authFetchJson(url, {
     method: "POST",

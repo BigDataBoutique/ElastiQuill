@@ -11,7 +11,7 @@
               "type": "keyword"
             },
             "website": {
-              "type": "object", 
+              "type": "object",
               "enabled": false
             }
           }
@@ -29,11 +29,11 @@
           "type": "date"
         },
         "user_agent": {
-          "type": "object", 
+          "type": "object",
           "enabled": false
         },
         "user_host_address": {
-          "type": "object", 
+          "type": "object",
           "enabled": false
         },
         "approved": {
@@ -56,7 +56,7 @@
                   "type": "keyword"
                 },
                 "website": {
-                  "type": "object", 
+                  "type": "object",
                   "enabled": false
                 }
               }
@@ -74,11 +74,11 @@
               "type": "boolean"
             },
             "user_agent": {
-              "type": "object", 
+              "type": "object",
               "enabled": false
             },
             "user_host_address": {
-              "type": "object", 
+              "type": "object",
               "enabled": false
             }
           }

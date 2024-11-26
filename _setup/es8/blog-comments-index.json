@@ -1,0 +1,92 @@
+{
+  "mappings": {
+    "properties": {
+      "author": {
+        "properties": {
+          "name": {
+            "type": "keyword"
+          },
+          "email": {
+            "type": "keyword"
+          },
+          "website": {
+            "type": "object",
+            "enabled": false
+          }
+        }
+      },
+      "content": {
+        "type": "text"
+      },
+      "comment_id": {
+        "type": "keyword"
+      },
+      "post_id": {
+        "type": "keyword"
+      },
+      "published_at": {
+        "type": "date"
+      },
+      "user_agent": {
+        "type": "object",
+        "enabled": false
+      },
+      "user_host_address": {
+        "type": "object",
+        "enabled": false
+      },
+      "approved": {
+        "type": "boolean"
+      },
+      "spam": {
+        "type": "boolean"
+      },
+      "replies": {
+        "properties": {
+          "approved": {
+            "type": "boolean"
+          },
+          "author": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "email": {
+                "type": "keyword"
+              },
+              "website": {
+                "type": "object",
+                "enabled": false
+              }
+            }
+          },
+          "comment_id": {
+            "type": "keyword"
+          },
+          "content": {
+            "type": "text"
+          },
+          "published_at": {
+            "type": "date"
+          },
+          "spam": {
+            "type": "boolean"
+          },
+          "user_agent": {
+            "type": "object",
+            "enabled": false
+          },
+          "user_host_address": {
+            "type": "object",
+            "enabled": false
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1
+    }
+  }
+}

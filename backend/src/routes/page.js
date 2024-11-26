@@ -11,6 +11,7 @@ router.get(
     let page;
     try {
       page = await blogPosts.getItemById({ id: req.params.slug });
+
       if (!page) {
         throw {
           status: 404,

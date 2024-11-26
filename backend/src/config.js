@@ -73,6 +73,7 @@ function initConfig() {
     ["credentials.google.gcs-bucket", "GOOGLE_GCS_BUCKET"],
     ["credentials.google.gcs-keyfile", "GOOGLE_APPLICATION_CREDENTIALS"],
     ["credentials.aws.s3-bucket", "AWS_S3_BUCKET"],
+    ["credentials.aws.region", "AWS_REGION"],
     ["credentials.aws.access-key-id", "AWS_ACCESS_KEY_ID"],
     ["credentials.aws.secret-access-key", "AWS_SECRET_ACCESS_KEY"],
     ["credentials.akismet.api-key", "AKISMET_APIKEY"],

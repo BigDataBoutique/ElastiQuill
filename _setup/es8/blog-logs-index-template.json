@@ -1,0 +1,206 @@
+{
+  "index_patterns": ["blog-logs*"],
+  "composed_of": [],
+  "priority": 1,
+  "version": 1,
+  "_meta": {
+    "description": "Template for blog logs"
+  },
+  "template": {
+    "settings": {
+      "index": {
+        "number_of_shards": "1"
+      }
+    },
+    "mappings": {
+      "properties": {
+        "read_item": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "slug": {
+              "type": "keyword"
+            }
+          }
+        },
+        "took": {
+          "type": "long"
+        },
+        "@timestamp": {
+          "type": "date"
+        },
+        "ecs": {
+          "properties": {
+            "version": {
+              "type": "keyword"
+            }
+          }
+        },
+        "log": {
+          "properties": {
+            "level": {
+              "type": "keyword"
+            }
+          }
+        },
+        "visitor_id": {
+          "type": "keyword"
+        },
+        "http": {
+          "properties": {
+            "request": {
+              "properties": {
+                "referrer": {
+                  "type": "text"
+                },
+                "method": {
+                  "type": "keyword"
+                },
+                "referrer_parsed": {
+                  "properties": {
+                    "full": {
+                      "type": "keyword"
+                    },
+                    "domain": {
+                      "type": "keyword"
+                    },
+                    "path": {
+                      "type": "keyword"
+                    },
+                    "query": {
+                      "type": "keyword"
+                    },
+                    "referer": {
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "type": "keyword"
+                    },
+                    "search_parameter": {
+                      "type": "keyword"
+                    },
+                    "search_term": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "user_agent": {
+                  "type": "text"
+                },
+                "user_agent_parsed": {
+                  "properties": {
+                    "device": {
+                      "properties": {
+                        "name": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "os": {
+                      "properties": {
+                        "name": {
+                          "type": "keyword"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "response": {
+              "properties": {
+                "status_code": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "geo": {
+              "properties": {
+                "continent_name": {
+                  "type": "keyword"
+                },
+                "region_iso_code": {
+                  "type": "keyword"
+                },
+                "city_name": {
+                  "type": "keyword"
+                },
+                "country_iso_code": {
+                  "type": "keyword"
+                },
+                "location": {
+                  "type": "geo_point"
+                },
+                "region_name": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "address": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "keyword"
+            }
+          }
+        },
+        "error": {
+          "properties": {
+            "message": {
+              "type": "text"
+            }
+          }
+        },
+        "list_items": {
+          "properties": {
+            "page_index": {
+              "type": "long"
+            },
+            "tag": {
+              "type": "keyword"
+            },
+            "search_query": {
+              "type": "text"
+            },
+            "page_size": {
+              "type": "long"
+            }
+          }
+        },
+        "url": {
+          "properties": {
+            "path": {
+              "type": "keyword"
+            },
+            "original": {
+              "type": "keyword"
+            },
+            "scheme": {
+              "type": "keyword"
+            },
+            "domain": {
+              "type": "keyword"
+            },
+            "query": {
+              "type": "keyword"
+            },
+            "full": {
+              "type": "keyword"
+            }
+          }
+        },
+        "tags": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
