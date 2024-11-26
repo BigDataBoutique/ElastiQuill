@@ -122,7 +122,7 @@ export async function loadContentPageById(id) {
 export async function loadAllStats(startDate, interval) {
   const apiRoute = `${API_ROUTE_PREFIX}/stats/all?${qs.stringify({
     start: startDate ? startDate.toISOString() : 0,
-    interval,
+    interval: interval,
   })}`;
   return await authFetchJson(apiRoute);
 }
@@ -132,7 +132,7 @@ export async function loadItemStats(itemType, id, startDate, interval) {
     type: itemType,
     item_id: id,
     start: startDate ? startDate.toISOString() : 0,
-    interval,
+    interval: interval,
   })}`;
   return await authFetchJson(apiRoute);
 }

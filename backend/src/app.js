@@ -4,6 +4,7 @@ import path from "path";
 import logger from "morgan";
 import express from "express";
 import passport from "passport";
+import session from "express-session";
 import compression from "compression";
 import createError from "http-errors";
 import cookieParser from "cookie-parser";
@@ -127,6 +128,19 @@ if (BLOG_THEME_PATH && fs.existsSync(path.join(BLOG_THEME_PATH, "public"))) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(
+  session({
+    secret: config.credentials?.session?.secret || "your-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
+
 app.use(passport.initialize());
 
 if (process.env.NODE_ENV === "production") {
