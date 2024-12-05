@@ -142,6 +142,7 @@ export async function setup() {
         console.error(`Failed to update template: ${err.message}`);
         throw err;
       }
+
     }
 
     if (!status.ingestPipeline) {
