@@ -99,34 +99,39 @@ export async function setup() {
 
       try {
         if (esMajorVersion >= 8) {
-          const current = await esClient.indices.getIndexTemplate({
-            name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-          });
-          parsed.index_patterns = updateIndexPatterns(
-            current.body.index_templates[0].index_template.index_patterns
-          );
-        } else {
-          const current = await esClient.indices.getTemplate({
-            name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
-          });
-          parsed.index_patterns = updateIndexPatterns(
-            current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
-          );
-        }
-      } catch (err) {
-        if (err.meta.statusCode !== 404) {
-          throw err;
-        }
-        parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
-      }
+          try {
+            const current = await esClient.indices.getIndexTemplate({
+              name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+            });
+            parsed.index_patterns = updateIndexPatterns(
+              current.body.index_templates[0].index_template.index_patterns
+            );
+          } catch (err) {
+            if (err.meta.statusCode !== 404) {
+              throw err;
+            }
+            parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
+          }
 
-      try {
-        if (esMajorVersion >= 8) {
           await esClient.indices.putIndexTemplate({
             name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
             body: parsed,
           });
         } else {
+          try {
+            const current = await esClient.indices.getTemplate({
+              name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
+            });
+            parsed.index_patterns = updateIndexPatterns(
+              current.body[BLOG_LOGS_INDEX_TEMPLATE_NAME].index_patterns
+            );
+          } catch (err) {
+            if (err.meta.statusCode !== 404) {
+              throw err;
+            }
+            parsed.index_patterns = updateIndexPatterns(parsed.index_patterns);
+          }
+
           await esClient.indices.putTemplate({
             name: BLOG_LOGS_INDEX_TEMPLATE_NAME,
             body: parsed,
@@ -137,6 +142,7 @@ export async function setup() {
         console.error(`Failed to update template: ${err.message}`);
         throw err;
       }
+
     }
 
     if (!status.ingestPipeline) {
@@ -168,20 +174,28 @@ async function setupRollableIndex({
   includeTypeName,
 }) {
   const blogIndexName = getIndexName(indexPrefix, mappingsFilename);
-  if (!indexExists) {
-    const parsed = readIndexFile(mappingsFilename, { json: true });
-    parsed.aliases = {
-      [indexAliasName]: {},
-    };
-    await esClient.indices.create({
-      index: blogIndexName,
-      body: JSON.stringify(parsed),
-      includeTypeName,
-    });
-  } else if (!indexUpToDate) {
-    await reindex(indexAliasName, blogIndexName, mappingsFilename, {
-      includeTypeName,
-    });
+
+  try {
+    if (!indexExists) {
+      const parsed = readIndexFile(mappingsFilename, { json: true });
+      parsed.aliases = {
+        [indexAliasName]: {
+          is_write_index: esMajorVersion >= 8,
+        },
+      };
+      await esClient.indices.create({
+        index: blogIndexName,
+        body: JSON.stringify(parsed),
+        includeTypeName,
+      });
+    } else if (!indexUpToDate) {
+      await reindex(indexAliasName, blogIndexName, mappingsFilename, {
+        includeTypeName,
+      });
+    }
+  } catch (error) {
+    console.error("Error in setupRollableIndex:", error);
+    throw error;
   }
 }
 

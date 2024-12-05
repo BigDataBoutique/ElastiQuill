@@ -1,14 +1,22 @@
-FROM node:16.19.1-alpine
+FROM node:20-alpine
+ARG TARGETARCH
 LABEL maintainer="info@bigdataboutique.com"
 
-RUN apk add git
+RUN apk add git curl
 
 WORKDIR /app
 COPY . .
 
-RUN cd admin-frontend && npm install && npm run build && mv build .. && cd .. && \
-    cd backend && npm install && npm run build && mv node_modules dist/* .. && cd .. && \
-    ls -A | grep -v "server.js\|_setup\|build\|node_modules\|views" | xargs rm -rf
+RUN cd admin-frontend && \
+    npm install && \
+    npm run build && \
+    cd ..
 
-EXPOSE 3000
-CMD NODE_ENV=production node server.js
+RUN cd backend && \
+    npm install && \
+    npm run build && \
+    mv node_modules dist/* .. && \
+    cd ..
+
+EXPOSE 5000
+CMD ["node", "server.js"]

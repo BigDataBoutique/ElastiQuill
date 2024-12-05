@@ -9,10 +9,15 @@
   "template": {
     "settings": {
       "index": {
-        "number_of_shards": "1"
+        "number_of_shards": "1",
+        "number_of_replicas": "1"
       }
     },
     "mappings": {
+      "dynamic": "strict",
+      "_source": {
+        "enabled": true
+      },
       "properties": {
         "read_item": {
           "properties": {
