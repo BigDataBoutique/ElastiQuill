@@ -1,45 +1,65 @@
-version: "3.3"
-
 services:
   blog_es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     container_name: blog_es
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     environment:
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
+      - "xpack.security.enrollment.enabled=false"
     ports:
       - 9200:9200
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
 
   blog_kibana:
-    image: docker.elastic.co/kibana/kibana:7.2.0
+    image: docker.elastic.co/kibana/kibana:8.12.0
     container_name: blog_kibana
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     environment:
-      ELASTICSEARCH_HOSTS: http://blog_es:9200
+      - ELASTICSEARCH_HOSTS=http://blog_es:9200
     ports:
       - 5601:5601
+    depends_on:
+      - blog_es
 
   blog:
-    image: bigdataboutique/elastiquill
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: bigdataboutique/elastiquill
     container_name: blog
     environment:
-      ELASTICSEARCH_HOSTS: http://blog_es:9200
-      BLOG_ADMIN_EMAILS: _all_
-      #BLOG_THEME_PATH: /etc/elastiquill-theme
-      BLOG_THEME_CACHING: "false"
-      BLOG_CACHE_TTL: "0"
+      - ELASTICSEARCH_HOSTS=http://blog_es:9200
+      - BLOG_ADMIN_EMAILS=_all_
+      - BLOG_THEME_CACHING=false
+      - BLOG_CACHE_TTL=0
+      - NODE_ENV=production
+      - ADMIN_FRONTEND_PATH=/admin-frontend/build
+      - SETUP_DIR=/app/_setup
+      - CONFIG_PATH=/etc/elastiquill/config.yml
     depends_on:
       - blog_es
     ports:
-      - 5000:5000
+      - 5001:5000
     volumes:
       - ${PWD}/_k8s:/etc/elastiquill
       #- ${PWD}/_theme:/etc/elastiquill-theme
 
+volumes:
+  es_data:
+    driver: local
+
 networks:
   default:
-    external:
-      name: blog
+    name: blog
+    external: true
