@@ -36,7 +36,7 @@ const UpdateCommentArgSchema = Joi.object().keys({
 });
 
 export async function createComment(comment) {
-  const result = Joi.validate(comment, CreateCommentArgSchema);
+  const result = CreateCommentArgSchema.validate(comment);
   if (result.error) {
     throw result.error;
   }
@@ -164,7 +164,7 @@ export async function deletePostComments(id) {
 }
 
 export async function updateComment(path, partial) {
-  const result = Joi.validate(partial, UpdateCommentArgSchema);
+  const result = UpdateCommentArgSchema.validate(partial);
   if (result.error) {
     throw result.error;
   }

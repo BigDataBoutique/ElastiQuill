@@ -31,14 +31,13 @@ const STATICS_ROUTE_PREFIX = config.blog["statics-route-prefix"];
 
 const baseViewPath = path.join(__dirname, "views/base");
 const additionalViewPaths = [];
+let layoutsDir = path.join(baseViewPath, "layouts");
 
 if (BLOG_THEME_PATH) {
   if (fs.existsSync(BLOG_THEME_PATH)) {
     console.log("Theme path configured: " + BLOG_THEME_PATH);
     additionalViewPaths.unshift(BLOG_THEME_PATH);
-    // copying theme layout files into the base layout folder since
-    // express-handlebars doesn't support multiple layout folders
-    copyFilesSync(`${BLOG_THEME_PATH}/layouts`, `${baseViewPath}/layouts`);
+    layoutsDir = path.join(BLOG_THEME_PATH, "layouts");
   } else {
     console.log("Invalid BLOG_THEME_PATH", BLOG_THEME_PATH, "does not exist");
   }
@@ -65,7 +64,7 @@ export const hbs = create({
   partialsDir: [baseViewPath, ...additionalViewPaths].map(
     path => `${path}/partials`
   ),
-  layoutsDir: `${baseViewPath}/layouts`,
+  layoutsDir,
   defaultLayout: "main",
   extname: ".hbs",
 });
