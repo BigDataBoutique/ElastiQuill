@@ -55,7 +55,7 @@ export function getStatus() {
 }
 
 export async function sendContactMessage(message) {
-  const result = Joi.validate(message, ContactMessageArgSchema);
+  const result = ContactMessageArgSchema.validate(message);
   if (result.error) {
     throw result.error;
   }
@@ -72,7 +72,7 @@ export async function sendContactMessage(message) {
 }
 
 export function sendNewCommentNotification(args) {
-  const result = Joi.validate(args, SendNewCommentNotificationArgSchema);
+  const result = SendNewCommentNotificationArgSchema.validate(args);
   if (result.error) {
     throw result.error;
   }

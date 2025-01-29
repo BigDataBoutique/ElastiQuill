@@ -16,9 +16,10 @@ router.post(
     const url = _.trimEnd(rawUrl, "/");
     const jsonUrl = url.endsWith(".json") ? url : url + ".json";
 
+    let resp;
     try {
       const response = await axios.get(jsonUrl);
-      let resp = response.data;
+      resp = response.data;
       if (resp.tags) {
         resp.tags = resp.tags.map(t => t.key);
       }
@@ -28,7 +29,7 @@ router.post(
       throw new Error("Failed to fetch " + jsonUrl);
     }
 
-    const result = Joi.validate(resp, blogPosts.CreatePostArgSchema, {
+    const result = blogPosts.CreatePostArgSchema.validate(resp, {
       allowUnknown: true,
       stripUnknown: true,
     });
