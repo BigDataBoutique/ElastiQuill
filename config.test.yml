@@ -15,3 +15,6 @@ elasticsearch:
 credentials:
   sendgrid: SENDGRID-API-KEY
   google-analytics-code: ga-abc123
+  google:
+    gcs-bucket: blog-bucket
+    gcs-keyfile: /path/to/google-credentials.json

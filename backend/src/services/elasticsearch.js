@@ -370,12 +370,8 @@ export function readIndexFile(fileName, opts = {}) {
     const string = fs.readFileSync(filePath).toString("utf-8");
 
     if (opts.json) {
-      try {
-        const parsed = JSON.parse(string);
-        return parsed;
-      } catch (jsonError) {
-        throw jsonError;
-      }
+      const parsed = JSON.parse(string);
+      return parsed;
     }
     return string;
   } catch (err) {

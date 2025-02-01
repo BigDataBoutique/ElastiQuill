@@ -605,7 +605,7 @@ async function log({
     }
 
     await esClient.index(
-      addType({
+      elasticsearch.addType({
         index: logIndexName(),
         pipeline: req && res ? "request_log" : undefined,
         body,

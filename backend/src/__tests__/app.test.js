@@ -1,7 +1,26 @@
 import request from "supertest";
-
-import app from "../app";
+import fs from "fs";
 import { config } from "../config";
+
+jest.mock("@google-cloud/storage");
+
+const originalReadFileSync = fs.readFileSync;
+
+// Mock the Google credentials file read
+jest.spyOn(fs, "readFileSync").mockImplementation((filePath, ...args) => {
+  if (filePath.includes("google-credentials.json")) {
+    return JSON.stringify({
+      project_id: "mock-project",
+      private_key_id: "mock-key-id",
+      private_key: "mock-private-key",
+      client_email: "mock@mock-project.iam.gserviceaccount.com",
+      client_id: "mock-client-id",
+    });
+  }
+  return originalReadFileSync(filePath, ...args);
+});
+
+const app = require("../app").default;
 
 describe("blog.force-https", () => {
   let forceHttpsConfig;
@@ -17,8 +36,8 @@ describe("blog.force-https", () => {
   it("should redirect non-https request to https on force-https", async () => {
     const res = await request(app).get("/");
     expect(res.statusCode).toEqual(301);
-    expect(res.request.url).toMatch(new RegExp("^http://"));
-    expect(res.header.location).toMatch(new RegExp("^https://"));
+    expect(res.request.url).toMatch(/^http:\/\//);
+    expect(res.header.location).toMatch(/^https:\/\//);
     expect(res.redirect).toBe(true);
   });
 

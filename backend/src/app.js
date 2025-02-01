@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 import parseUrl from "parseurl";
 import { create } from "express-handlebars";
 import { config } from "./config";
-import { getErrorStatus, copyFilesSync } from "./util";
+import { getErrorStatus } from "./util";
 
 export const routingTable = loadRoutingTable(config);
 
