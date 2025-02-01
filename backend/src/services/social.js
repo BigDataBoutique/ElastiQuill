@@ -198,28 +198,24 @@ export function postToTwitter(title, url, imageUrl, tags) {
   });
 
   async function uploadImage(imgUrl) {
-    try {
-      const imageResponse = await axios.get(imgUrl, {
-        responseType: "arraybuffer",
-      });
-      const imageBinary = imageResponse.data;
+    const imageResponse = await axios.get(imgUrl, {
+      responseType: "arraybuffer",
+    });
+    const imageBinary = imageResponse.data;
 
-      return new Promise((resolve, reject) => {
-        twitterClient.post(
-          "media/upload",
-          { media: imageBinary },
-          (error, media) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-            resolve(media.media_id_string);
+    return new Promise((resolve, reject) => {
+      twitterClient.post(
+        "media/upload",
+        { media: imageBinary },
+        (error, media) => {
+          if (error) {
+            reject(error);
+            return;
           }
-        );
-      });
-    } catch (err) {
-      throw err;
-    }
+          resolve(media.media_id_string);
+        }
+      );
+    });
   }
 }
 

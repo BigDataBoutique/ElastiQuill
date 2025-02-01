@@ -4,4 +4,5 @@ module.exports = {
     "^.+\\.(js|ts)$": "babel-jest",
   },
   moduleFileExtensions: ["js", "ts"],
+  transformIgnorePatterns: [],
 };
