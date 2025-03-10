@@ -115,7 +115,6 @@ async function getSitemap() {
   return await cache.cacheAndReturn(CACHE_KEYS.SITEMAP, async () => {
     const posts = await blogPosts.getAllItems({ type: "post" });
     const contentPages = await blogPosts.getAllItems({ type: "page" });
-    const { tags, series } = await blogPosts.getAllTags();
 
     const latestPostDate = getLatestPostDate(posts);
 
