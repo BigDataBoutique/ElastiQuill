@@ -125,16 +125,6 @@ async function getSitemap() {
         priority: 1.0,
         lastmod: latestPostDate,
       },
-      {
-        url: "/contact",
-        priority: 0.4,
-        lastmod: latestPostDate,
-      },
-      {
-        url: `${BLOG_ROUTE_PREFIX}/rss`,
-        priority: 0.0,
-        lastmod: latestPostDate,
-      },
     ];
 
     contentPages.forEach(page => {
@@ -147,29 +137,29 @@ async function getSitemap() {
       }
     });
 
-    tags.forEach(tag => {
-      const latestTaggedPostDate = getLatestPostDate(
-        posts.filter(post => post.tags && post.tags.includes(tag))
-      );
-
-      links.push({
-        url: `${BLOG_ROUTE_PREFIX}/tagged/${tag}`.toLowerCase(),
-        priority: 0.4,
-        lastmod: latestTaggedPostDate,
-      });
-    });
-
-    series.forEach(series => {
-      const latestSeriesPostDate = getLatestPostDate(
-        posts.filter(post => post.series && post.series === series)
-      );
-
-      links.push({
-        url: `${BLOG_ROUTE_PREFIX}/series/${series}`.toLowerCase(),
-        priority: 0.4,
-        lastmod: latestSeriesPostDate,
-      });
-    });
+    // tags.forEach(tag => {
+    //   const latestTaggedPostDate = getLatestPostDate(
+    //     posts.filter(post => post.tags && post.tags.includes(tag))
+    //   );
+    //
+    //   links.push({
+    //     url: `${BLOG_ROUTE_PREFIX}/tagged/${tag}`.toLowerCase(),
+    //     priority: 0.4,
+    //     lastmod: latestTaggedPostDate,
+    //   });
+    // });
+    //
+    // series.forEach(series => {
+    //   const latestSeriesPostDate = getLatestPostDate(
+    //     posts.filter(post => post.series && post.series === series)
+    //   );
+    //
+    //   links.push({
+    //     url: `${BLOG_ROUTE_PREFIX}/series/${series}`.toLowerCase(),
+    //     priority: 0.4,
+    //     lastmod: latestSeriesPostDate,
+    //   });
+    // });
 
     posts.forEach(post => {
       if (post.is_published) {
