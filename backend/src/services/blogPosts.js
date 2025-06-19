@@ -839,8 +839,6 @@ function prepareHit(hit) {
   if (res.type === "post" && res.tags) {
     const series = res.tags.filter(t => t.match(SERIES_REGEXP_STR));
     res.tags = res.tags.filter(t => !series.includes(t));
-
-    res.series = null;
     if (series.length) {
       res.series = stripSeriesTag(series[0]);
     }
