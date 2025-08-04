@@ -642,7 +642,6 @@ export async function getItems({
           ]
         }
     })
-    filterByTags.push("{" + series + "}");
   }
 
   if (filterByTags.length) {
