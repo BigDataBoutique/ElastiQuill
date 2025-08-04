@@ -635,13 +635,17 @@ export async function getItems({
       .map(s => s[0].toUpperCase() + s.slice(1).toLowerCase())
       .join(" ");
     query.body.query.bool.filter.push({
-        bool: {
-          should: [
-            { term: { "series.keyword": capitalizedSeries } },
-            { term: { "tags.keyword-lowercase": "{" + series.toLowerCase() + "}" } }
-          ]
-        }
-    })
+      bool: {
+        should: [
+          { term: { "series.keyword": capitalizedSeries } },
+          {
+            term: {
+              "tags.keyword-lowercase": "{" + series.toLowerCase() + "}",
+            },
+          },
+        ],
+      },
+    });
   }
 
   if (filterByTags.length) {
