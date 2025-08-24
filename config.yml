@@ -2,13 +2,13 @@
 blog:
   title: ElastiQuill
   description: ElastiQuill blog engine demo
-  url: http://localhost:5000
+  url: http://localhost:5001
   port: 5000
   compression: true
   jwt-secret: SECRET-KEY
   admin-emails: _all_
 elasticsearch:
-  hosts: localhost:9200,localhost:9201
+  hosts: blog_es:9200
   blog-index-name: blog-posts
   blog-comments-index-name: blog-comments
   blog-logs-index-name: blog-logs
